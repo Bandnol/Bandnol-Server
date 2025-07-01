@@ -1,0 +1,29 @@
+{
+  "name": "bandnol-server",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "UMC 8th Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon --exec node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bandnol/Bandnol-Server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bandnol/Bandnol-Server/issues"
+  },
+  "homepage": "https://github.com/Bandnol/Bandnol-Server#readme",
+  "dependencies": {
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
