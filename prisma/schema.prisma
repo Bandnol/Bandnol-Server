@@ -52,7 +52,6 @@ model User {
   updated_at      DateTime?          @updatedAt
   inactive_at     DateTime?
   inactive_status Boolean?           @default(false)
-  like_count      Int                @default(0)
 
   posts           Post[]
   bookmarks       Bookmark[]
@@ -138,10 +137,10 @@ model UserRecommendSong {
   sender_id         Int?
   recommend_song_id Int?
   created_at        DateTime? @default(now())
-  category          String?
   is_anoymous       Boolean?
   is_using_AI       Boolean?
   receiver_id       Int?
+  is_liked          Boolean?
 
   sender            User?      @relation("Sender", fields: [sender_id], references: [id])
   receiver          User?      @relation("Receiver", fields: [receiver_id], references: [id])
