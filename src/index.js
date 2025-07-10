@@ -1,9 +1,38 @@
+import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
+import routers from "./routes/routes.index.js";
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
+
+/**
+ * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
+ */
+app.use((req, res, next) => {
+    res.success = (success) => {
+        return res.json({ success: true, data: success, error: null });
+    };
+
+    res.error = ({ code = "unknown", message = null, data = null }) => {
+        return res.json({
+            success: false,
+            data: data,
+            error: { code, message },
+        });
+    };
+
+    next();
+});
+
+app.use(cors()); // cors 방식 허용
+app.use(express.static("public")); // 정적 파일 접근
+app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
+app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
 
 // swagger 설정
 app.use(
@@ -42,6 +71,24 @@ app.get("/openapi.json", async (req, res, next) => {
 
 app.get("/", (req, res) => {
     res.send("Hello World! ");
+});
+
+// Router 연결
+app.use("/", routers);
+
+/**
+ * 전역 오류를 처리하기 위한 미들웨어
+ */
+app.use((err, req, res, next) => {
+    if (res.headersSent) {
+        return next(err);
+    }
+
+    res.status(err.statusCode || 500).error({
+        code: err.errorCode || "unknown",
+        message: err.reason || err.message || null,
+        data: err.data || null,
+    });
 });
 
 app.listen(port, () => {
