@@ -7,96 +7,119 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model UserLikedArtist {
-  id        String    @id
-  createdAt DateTime? @map("created_at")
-  updatedAt DateTime? @map("updated_at")
-  artistId  Int?      @map("artist_id")
-  artistName String?  @map("artist_name")
-  userId    String?   @map("user_id")
-  imgUrl    String?   @map("img_url")
+// Enum 모델 정의
+enum Gender {
+  MAN
+  WOMAN
+}
 
-  user      User?     @relation(fields: [userId], references: [id])
+enum SocialType {
+  NAVER
+  KAKAO
+  GOOGLE
+}
+
+enum NoticeType {
+  RECOMMEND_RECEIVED
+  RECOMMEND_SENT
+  RECOMMEND_UNREAD_TIMEOUT
+  RECOMMEND_READ_BY_OTHER
+  ANNOUNCEMENT
+  // BOOKMARKED
+  // POST_LIKED
+  // SUPERFAN_SELECTED
+  // MONTHLY_REPORT_CREATE
+}
+
+
+model UserLikedArtist {
+  id         String      @id  @unique
+  createdAt  DateTime    @map("created_at") @default(now())
+  updatedAt  DateTime    @map("updated_at") @updatedAt 
+  artistId   String      @map("artist_id") 
+  artistName String      @map("artist_name")
+  userId     String      @map("user_id")
+  imgUrl     String      @map("img_url")
+
+  user      User         @relation(fields: [userId], references: [id])
 }
 
 model Inquiry {
-  id        String   @id
-  email     String?  @db.VarChar(100)
-  content   String?
-  createdAt DateTime? @map("created_at")
-  updatedAt DateTime? @map("updated_at")
+  id        String     @id @unique
+  email     String     @db.VarChar(100)
+  content   String
+  createdAt DateTime   @map("created_at") @default(now())
+  updatedAt DateTime   @map("updated_at") @updatedAt 
 }
 
 model RecomsSong {
-  id         String   @id
-  title      String?  @db.VarChar(100)
-  artistName String?  @map("artist_name")
-  imgUrl     String?  @map("img_url")
+  id         String     @id @unique
+  title      String     @db.VarChar(100)
+  artistName String     @map("artist_name")
+  imgUrl     String?    @map("img_url")
 
   userRecomsSongs UserRecomsSong[]
 }
 
 model Notification {
-  id           String   @id
-  content      String?
-  createdAt    DateTime? @map("created_at")
-  updatedAt    DateTime? @map("updated_at")
-  type         String?   @db.VarChar(50)
-  referenceId  String    @map("reference_id")
-  isConfirmed  Boolean?  @map("is_confirmed")
+  id           String      @id @unique
+  content      String
+  createdAt    DateTime    @map("created_at") @default(now())
+  updatedAt    DateTime    @map("updated_at") @updatedAt 
+  type         NoticeType
+  referenceId  String      @map("reference_id")
+  isConfirmed  Boolean     @map("is_confirmed") @default(false)
   link         String?
-  receiverId   String?   @map("receiver_id")
-  senderId     String    @map("sender_id")
+  receiverId   String      @map("receiver_id")
+  senderId     String?     @map("sender_id")
 
-  sender   User? @relation("NotificationSender", fields: [senderId], references: [id])
-  receiver User? @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  receiver     User        @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  sender       User?       @relation("NotificationSender", fields: [senderId], references: [id])
 }
 
 model RecomsReply {
-  id               String   @id
-  content          String?
-  createdAt        DateTime? @map("created_at")
-  updatedAt        DateTime? @map("updated_at")
-  userRecomsSongId String    @map("user_recoms_song_id")
-  responderId      String?   @map("responder_id")
+  id               String         @id @unique
+  content          String
+  createdAt        DateTime       @map("created_at") @default(now())
+  updatedAt        DateTime       @map("updated_at") @updatedAt
+  userRecomsSongId String         @map("user_recoms_song_id")
+  responderId      String         @map("responder_id")
 
   userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
-  responder        User? @relation(fields: [responderId], references: [id])
+  responder        User           @relation(fields: [responderId], references: [id])
 }
 
 model UserRecomsSong {
-  id           String     @id
-  senderId     String?    @map("sender_id")
-  recomsSongId String?    @map("recoms_song_id")
-  receiverId   String?    @map("receiver_id")
-  createdAt    DateTime?  @map("created_at")
-  isAnoymous   Boolean?   @map("is_anoymous")
-  isLiked      Boolean?   @map("is_liked")
-  comment      String?
+  id           String        @id @unique
+  senderId     String        @map("sender_id")
+  recomsSongId String        @map("recoms_song_id")
+  receiverId   String        @map("receiver_id")
+  createdAt    DateTime      @map("created_at") @default(now())
+  isAnoymous   Boolean       @map("is_anoymous") @default(false)
+  isLiked      Boolean       @map("is_liked") @default(false)
+  comment      String
 
-  recomsSong   RecomsSong? @relation(fields: [recomsSongId], references: [id])
-  sender       User?       @relation("UserSentRecom", fields: [senderId], references: [id])
-  receiver     User?       @relation("UserReceivedRecom", fields: [receiverId], references: [id])
+  recomsSong   RecomsSong    @relation(fields: [recomsSongId], references: [id])
+  sender       User          @relation("UserSentRecom", fields: [senderId], references: [id])
+  receiver     User          @relation("UserReceivedRecom", fields: [receiverId], references: [id])
   replies      RecomsReply[]
 }
 
 model User {
-  id              String   @id
-  socialType      String?  @map("social_type")
-  ownId           String?  @map("own_id")
-  nickname        String?  @db.VarChar(10)
-  birth           DateTime?
-  gender          String?
-  recomsTime      String   @map("recoms_time") @default("09:00")
+  id              String      @id @unique
+  socialType      SocialType  @map("social_type") 
+  ownId           String      @map("own_id") @unique
+  nickname        String      @db.VarChar(10)
+  birth           DateTime
+  gender          Gender      @default(MAN)
+  recomsTime      String      @map("recoms_time") @default("09:00")
   photo           String?
   bio             String?
-  tag             String?  @db.VarChar(5)
-  qrCode          String?  @map("qr_code")
-  backgroundImg   String   @map("background_img")
-  createdAt       DateTime? @map("created_at")
-  updatedAt       DateTime? @map("updated_at")
-  inactiveAt      DateTime? @map("inactive_at") @default(now())
-  inactiveStatus  Boolean?  @map("inactive_status") @default(false)
+  backgroundImg   String?     @map("background_img")
+  createdAt       DateTime    @map("created_at") @default(now())
+  updatedAt       DateTime    @map("updated_at") @updatedAt
+  inactiveAt      DateTime?   @map("inactive_at") 
+  inactiveStatus  Boolean     @map("inactive_status") @default(false)
 
   sentRecoms      UserRecomsSong[] @relation("UserSentRecom")
   receivedRecoms  UserRecomsSong[] @relation("UserReceivedRecom")
@@ -108,10 +131,10 @@ model User {
 }
 
 model FcmToken {
-  id        String   @id
-  fcmToken  String?  @map("fcm_token") @db.VarChar(512)
-  userId    String?  @map("user_id")
-  createdAt DateTime? @map("created_at")
+  id        String   @id @unique
+  fcmToken  String   @map("fcm_token") @db.VarChar(512)
+  userId    String   @map("user_id")
+  createdAt DateTime @map("created_at") @default(now())
 
-  user User? @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
