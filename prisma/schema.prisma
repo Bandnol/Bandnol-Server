@@ -1,11 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-// schema.prisma
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,186 +7,111 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Enums
-enum SocialType {
-  google
-  kakao
-}
-
-enum Gender {
-  man
-  woman
-}
-
-enum NotificationType {
-  RECOMMEND_RECEIVED
-  REPLY_RECEIVED
-  POST_REACTION
-  COMMUNITY_REACTION
-  PERMISSION_UPDATE
-  RECOMMEND_NOT_SENT
-  ANNOUNCEMENT
-}
-
-// Models
-model User {
-  id               Int                @id @default(autoincrement())
-  social_type      SocialType?
-  name             String?
-  nickname         String?
-  birth            DateTime?
-  gender           Gender?
-  photo            String?
-  background_image String?
-  bio              String?
-  tag              String?
-  qr_code          String?
-  created_at       DateTime?          @default(now())
-  updated_at       DateTime?          @updatedAt
-  inactive_at      DateTime?
-  inactive_status  Boolean?           @default(false)
-
-  posts            Post[]
-  bookmarks        Bookmark[]
-  follows          Follow[]           @relation("Followings")
-  followers        Follow[]           @relation("Followers")
-  userLikedArtist  UserLikedArtist[]
-  comments         Comment[]
-  recommendations  UserRecommendSong[] @relation("Sender")
-  receivedSongs    UserRecommendSong[] @relation("Receiver")
-  replies          RecommendationReply[] @relation("Responder")
-  ArtistComment    ArtistComment[]
-}
-
 model UserLikedArtist {
-  id         Int       @id @default(autoincrement())
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
-  artist_id  Int?
-  user_id    Int?
+  id        String    @id
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  artistId  Int?      @map("artist_id")
+  artistName String?  @map("artist_name")
+  userId    String?   @map("user_id")
+  imgUrl    String?   @map("img_url")
 
-  user       User?     @relation(fields: [user_id], references: [id])
-  comments   ArtistComment[]
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 model Inquiry {
-  id          Int       @id @default(autoincrement())
-  email       String?
-  description String?
-  created_at  DateTime? @default(now())
-  updated_at  DateTime? @updatedAt
+  id        String   @id
+  email     String?  @db.VarChar(100)
+  content   String?
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @map("updated_at")
 }
 
-model Comment {
-  id                     Int       @id @default(autoincrement())
-  emoji                  String?
-  description            String?
-  updated_at             DateTime? @updatedAt
-  user_recommend_song_id Int?
+model RecomsSong {
+  id         String   @id
+  title      String?  @db.VarChar(100)
+  artistName String?  @map("artist_name")
+  imgUrl     String?  @map("img_url")
 
-  userRecommendSong      UserRecommendSong? @relation(fields: [user_recommend_song_id], references: [id])
-  user_id                Int?
-  User                   User? @relation(fields: [user_id], references: [id])
-}
-
-model Sing {
-  id      Int @id @default(autoincrement())
-  song_id Int?
-}
-
-model RecommendSong {
-  id   Int    @id @default(autoincrement())
-  name String?
-
-  userRecommendations UserRecommendSong[]
+  userRecomsSongs UserRecomsSong[]
 }
 
 model Notification {
-  id           Int               @id @default(autoincrement())
-  title        String?
-  description  String?
-  created_at   DateTime?         @default(now())
-  updated_at   DateTime?         @updatedAt
-  type         NotificationType?
-  reference_id Int
-  receiver_id  Int?
-  is_read      Boolean?
+  id           String   @id
+  content      String?
+  createdAt    DateTime? @map("created_at")
+  updatedAt    DateTime? @map("updated_at")
+  type         String?   @db.VarChar(50)
+  referenceId  String    @map("reference_id")
+  isConfirmed  Boolean?  @map("is_confirmed")
+  link         String?
+  receiverId   String?   @map("receiver_id")
+  senderId     String    @map("sender_id")
+
+  sender   User? @relation("NotificationSender", fields: [senderId], references: [id])
+  receiver User? @relation("NotificationReceiver", fields: [receiverId], references: [id])
 }
 
-model RecommendationReply {
-  id                     Int       @id @default(autoincrement())
-  description            String?
-  created_at             DateTime? @default(now())
-  updated_at             DateTime? @updatedAt
-  user_recommend_song_id Int
-  responder_id           Int?
+model RecomsReply {
+  id               String   @id
+  content          String?
+  createdAt        DateTime? @map("created_at")
+  updatedAt        DateTime? @map("updated_at")
+  userRecomsSongId String    @map("user_recoms_song_id")
+  responderId      String?   @map("responder_id")
 
-  userRecommendSong      UserRecommendSong @relation(fields: [user_recommend_song_id], references: [id])
-  responder              User?              @relation("Responder", fields: [responder_id], references: [id])
+  userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
+  responder        User? @relation(fields: [responderId], references: [id])
 }
 
-model UserRecommendSong {
-  id                Int       @id @default(autoincrement())
-  sender_id         Int?
-  recommend_song_id Int?
-  created_at        DateTime? @default(now())
-  is_anoymous       Boolean?
-  is_using_AI       Boolean?
-  receiver_id       Int?
-  is_liked          Boolean?
+model UserRecomsSong {
+  id           String     @id
+  senderId     String?    @map("sender_id")
+  recomsSongId String?    @map("recoms_song_id")
+  receiverId   String?    @map("receiver_id")
+  createdAt    DateTime?  @map("created_at")
+  isAnoymous   Boolean?   @map("is_anoymous")
+  isLiked      Boolean?   @map("is_liked")
+  comment      String?
 
-  sender            User?      @relation("Sender", fields: [sender_id], references: [id])
-  receiver          User?      @relation("Receiver", fields: [receiver_id], references: [id])
-  recommendSong     RecommendSong? @relation(fields: [recommend_song_id], references: [id])
-  comments          Comment[]
-  replies           RecommendationReply[]
+  recomsSong   RecomsSong? @relation(fields: [recomsSongId], references: [id])
+  sender       User?       @relation("UserSentRecom", fields: [senderId], references: [id])
+  receiver     User?       @relation("UserReceivedRecom", fields: [receiverId], references: [id])
+  replies      RecomsReply[]
 }
 
-model Follow {
-  id            Int       @id @default(autoincrement())
-  follower_id   Int?
-  following_id  Int?
-  created_at    DateTime? @default(now())
-  user_id       Int?
+model User {
+  id              String   @id
+  socialType      String?  @map("social_type")
+  ownId           String?  @map("own_id")
+  nickname        String?  @db.VarChar(10)
+  birth           DateTime?
+  gender          String?
+  recomsTime      String   @map("recoms_time") @default("09:00")
+  photo           String?
+  bio             String?
+  tag             String?  @db.VarChar(5)
+  qrCode          String?  @map("qr_code")
+  backgroundImg   String   @map("background_img")
+  createdAt       DateTime? @map("created_at")
+  updatedAt       DateTime? @map("updated_at")
+  inactiveAt      DateTime? @map("inactive_at") @default(now())
+  inactiveStatus  Boolean?  @map("inactive_status") @default(false)
 
-  follower      User?     @relation("Followings", fields: [follower_id], references: [id])
-  following     User?     @relation("Followers", fields: [following_id], references: [id])
+  sentRecoms      UserRecomsSong[] @relation("UserSentRecom")
+  receivedRecoms  UserRecomsSong[] @relation("UserReceivedRecom")
+  sentNotices     Notification[] @relation("NotificationSender")
+  receivedNotices Notification[] @relation("NotificationReceiver")
+  fcmTokens       FcmToken[]
+  recomsReplies   RecomsReply[]
+  likedArtist     UserLikedArtist[]
 }
 
-model Post {
-  id         Int       @id @default(autoincrement())
-  content    String?
-  media_urls String[]
-  like       Int?
-  is_editied Boolean?
-  visibility String?
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
+model FcmToken {
+  id        String   @id
+  fcmToken  String?  @map("fcm_token") @db.VarChar(512)
+  userId    String?  @map("user_id")
+  createdAt DateTime? @map("created_at")
 
-  user_id    Int?
-  user       User?     @relation(fields: [user_id], references: [id])
-  bookmarks  Bookmark[]
-}
-
-model Bookmark {
-  id         Int       @id @default(autoincrement())
-  created_at DateTime? @default(now())
-
-  post_id    Int
-  user_id    Int?
-
-  post       Post      @relation(fields: [post_id], references: [id])
-  user       User?     @relation(fields: [user_id], references: [id])
-}
-
-model ArtistComment {
-  id                 Int       @id @default(autoincrement())
-  content            String?
-  created_at         DateTime? @default(now())
-
-  user_liked_artist_id Int?
-  user_id              Int?
-
-  userLikedArtist      UserLikedArtist? @relation(fields: [user_liked_artist_id], references: [id])
-  user                 User?            @relation(fields: [user_id], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 }
