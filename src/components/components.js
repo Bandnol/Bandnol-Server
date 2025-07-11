@@ -1,4 +1,3 @@
-// src/swagger/components.js
 export default {
   responses: {
     Success: {
@@ -8,10 +7,13 @@ export default {
           schema: {
             type: "object",
             properties: {
-              resultType: { type: "string" },
-              error: { type: "object" },
-              success: { type: "object" },
-            },
+              success: { type: "boolean"},
+              data: { type: "object" },
+              error: {
+                type: ["object", "null"],
+                example: null
+              }
+            }
           },
         },
       },
