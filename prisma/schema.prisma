@@ -112,7 +112,7 @@ model FcmToken {
 model Session {
   id        String   @id @default(uuid())
   sid       String   @unique // session 식별 
-  data      String   @db.VarChar(512) //사용자의 정보 저장
+  data      String   @db.Text //사용자의 정보 저장
   expiresAt DateTime @map("expires_at") // Session의 만료 시간 (보통 1주일)
 
   @@map("session")
