@@ -27,10 +27,11 @@ model Inquiry {
 }
 
 model RecomsSong {
-  id              String           @id @unique 
+  id              String           @id @unique
   title           String           @db.VarChar(100)
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
+  preview_url     String?
   userRecomsSongs UserRecomsSong[]
 }
 
@@ -61,7 +62,7 @@ model RecomsReply {
 }
 
 model UserRecomsSong {
-  id           String        @id @unique @default(uuid()) 
+  id           String        @id @unique @default(uuid())
   senderId     String        @map("sender_id")
   recomsSongId String        @map("recoms_song_id")
   receiverId   String        @map("receiver_id")
@@ -77,10 +78,8 @@ model UserRecomsSong {
 
 model User {
   id              String            @id @unique @default(uuid())
-  name            String?            
   socialType      SocialType        @map("social_type")
-  email           String?            
-  nickname        String?            @db.VarChar(40)
+  nickname        String?           @db.VarChar(40)
   birth           DateTime?
   gender          Gender            @default(MAN)
   photo           String?
@@ -92,6 +91,8 @@ model User {
   backgroundImg   String?           @map("background_img")
   ownId           String?           @unique @map("own_id")
   recomsTime      String            @default("09:00") @map("recoms_time")
+  email           String?
+  name            String?
   fcmTokens       FcmToken[]
   receivedNotices Notification[]    @relation("NotificationReceiver")
   sentNotices     Notification[]    @relation("NotificationSender")
@@ -111,9 +112,9 @@ model FcmToken {
 
 model Session {
   id        String   @id @default(uuid())
-  sid       String   @unique // session 식별 
-  data      String   @db.Text //사용자의 정보 저장
-  expiresAt DateTime @map("expires_at") // Session의 만료 시간 (보통 1주일)
+  sid       String   @unique
+  data      String   @db.Text
+  expiresAt DateTime @map("expires_at")
 
   @@map("session")
 }
