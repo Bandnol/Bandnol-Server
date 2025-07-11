@@ -7,8 +7,8 @@ import routers from "./routes/routes.index.js";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
-import { prisma } from "./db.config.js";
-import { googleStrategy, naverStrategy, kakaoStrategy } from "./auth.config.js";
+import { prisma } from "./configs/db.config.js";
+import { googleStrategy, naverStrategy, kakaoStrategy } from "./configs/auth.config.js";
 
 dotenv.config();
 
@@ -48,19 +48,19 @@ app.use(express.json()); // request의 본문을 json으로 해석할 수 있도
 app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
 
 app.use(
-  session({
-    cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // ms -> 유효기간 7일
-    },
-    resave: false,
-    saveUninitialized: false,
-    secret: process.env.EXPRESS_SESSION_SECRET,
-    store: new PrismaSessionStore(prisma, {
-      checkPeriod: 2 * 60 * 1000, // ms -> 2분 마다 세션 만료 여부 확인
-      dbRecordIdIsSessionId: true,// DB 기본 키 그대로 사용
-      dbRecordIdFunction: undefined,
-    }),
-  })
+    session({
+        cookie: {
+            maxAge: 7 * 24 * 60 * 60 * 1000, // ms -> 유효기간 7일
+        },
+        resave: false,
+        saveUninitialized: false,
+        secret: process.env.EXPRESS_SESSION_SECRET,
+        store: new PrismaSessionStore(prisma, {
+            checkPeriod: 2 * 60 * 1000, // ms -> 2분 마다 세션 만료 여부 확인
+            dbRecordIdIsSessionId: true, // DB 기본 키 그대로 사용
+            dbRecordIdFunction: undefined,
+        }),
+    })
 );
 
 app.use(passport.initialize());
@@ -102,9 +102,9 @@ app.get("/openapi.json", async (req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-   // #swagger.ignore = true
-  console.log(req.user);
-  res.send("Hello World!");
+    // #swagger.ignore = true
+    console.log(req.user);
+    res.send("Hello World!");
 });
 
 // Router 연결

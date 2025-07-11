@@ -1,4 +1,4 @@
-import { prisma } from "../db.config.js";
+import { prisma } from "../configs/db.config.js";
 
 // 추천 곡 반환
 export const getRecomsSong = async (recomsId) => {
