@@ -30,6 +30,7 @@
         "jsonwebtoken": "^9.0.2",
         "passport": "^0.7.0",
         "passport-google-oauth20": "^2.0.0",
+        "passport-naver-v2": "^2.0.8",
         "pg": "^8.16.3",
         "prisma": "^6.11.1",
         "swagger-autogen": "^2.23.7",

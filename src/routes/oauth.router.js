@@ -13,5 +13,12 @@ router.get("/callback/google", passport.authenticate("google", {
 }), (req, res) => {
   res.redirect("/"); 
 });
+router.get("/login/naver", passport.authenticate("naver"));
+router.get("/callback/naver", passport.authenticate("naver", {
+    failureRedirect: "/api/v1/oauth2/login/naver",
+    failureMessage: true,
+}), (req, res) => {
+    res.redirect("/");
+});
 
 export default router;
