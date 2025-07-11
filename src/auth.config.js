@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as NaverStrategy } from 'passport-naver-v2';
+import { Strategy as KakaoStrategy } from "passport-kakao";
 import { NotFoundUserEmail } from "./errors.js";
 import { prisma } from "./db.config.js"
 import { generateToken } from "./utils/token.js";
@@ -38,6 +39,21 @@ export const naverStrategy = new NaverStrategy(
     }
 );
 
+export const kakaoStrategy = new KakaoStrategy(
+    {
+        
+        clientID: process.env.KAKAO_TEST_API_KEY,
+        callbackURL: "http://localhost:3000/api/v1/oauth2/callback/kakao",
+        scope: [ "account_email", "name" ],
+        state: true
+    },
+    (accessToken, refreshToken, profile, cb) => {
+        return socialVerify(profile, SocialType.KAKAO)
+            .then((user) => cb(null,user))
+            .catch((err) => cb(err));
+    }
+);
+
 const socialVerify = async (profile, type) => {
   try {
     let email, name, rawGender = null, birthyear = null, birthday = null, fullBirth = null, gender = null;
@@ -57,16 +73,15 @@ const socialVerify = async (profile, type) => {
 
       gender = rawGender === "M" ? Gender.MAN
                    : rawGender === "F" ? Gender.WOMAN : null;
-      console.log("🧬 rawGender:", rawGender);
-console.log("🎯 변환된 gender(enum):", gender);
       if (birthyear && birthday) {
         fullBirth = `${birthyear}-${birthday}`;  
       }
     }
 
     else if (type === SocialType.KAKAO) {
-      email = profile._json?.kakao_account?.email;
-      name = profile.username;
+      const account = profile._json.kakao_account;
+      name = account.name;
+      email = account.email;
     }
 
     else {
@@ -88,6 +103,18 @@ console.log("🎯 변환된 gender(enum):", gender);
           gender: gender,
           birth: fullBirth ? new Date(fullBirth) : null
         },
+      });
+    }else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          name: name,
+          socialType: type,
+          ...(type === SocialType.NAVER && {
+          gender: user.gender,
+          birth: user.birth ? new Date(fullBirth) : null,
+        }),
+        }
       });
     }
 
