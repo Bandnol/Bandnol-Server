@@ -1,3 +1,9 @@
+export const searchTracksResponseDTO = (tracks) => {
+    return {
+       data: tracks
+    }
+}
+
 export const trackInfoResponseDTO = (recomsData) => {
     const kstDate = new Date(recomsData.createdAt.getTime() + 9 * 60 * 60 * 1000); // UTC+9 시간대
 

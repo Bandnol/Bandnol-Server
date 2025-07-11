@@ -1,13 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model UserLikedArtist {
+  id         String   @id @unique @default(uuid())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  artistId   String   @map("artist_id")
+  userId     String   @map("user_id")
+  artistName String   @map("artist_name")
+  imgUrl     String   @map("img_url")
+  user       User     @relation(fields: [userId], references: [id])
 }
 
-// Enum 모델 정의
+model Inquiry {
+  id        String   @id @unique @default(uuid())
+  email     String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  content   String
+}
+
+model RecomsSong {
+  id              String           @id @unique
+  title           String           @db.VarChar(100)
+  artistName      String           @map("artist_name")
+  imgUrl          String?          @map("img_url")
+  preview_url     String?
+  userRecomsSongs UserRecomsSong[]
+}
+
+model Notification {
+  id          String     @id @unique @default(uuid())
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  referenceId String     @map("reference_id")
+  receiverId  String     @map("receiver_id")
+  content     String
+  isConfirmed Boolean    @default(false) @map("is_confirmed")
+  link        String?
+  senderId    String?    @map("sender_id")
+  type        NoticeType
+  receiver    User       @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  sender      User?      @relation("NotificationSender", fields: [senderId], references: [id])
+}
+
+model RecomsReply {
+  id               String         @id @unique @default(uuid())
+  content          String
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  userRecomsSongId String         @map("user_recoms_song_id")
+  responderId      String         @map("responder_id")
+  responder        User           @relation(fields: [responderId], references: [id])
+  userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
+}
+
+model UserRecomsSong {
+  id           String        @id @unique @default(uuid())
+  senderId     String        @map("sender_id")
+  recomsSongId String        @map("recoms_song_id")
+  receiverId   String        @map("receiver_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  isAnoymous   Boolean       @default(false) @map("is_anoymous")
+  isLiked      Boolean       @default(false) @map("is_liked")
+  comment      String
+  replies      RecomsReply[]
+  receiver     User          @relation("UserReceivedRecom", fields: [receiverId], references: [id])
+  recomsSong   RecomsSong    @relation(fields: [recomsSongId], references: [id])
+  sender       User          @relation("UserSentRecom", fields: [senderId], references: [id])
+}
+
+model User {
+  id              String            @id @unique @default(uuid())
+  socialType      SocialType        @map("social_type")
+  nickname        String?           @db.VarChar(40)
+  birth           DateTime?
+  gender          Gender            @default(MAN)
+  photo           String?
+  bio             String?
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  inactiveAt      DateTime?         @map("inactive_at")
+  inactiveStatus  Boolean           @default(false) @map("inactive_status")
+  backgroundImg   String?           @map("background_img")
+  ownId           String?           @unique @map("own_id")
+  recomsTime      String            @default("09:00") @map("recoms_time")
+  email           String?
+  name            String?
+  fcmTokens       FcmToken[]
+  receivedNotices Notification[]    @relation("NotificationReceiver")
+  sentNotices     Notification[]    @relation("NotificationSender")
+  recomsReplies   RecomsReply[]
+  likedArtist     UserLikedArtist[]
+  receivedRecoms  UserRecomsSong[]  @relation("UserReceivedRecom")
+  sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
+}
+
+model FcmToken {
+  id        String   @id @unique @default(uuid())
+  fcmToken  String   @map("fcm_token") @db.VarChar(512)
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  sid       String   @unique
+  data      String   @db.Text
+  expiresAt DateTime @map("expires_at")
+
+  @@map("session")
+}
+
 enum Gender {
   MAN
   WOMAN
@@ -25,116 +136,4 @@ enum NoticeType {
   RECOMMEND_UNREAD_TIMEOUT
   RECOMMEND_READ_BY_OTHER
   ANNOUNCEMENT
-  // BOOKMARKED
-  // POST_LIKED
-  // SUPERFAN_SELECTED
-  // MONTHLY_REPORT_CREATE
-}
-
-
-model UserLikedArtist {
-  id         String      @id  @unique
-  createdAt  DateTime    @map("created_at") @default(now())
-  updatedAt  DateTime    @map("updated_at") @updatedAt 
-  artistId   String      @map("artist_id") 
-  artistName String      @map("artist_name")
-  userId     String      @map("user_id")
-  imgUrl     String      @map("img_url")
-
-  user      User         @relation(fields: [userId], references: [id])
-}
-
-model Inquiry {
-  id        String     @id @unique
-  email     String     @db.VarChar(100)
-  content   String
-  createdAt DateTime   @map("created_at") @default(now())
-  updatedAt DateTime   @map("updated_at") @updatedAt 
-}
-
-model RecomsSong {
-  id         String     @id @unique
-  title      String     @db.VarChar(100)
-  artistName String     @map("artist_name")
-  imgUrl     String?    @map("img_url")
-
-  userRecomsSongs UserRecomsSong[]
-}
-
-model Notification {
-  id           String      @id @unique
-  content      String
-  createdAt    DateTime    @map("created_at") @default(now())
-  updatedAt    DateTime    @map("updated_at") @updatedAt 
-  type         NoticeType
-  referenceId  String      @map("reference_id")
-  isConfirmed  Boolean     @map("is_confirmed") @default(false)
-  link         String?
-  receiverId   String      @map("receiver_id")
-  senderId     String?     @map("sender_id")
-
-  receiver     User        @relation("NotificationReceiver", fields: [receiverId], references: [id])
-  sender       User?       @relation("NotificationSender", fields: [senderId], references: [id])
-}
-
-model RecomsReply {
-  id               String         @id @unique
-  content          String
-  createdAt        DateTime       @map("created_at") @default(now())
-  updatedAt        DateTime       @map("updated_at") @updatedAt
-  userRecomsSongId String         @map("user_recoms_song_id")
-  responderId      String         @map("responder_id")
-
-  userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
-  responder        User           @relation(fields: [responderId], references: [id])
-}
-
-model UserRecomsSong {
-  id           String        @id @unique
-  senderId     String        @map("sender_id")
-  recomsSongId String        @map("recoms_song_id")
-  receiverId   String        @map("receiver_id")
-  createdAt    DateTime      @map("created_at") @default(now())
-  isAnoymous   Boolean       @map("is_anoymous") @default(false)
-  isLiked      Boolean       @map("is_liked") @default(false)
-  comment      String
-
-  recomsSong   RecomsSong    @relation(fields: [recomsSongId], references: [id])
-  sender       User          @relation("UserSentRecom", fields: [senderId], references: [id])
-  receiver     User          @relation("UserReceivedRecom", fields: [receiverId], references: [id])
-  replies      RecomsReply[]
-}
-
-model User {
-  id              String      @id @unique
-  socialType      SocialType  @map("social_type") 
-  ownId           String      @map("own_id") @unique
-  nickname        String      @db.VarChar(10)
-  birth           DateTime
-  gender          Gender      @default(MAN)
-  recomsTime      String      @map("recoms_time") @default("09:00")
-  photo           String?
-  bio             String?
-  backgroundImg   String?     @map("background_img")
-  createdAt       DateTime    @map("created_at") @default(now())
-  updatedAt       DateTime    @map("updated_at") @updatedAt
-  inactiveAt      DateTime?   @map("inactive_at") 
-  inactiveStatus  Boolean     @map("inactive_status") @default(false)
-
-  sentRecoms      UserRecomsSong[] @relation("UserSentRecom")
-  receivedRecoms  UserRecomsSong[] @relation("UserReceivedRecom")
-  sentNotices     Notification[] @relation("NotificationSender")
-  receivedNotices Notification[] @relation("NotificationReceiver")
-  fcmTokens       FcmToken[]
-  recomsReplies   RecomsReply[]
-  likedArtist     UserLikedArtist[]
-}
-
-model FcmToken {
-  id        String   @id @unique
-  fcmToken  String   @map("fcm_token") @db.VarChar(512)
-  userId    String   @map("user_id")
-  createdAt DateTime @map("created_at") @default(now())
-
-  user User @relation(fields: [userId], references: [id])
 }

@@ -4,8 +4,21 @@ import express from "express";
 import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
 import routers from "./routes/routes.index.js";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import session from "express-session";
+import passport from "passport";
+import { prisma } from "./db.config.js";
+import { googleStrategy, naverStrategy, kakaoStrategy } from "./auth.config.js";
 
 dotenv.config();
+
+passport.use(googleStrategy);
+passport.use(naverStrategy);
+passport.use(kakaoStrategy);
+
+// Session의 정보를 가져올 때 사용하는 함수들
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
 
 const app = express();
 const port = process.env.PORT;
@@ -33,6 +46,25 @@ app.use(cors()); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
 app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
+
+app.use(
+  session({
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // ms -> 유효기간 7일
+    },
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    store: new PrismaSessionStore(prisma, {
+      checkPeriod: 2 * 60 * 1000, // ms -> 2분 마다 세션 만료 여부 확인
+      dbRecordIdIsSessionId: true,// DB 기본 키 그대로 사용
+      dbRecordIdFunction: undefined,
+    }),
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // swagger 설정
 app.use(
@@ -70,7 +102,9 @@ app.get("/openapi.json", async (req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("Hello World! ");
+   // #swagger.ignore = true
+  console.log(req.user);
+  res.send("Hello World!");
 });
 
 // Router 연결
