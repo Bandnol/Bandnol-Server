@@ -7,7 +7,8 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node src/index.js",
-        "dev": "nodemon -e js,json,prisma --ignore src/generated --exec \"prisma generate && node src/index.js\""
+        "dev": "nodemon -e js,json,prisma --ignore src/generated --exec \"prisma generate && node src/index.js\"",
+        "seed": "node prisma/seed.js"
     },
     "repository": {
         "type": "git",
@@ -35,6 +36,7 @@
         "passport-naver-v2": "^2.0.8",
         "pg": "^8.16.3",
         "prisma": "^6.11.1",
+        "spotify-web-api-node": "^5.0.2",
         "swagger-autogen": "^2.23.7",
         "swagger-ui-express": "^5.0.1"
     },
