@@ -8,7 +8,7 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
-import { googleStrategy, naverStrategy, kakaoStrategy } from "./auth.config.js";
+import { googleStrategy, naverStrategy, kakaoStrategy } from "./configs/auth.config.js";
 
 dotenv.config();
 
