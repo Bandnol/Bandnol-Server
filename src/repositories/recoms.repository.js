@@ -1,53 +1,79 @@
-import { prisma } from '../db.config.js';
+import { prisma } from "../configs/db.config.js";
 
-export const findSongByUser = async (userId, artistName, songName) => {
-  const whereClause = {
-    recomsSong: {
-      ...(artistName && { artistName: { contains: artistName } }),
-      ...(songName && { title: { contains: songName } }),
-    },
-  };
+// 추천 곡 반환
+export const getRecomsSong = async (recomsId) => {
+    const recomsData = await prisma.userRecomsSong.findFirst({
+        where: { id: recomsId },
+        select: {
+            id: true,
+            createdAt: true,
+            isAnoymous: true,
+            isLiked: true,
+            recomsSong: true,
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+            receiver: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+            replies: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
 
-  const sent = await prisma.userRecomsSong.findFirst({
+    return recomsData;
+};
+
+// 특정 유저가 보낸 추천곡 중에서 검색
+export const findSentSongByUser = async (userId, artistName, songName) => {
+  return await prisma.userRecomsSong.findFirst({
     where: {
       senderId: userId,
-      ...whereClause,
+      recomsSong: {
+        artistName: {
+          contains: artistName,
+          mode: 'insensitive',
+        },
+        title: {
+          contains: songName,
+          mode: 'insensitive',
+        },
+      },
     },
-    include: { recomsSong: true },
-    orderBy: { createdAt: 'desc' },
+    include: {
+      recomsSong: true,
+    },
   });
+};
 
-  const received = await prisma.userRecomsSong.findFirst({
+// 특정 유저가 받은 추천곡 중에서 검색
+export const findReceivedSongByUser = async (userId, artistName, songName) => {
+  return await prisma.userRecomsSong.findFirst({
     where: {
       receiverId: userId,
-      ...whereClause,
+      recomsSong: {
+        artistName: {
+          contains: artistName,
+          mode: 'insensitive',
+        },
+        title: {
+          contains: songName,
+          mode: 'insensitive',
+        },
+      },
     },
     include: {
       recomsSong: true,
       sender: true,
     },
-    orderBy: { createdAt: 'desc' },
   });
-
-  return {
-    send: sent
-      ? {
-          date: sent.createdAt,
-          comment: sent.comment,
-          title: sent.recomsSong.title,
-          artistName: sent.recomsSong.artistName,
-          imageUrl: sent.recomsSong.imgUrl,
-        }
-      : null,
-    receive: received
-      ? {
-          senderNickname: received.sender.nickname,
-          date: received.createdAt,
-          comment: received.comment,
-          title: received.recomsSong.title,
-          artistName: received.recomsSong.artistName,
-          imageUrl: received.recomsSong.imgUrl,
-        }
-      : null,
-  };
 };

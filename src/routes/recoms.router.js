@@ -1,9 +1,15 @@
-import express from "express";
+import { Router } from "express";
+
+import { handleAllTracks } from "../controllers/recoms.controller.js";
+import { handleRecomsSong } from "../controllers/recoms.controller.js";
 import { searchRecomSong } from "../controllers/recoms.controller.js";
 
-const router = express.Router();
+import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
-// GET /api/v1/recoms/search/song
+const router = Router();
+
+router.get("/search-song", handleAllTracks);
+router.get("/recoms/:recomsId", authenticateAccessToken, handleRecomsSong);
 router.get("/search/song", searchRecomSong);
 
 export default router;
