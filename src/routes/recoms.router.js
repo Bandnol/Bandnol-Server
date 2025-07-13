@@ -10,6 +10,6 @@ const router = Router();
 
 router.get("/search-song", handleAllTracks);
 router.get("/recoms/:recomsId", authenticateAccessToken, handleRecomsSong);
-router.get("/search/record", searchRecomSong);
+router.get("/recoms/search/record", searchRecomSong);
 
 export default router;
