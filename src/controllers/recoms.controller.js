@@ -114,14 +114,37 @@ export const handleRecomsSong = async (req, res, next) => {
 
 export const searchRecomSong = async (req, res, next) => {
   try {
-    const { artistName, songName } = req.query;
+    const { keyword } = req.query;
     //const userId = req.user.id; 
-    const userId = "user-sender-001"; // 임시로 고정
-    const result = await searchSong(userId, artistName, songName);
+    const userId = "user-receiver-001"; // 임시로 고정
+    const results = await searchSong(userId, keyword);
+
+    const send = [];
+    const receive = [];
+
+    for (const item of results) {
+      const commonData = {
+        date: item.createdAt,
+        comment: item.comment,
+        title: item.recomsSong.title,
+        artistName: item.recomsSong.artistName,
+        imageUrl: item.recomsSong.imgUrl,
+      };
+
+      if (item.senderId === userId) {
+        send.push(commonData);
+      }
+      if (item.receiverId === userId) {
+        receive.push({
+          ...commonData,
+          senderNickname: item.sender.nickname,
+        });
+      }
+    }
 
     res.status(200).json({
       success: true,
-      data: result,
+      data: { send, receive },
       error: null,
     });
   } catch (err) {
