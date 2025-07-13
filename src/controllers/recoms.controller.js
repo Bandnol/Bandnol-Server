@@ -116,7 +116,7 @@ export const searchRecomSong = async (req, res, next) => {
   try {
     const { artistName, songName } = req.query;
     //const userId = req.user.id; 
-    const userId = "user-1"; // 임시로 고정
+    const userId = "user-sender-001"; // 임시로 고정
     const result = await searchSong(userId, artistName, songName);
 
     res.status(200).json({
