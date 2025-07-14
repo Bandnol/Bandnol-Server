@@ -47,10 +47,10 @@ jobs:
             - name: Deploy on EC2
               run: |
                   ssh bandnol <<EOF
-                    docker pull ${{ secrets.DOCKER_USERNAME }}/bandnol-server
-                    docker stop bandnol || true
-                    docker rm bandnol || true
-                    docker run -d \
+                    sudo docker pull ${{ secrets.DOCKER_USERNAME }}/bandnol-server
+                    sudo docker stop bandnol || true
+                    sudo docker rm bandnol || true
+                    sudo docker run -d \
                       --name bandnol \
                       --env-file /opt/app/.env.prod \
                       -p 3000:3000 \
@@ -61,5 +61,5 @@ jobs:
               if: steps.paths-filter.outputs.prisma == 'true'
               run: |
                   ssh bandnol <<EOF
-                    docker exec bandnol npx prisma migrate deploy
+                    sudo docker exec bandnol npx prisma migrate deploy
                   EOF
