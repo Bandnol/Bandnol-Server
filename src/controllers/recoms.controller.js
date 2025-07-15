@@ -142,11 +142,7 @@ export const searchRecomSong = async (req, res, next) => {
       }
     }
 
-    res.status(200).json({
-      success: true,
-      data: { send, receive },
-      error: null,
-    });
+    res.status(200).success({ send, receive }); 
   } catch (err) {
     next(err);
   }
