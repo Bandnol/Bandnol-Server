@@ -8,7 +8,7 @@ datasource db {
 }
 
 model UserLikedArtist {
-  id         String   @id @unique
+  id         String   @id @unique @default(uuid())
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   artistId   String   @map("artist_id")
@@ -19,7 +19,7 @@ model UserLikedArtist {
 }
 
 model Inquiry {
-  id        String   @id @unique
+  id        String   @id @unique @default(uuid())
   email     String   @db.VarChar(100)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -31,11 +31,12 @@ model RecomsSong {
   title           String           @db.VarChar(100)
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
+  preview_url     String?
   userRecomsSongs UserRecomsSong[]
 }
 
 model Notification {
-  id          String     @id @unique
+  id          String     @id @unique @default(uuid())
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
   referenceId String     @map("reference_id")
@@ -50,7 +51,7 @@ model Notification {
 }
 
 model RecomsReply {
-  id               String         @id @unique
+  id               String         @id @unique @default(uuid())
   content          String
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
@@ -61,7 +62,7 @@ model RecomsReply {
 }
 
 model UserRecomsSong {
-  id           String        @id @unique
+  id           String        @id @unique @default(uuid())
   senderId     String        @map("sender_id")
   recomsSongId String        @map("recoms_song_id")
   receiverId   String        @map("receiver_id")
@@ -76,11 +77,9 @@ model UserRecomsSong {
 }
 
 model User {
-  id              String            @id @unique
-  name            String?            
+  id              String            @id @unique @default(uuid())
   socialType      SocialType        @map("social_type")
-  email           String?            
-  nickname        String?            @db.VarChar(40)
+  nickname        String?           @db.VarChar(40)
   birth           DateTime?
   gender          Gender            @default(MAN)
   photo           String?
@@ -92,6 +91,8 @@ model User {
   backgroundImg   String?           @map("background_img")
   ownId           String?           @unique @map("own_id")
   recomsTime      String            @default("09:00") @map("recoms_time")
+  email           String?
+  name            String?
   fcmTokens       FcmToken[]
   receivedNotices Notification[]    @relation("NotificationReceiver")
   sentNotices     Notification[]    @relation("NotificationSender")
@@ -102,7 +103,7 @@ model User {
 }
 
 model FcmToken {
-  id        String   @id @unique
+  id        String   @id @unique @default(uuid())
   fcmToken  String   @map("fcm_token") @db.VarChar(512)
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
@@ -110,10 +111,10 @@ model FcmToken {
 }
 
 model Session {
-  id        String   @id
-  sid       String   @unique // session 식별 
-  data      String   @db.VarChar(512) //사용자의 정보 저장
-  expiresAt DateTime @map("expires_at") // Session의 만료 시간 (보통 1주일)
+  id        String   @id @default(uuid())
+  sid       String   @unique
+  data      String   @db.Text
+  expiresAt DateTime @map("expires_at")
 
   @@map("session")
 }
