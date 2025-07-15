@@ -81,7 +81,7 @@ model User {
   socialType      SocialType        @map("social_type")
   nickname        String?           @db.VarChar(40)
   birth           DateTime?
-  gender          Gender            @default(MAN)
+  gender          Gender?           @default(MAN)
   photo           String?
   bio             String?
   createdAt       DateTime          @default(now()) @map("created_at")
@@ -100,6 +100,7 @@ model User {
   likedArtist     UserLikedArtist[]
   receivedRecoms  UserRecomsSong[]  @relation("UserReceivedRecom")
   sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
+  notifications   NotificationType?
 }
 
 model FcmToken {
@@ -119,6 +120,17 @@ model Session {
   @@map("session")
 }
 
+model NotificationType {
+  id              String     @id @unique @default(uuid())
+  userId          String     @map("user_id") @unique
+  recomsReceived  Boolean    @map("recoms_received") @default(true)
+  recomsSent      Boolean    @map("recoms_sent") @default(true)
+  commentArrived  Boolean    @map("comment_arrived") @default(true)
+  notRecoms       Boolean    @map("not_recoms") @default(true)
+  announcement    Boolean    @default(true)
+  user            User       @relation(fields: [userId], references: [id])
+}
+
 enum Gender {
   MAN
   WOMAN
@@ -131,9 +143,9 @@ enum SocialType {
 }
 
 enum NoticeType {
-  RECOMMEND_RECEIVED
-  RECOMMEND_SENT
-  RECOMMEND_UNREAD_TIMEOUT
-  RECOMMEND_READ_BY_OTHER
+  RECOMS_RECEIVED
+  RECOMS_SENT
+  COMMENT_ARRIVED
+  NOT_RECOMS
   ANNOUNCEMENT
 }
