@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { recomsSong } from "../services/recoms.service.js";
+import { searchSong } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
@@ -110,3 +111,38 @@ export const handleRecomsSong = async (req, res, next) => {
         next(err);
     }
 };
+
+export const searchRecomSong = async (req, res, next) => {
+  try {
+    const { keyword } = req.query;
+    const userId = req.user.userId; 
+    const results = await searchSong(userId, keyword);
+
+    const send = [];
+    const receive = [];
+
+    for (const item of results) {
+      const commonData = {
+        date: item.createdAt,
+        comment: item.comment,
+        title: item.recomsSong.title,
+        artistName: item.recomsSong.artistName,
+        imageUrl: item.recomsSong.imgUrl,
+      };
+
+      if (item.senderId === userId) {
+        send.push(commonData);
+      }
+      if (item.receiverId === userId) {
+        receive.push({
+          ...commonData,
+          senderNickname: item.sender.nickname,
+        });
+      }
+    }
+
+    res.status(200).success({ send, receive }); 
+  } catch (err) {
+    next(err);
+  }
+} 
