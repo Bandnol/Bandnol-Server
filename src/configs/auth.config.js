@@ -5,7 +5,8 @@ import { Strategy as KakaoStrategy } from "passport-kakao";
 import { NotFoundUserEmail } from "../errors.js";
 import { prisma } from "./db.config.js";
 import { generateToken } from "../utils/token.js";
-import { SocialType, Gender } from "@prisma/client";
+import pkg from '@prisma/client';
+const { SocialType, Gender } = pkg;
 
 dotenv.config();
 
