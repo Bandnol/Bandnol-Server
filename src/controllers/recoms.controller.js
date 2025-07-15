@@ -115,8 +115,7 @@ export const handleRecomsSong = async (req, res, next) => {
 export const searchRecomSong = async (req, res, next) => {
   try {
     const { keyword } = req.query;
-    //const userId = req.user.id; 
-    const userId = "user-receiver-001"; // 임시로 고정
+    const userId = req.user.userId; 
     const results = await searchSong(userId, keyword);
 
     const send = [];
@@ -142,11 +141,7 @@ export const searchRecomSong = async (req, res, next) => {
       }
     }
 
-    res.status(200).json({
-      success: true,
-      data: { send, receive },
-      error: null,
-    });
+    res.status(200).success({ send, receive }); 
   } catch (err) {
     next(err);
   }
