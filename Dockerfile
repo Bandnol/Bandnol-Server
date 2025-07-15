@@ -11,8 +11,11 @@ RUN npm install
 # 4. 전체 소스 복사
 COPY . .
 
-# 5. 앱 실행
+# 5. prisma client 생성
+RUN npx prisma generate
+
+# 6. 앱 실행
 CMD ["npm", "start"]
 
-# 6. 포트 설정
+# 7. 포트 설정
 EXPOSE 3000
