@@ -1,6 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { recomsSong } from "../services/recoms.service.js";
-import { searchSong } from "../services/recoms.service.js";
+import { sentRecomsSong, receivedRecomsSong, searchSong } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
@@ -18,94 +17,58 @@ export const handleAllTracks = async (req, res, next) => {
     res.status(StatusCodes.OK).success(tracks);
 };
 
-export const handleRecomsSong = async (req, res, next) => {
+export const handleSentRecomsSong = async (req, res, next) => {
     /*
-    #swagger.summary = '수신/발신한 추천 곡 조회 API'
+    #swagger.summary = '발신한 추천 곡 조회 API'
 
-    #swagger.parameters['recomsId'] = {
-        in: 'path',
-        required: true,
-        schema: { type: 'string' },
-        description: '추천 곡 ID'
-    }
+    #swagger.security = [{
+        bearerAuth: []
+    }]
 
     #swagger.responses[200] = {
-    description: "수신/발신한 추천 곡 조회 성공 응답",
-    content: {
-        "application/json": {
-        schema: {
-            type: "object",
-            properties: {
-            success: { type: "boolean", example: true },
-            data: {
-                type: "object",
-                properties: {
-                id: { type: "string", example: "recom-001" },
-                createdAt: { type: "string", format: "date", example: "2025-07-11" },
-                isAnoymous: { type: "boolean", example: false },
-                isLiked: { type: "boolean", example: true },
-                recomsSong: {
-                    type: "object",
-                    properties: {
-                    id: { type: "string", example: "7tI8dRuH2Yc6RuoTjxo4dU" },
-                    title: { type: "string", example: "Dangerously" },
-                    artistName: { type: "string", example: "Charlie Puth" },
-                    imgUrl: { type: "string", nullable: true, example: "https://i.scdn.co/image/..." },
-                    previewUrl: { type: "string", nullable: true, example: null }
-                    }
-                },
-                sender: {
-                    type: "object",
-                    properties: {
-                    id: { type: "string", example: "7tI8dRuH2Yc6RuoTjxo4dU" },
-                    nickname: { type: "string", example: "보내는이" }
-                    }
-                },
-                receiver: {
-                    type: "object",
-                    properties: {
-                    id: { type: "string", example: "7tI8dRuH2Yc6RuoTjxo4dU" },
-                    nickname: { type: "string", example: "받는이" }
-                    }
-                },
-                replyId: { type: "string", nullable: true, example: "7tI8dRuH2Yc6RuoTjxo4dU },
-                }
-            }
-            error: { type: "object", nullable: true, example: null },
-            }
-        }
-        }
-    }
-    }
+        $ref: "#/components/responses/Success"
+    };
 
     #swagger.responses[404] = {
-    description: "수신/발신한 추천 곡 조회 실패 응답",
-    content: {
-        "application/json": {
-        schema: {
-            type: "object",
-            properties: {
-            success: { type: "boolean", example: false },
-            data: { type: "string", nullable: true, example: null },
-            error: {
-                type: "object",
-                properties: {
-                code: { type: "string", example: "R1301" },
-                message: { type: "string", example: "해당 추천곡을 찾을 수 없습니다." }
-                }
-            }
-            }
-        }
-        }
-    }
-    }
+        $ref: "#/components/responses/Failed"
+    };
+
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/Failed"
+    };
     */
 
     try {
-        console.log("추천 곡 조회를 요청했습니다!");
+        const recomsData = await sentRecomsSong(req.params.recomsId, req.user.userId);
+        res.status(StatusCodes.OK).success(recomsData);
+    } catch (err) {
+        next(err);
+    }
+};
 
-        const recomsData = await recomsSong(req.params.recomsId);
-        console.log(recomsData);
+export const handleReceivedRecomsSong = async (req, res, next) => {
+    /*
+    #swagger.summary = '수신한 추천 곡 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/Failed"
+    };
+
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/Failed"
+    };
+    */
+
+    try {
+        const recomsData = await receivedRecomsSong(req.params.recomsId, req.user.userId);
         res.status(StatusCodes.OK).success(recomsData);
     } catch (err) {
         next(err);
@@ -113,36 +76,36 @@ export const handleRecomsSong = async (req, res, next) => {
 };
 
 export const searchRecomSong = async (req, res, next) => {
-  try {
-    const { keyword } = req.query;
-    const userId = req.user.userId; 
-    const results = await searchSong(userId, keyword);
+    try {
+        const { keyword } = req.query;
+        const userId = req.user.userId;
+        const results = await searchSong(userId, keyword);
 
-    const send = [];
-    const receive = [];
+        const send = [];
+        const receive = [];
 
-    for (const item of results) {
-      const commonData = {
-        date: item.createdAt,
-        comment: item.comment,
-        title: item.recomsSong.title,
-        artistName: item.recomsSong.artistName,
-        imageUrl: item.recomsSong.imgUrl,
-      };
+        for (const item of results) {
+            const commonData = {
+                date: item.createdAt,
+                comment: item.comment,
+                title: item.recomsSong.title,
+                artistName: item.recomsSong.artistName,
+                imageUrl: item.recomsSong.imgUrl,
+            };
 
-      if (item.senderId === userId) {
-        send.push(commonData);
-      }
-      if (item.receiverId === userId) {
-        receive.push({
-          ...commonData,
-          senderNickname: item.sender.nickname,
-        });
-      }
+            if (item.senderId === userId) {
+                send.push(commonData);
+            }
+            if (item.receiverId === userId) {
+                receive.push({
+                    ...commonData,
+                    senderNickname: item.sender.nickname,
+                });
+            }
+        }
+
+        res.status(200).success({ send, receive });
+    } catch (err) {
+        next(err);
     }
-
-    res.status(200).success({ send, receive }); 
-  } catch (err) {
-    next(err);
-  }
-} 
+};
