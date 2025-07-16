@@ -48,36 +48,6 @@ export const handleSentRecomsSong = async (req, res, next) => {
         next(err);
     }
 };
-
-export const handleReceivedRecomsSong = async (req, res, next) => {
-    /*
-    #swagger.summary = '수신한 추천 곡 조회 API'
-
-    #swagger.security = [{
-        bearerAuth: []
-    }]
-
-    #swagger.responses[200] = {
-        $ref: "#/components/responses/Success"
-    };
-
-    #swagger.responses[404] = {
-        $ref: "#/components/responses/Failed"
-    };
-
-    #swagger.responses[403] = {
-        $ref: "#/components/responses/Failed"
-    };
-    */
-
-    try {
-        const recomsData = await receivedRecomsSong(req.params.recomsId, req.user.userId);
-        res.status(StatusCodes.OK).success(recomsData);
-    } catch (err) {
-        next(err);
-    }
-};
-
 export const searchRecomSong = async (req, res, next) => {
 
   /*
@@ -213,9 +183,9 @@ export const searchRecomSong = async (req, res, next) => {
         });
       }
     }
-    
-      res.status(200).success({ send, receive });
-    } catch (err) {
-        next(err);
-    }
-};
+
+    res.status(200).success({ send, receive }); 
+  } catch (err) {
+    next(err);
+  }
+} 
