@@ -117,7 +117,7 @@ const socialVerify = async (profile, type) => {
         }
 
         const token = generateToken({ id: user.id });
-
+        
         return {
             token,
             user: {

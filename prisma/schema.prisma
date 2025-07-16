@@ -31,7 +31,6 @@ model RecomsSong {
   title           String           @db.VarChar(100)
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
-  preview_url     String?
   userRecomsSongs UserRecomsSong[]
 }
 
@@ -81,7 +80,7 @@ model User {
   socialType      SocialType        @map("social_type")
   nickname        String?           @db.VarChar(40)
   birth           DateTime?
-  gender          Gender            @default(MAN)
+  gender          Gender?           @default(MAN)
   photo           String?
   bio             String?
   createdAt       DateTime          @default(now()) @map("created_at")
@@ -113,7 +112,7 @@ model FcmToken {
 model Session {
   id        String   @id @default(uuid())
   sid       String   @unique
-  data      String   @db.Text
+  data      String   @db.VarChar(512)
   expiresAt DateTime @map("expires_at")
 
   @@map("session")
