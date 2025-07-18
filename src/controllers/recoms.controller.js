@@ -1,8 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { sentRecomsSong, receivedRecomsSong, searchSong } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
-import { MissingSearchQueryError } from "../errors.js";
-import { RecommendationNotFoundError } from "../errors.js";
+import { NotFoundKeywordError } from "../errors.js";
 
 
 export const handleAllTracks = async (req, res, next) => {
@@ -33,11 +32,11 @@ export const handleSentRecomsSong = async (req, res, next) => {
     };
 
     #swagger.responses[404] = {
-        $ref: "#/components/responses/Failed"
+        $ref: "#/components/responses/RecomsSongNotFoundError"
     };
 
     #swagger.responses[403] = {
-        $ref: "#/components/responses/Failed"
+        $ref: "#/components/responses/UserMismatchError"
     };
     */
 
@@ -62,11 +61,11 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
     };
 
     #swagger.responses[404] = {
-        $ref: "#/components/responses/Failed"
+        $ref: "#/components/responses/RecomsSongNotFoundError"
     };
 
     #swagger.responses[403] = {
-        $ref: "#/components/responses/Failed"
+        $ref: "#/components/responses/UserMismatchError"
     };
     */
 
@@ -82,98 +81,18 @@ export const searchRecomSong = async (req, res, next) => {
 
   /*
     #swagger.summary = '추천 기록 검색 API'
-    #swagger.security = [{ bearerAuth: [] }]
-    #swagger.parameters['keyword'] = {
-      in: 'query',
-      name: 'keyword',
-      required: true,
-      schema: { type: 'string', example: 'Blueming' },
-      description: '검색어(곡 제목 또는 아티스트명)'
-    }
 
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+    
     #swagger.responses[200] = {
-      description: '검색 성공 응답',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: true },
-              data: {
-                type: 'object',
-                properties: {
-                  send: {
-                    type: 'array',
-                    description: '내가 발신한 곡 리스트',
-                    items: { $ref: '#/components/schemas/RecomsSongItem' }
-                  },
-                  receive: {
-                    type: 'array',
-                    description: '내가 수신한 곡 리스트',
-                    items: {
-                      allOf: [
-                        { $ref: '#/components/schemas/RecomsSongItem' },
-                        {
-                          type: 'object',
-                          properties: {
-                            senderNickname: { type: 'string', example: 'noshel' }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              error: { type: 'object', nullable: true, example: null }
-            }
-          }
-        }
-      }
-    }
-
-    #swagger.responses[400] = {
-      description: '검색어 미입력',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: false },
-              data: { type: 'string', nullable: true, example: null },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string', example: 'RS1300' },
-                  message: { type: 'string', example: '검색어를 입력하세요.' }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+        $ref: "#/components/responses/Success"
+    };
 
     #swagger.responses[404] = {
-      description: '검색 결과 없음',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: false },
-              data: { type: 'string', nullable: true, example: null },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string', example: 'RS1301' },
-                  message: { type: 'string', example: '검색 결과가 없습니다.' }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+        $ref: "#/components/responses/RecomsSongNotFoundError"
+    };
   */  
   try {
     const { keyword } = req.query;
@@ -181,15 +100,15 @@ export const searchRecomSong = async (req, res, next) => {
 
     // 1) 검색어 없으면
     if (!keyword || keyword.trim() === "") {
-      throw new MissingSearchQueryError();
+      throw new NotFoundKeywordError("검색어를 입력하세요.");
     }
 
     const results = await searchSong(userId, keyword);
 
-    // 2) 결과가 없으면
-    if (results.length === 0) {
-      throw new RecommendationNotFoundError();
-    }
+    // // 2) 결과가 없으면
+    // if (results.length === 0) {
+    //   throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
+    // }
     
     const send = [];
     const receive = [];

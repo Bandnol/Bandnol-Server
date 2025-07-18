@@ -1,5 +1,5 @@
 import { sentRecomsResponseDTO, receivedRecomsResponseDTO } from "../dtos/recoms.dto.js";
-import { RecomsSongNotFoundError, UserMismatchError, MissingSearchQueryError } from "../errors.js";
+import { RecomsSongNotFoundError, UserMismatchError, NotFoundKeywordError } from "../errors.js";
 import { getSentRecomsSong, getReceivedRecomsSong, findSongByKeyword } from "../repositories/recoms.repository.js";
 
 export const sentRecomsSong = async (recomsId, userId) => {
@@ -34,8 +34,7 @@ export const receivedRecomsSong = async (recomsId, userId) => {
 
 export const searchSong = async (userId, keyword) => {
     if (!keyword) {
-        throw new MissingSearchQueryError();
+        throw new NotFoundKeywordError("검색어를 입력하세요.");
     }
-
     return await findSongByKeyword(userId, keyword);
 };

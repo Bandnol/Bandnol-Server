@@ -9,7 +9,7 @@ import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
 import { googleStrategy, naverStrategy, kakaoStrategy } from "./configs/auth.config.js";
-import { responses } from "./components/components.js";
+import components from "./components/components.js";
 
 dotenv.config();
 
@@ -97,7 +97,7 @@ app.get("/openapi.json", async (req, res, next) => {
         },
         host: "localhost:3000",
         components: {
-            responses,
+            ...components,
             securitySchemes: {
                 bearerAuth: {
                     type: "http",

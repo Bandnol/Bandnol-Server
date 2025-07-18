@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as NaverStrategy } from "passport-naver-v2";
 import { Strategy as KakaoStrategy } from "passport-kakao";
-import { NotFoundUserEmail } from "../errors.js";
+import { NotFoundUserEmailError } from "../errors.js";
 import { prisma } from "./db.config.js";
 import { generateToken } from "../utils/token.js";
 import { SocialType, Gender } from "@prisma/client";
@@ -87,7 +87,7 @@ const socialVerify = async (profile, type) => {
         }
 
         if (!email) {
-            throw new NotFoundUserEmail("해당 이메일을 찾을 수 없습니다.");
+            throw new NotFoundUserEmailError("해당 이메일을 찾을 수 없습니다.");
         }
 
         let user = await prisma.user.findFirst({ where: { email } });

@@ -2,7 +2,7 @@ import axios from 'axios';
 import qs from 'qs';
 
 import { searchTracksResponseDTO } from '../dtos/recoms.dto.js';
-import { NotFoundKeyword } from '../errors.js';
+import { NotFoundKeywordError } from '../errors.js';
 
 export async function getSpotifyToken() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -44,8 +44,6 @@ export async function searchSpotifyTracks(keyword, cursor) {
       limit: 20
     },
   });
-
-  console.log(res.data.tracks.items);
 
     const result = res.data.tracks.items.map((track) =>
         searchTracksResponseDTO({

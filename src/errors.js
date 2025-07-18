@@ -1,24 +1,4 @@
-export class MissingSearchQueryError extends Error {
-    errorCode = "RS1300";
-
-    constructor(reason = "검색어를 입력하세요.", data = null) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
-export class RecommendationNotFoundError extends Error {
-    errorCode = "RS1301";
-
-    constructor(reason = "추천 기록이 존재하지 않습니다.", data = null) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
-export class NotFoundUserEmail extends Error {
+export class NotFoundUserEmailError extends Error {
     errorCode = "U1301";
     statusCode = 404;
 
@@ -29,7 +9,7 @@ export class NotFoundUserEmail extends Error {
     }
 }
 
-export class NotFoundKeyword extends Error {
+export class NotFoundKeywordError extends Error {
     errorCode = "R1300";
     statusCode = 404;
 
@@ -40,8 +20,20 @@ export class NotFoundKeyword extends Error {
     }
 }
 
-export class RecomsSongNotFoundError extends Error {
+export class RecommendationNotFoundError extends Error {
     errorCode = "R1301";
+    statusCode = 404;
+
+    constructor(reason, data = null) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+
+export class RecomsSongNotFoundError extends Error {
+    errorCode = "R1302";
     statusCode = 404;
 
     constructor(reason, data) {
@@ -52,7 +44,7 @@ export class RecomsSongNotFoundError extends Error {
 }
 
 export class UserMismatchError extends Error {
-    errorCode = "R1302";
+    errorCode = "R1303";
     statusCode = 403;
 
     constructor(reason, data) {
