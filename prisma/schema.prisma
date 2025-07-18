@@ -70,7 +70,7 @@ model UserRecomsSong {
   receiverId   String?       @map("receiver_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   isAnoymous   Boolean       @default(false) @map("is_anoymous")
-  isLiked      Boolean       @default(false) @map("is_liked")
+  isLiked      Boolean?      @default(false) @map("is_liked")
   comment      String
   replies      RecomsReply?   
   receiver     User?         @relation("UserReceivedRecom", fields: [receiverId], references: [id])
