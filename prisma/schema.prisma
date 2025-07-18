@@ -33,7 +33,7 @@ model RecomsSong {
   title           String           @db.VarChar(100)
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
-  preview_url     String?
+  previewUrl      String?          @map("preview_url")
   userRecomsSongs UserRecomsSong[]
 }
 
@@ -57,7 +57,7 @@ model RecomsReply {
   content          String
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
-  userRecomsSongId String         @map("user_recoms_song_id")
+  userRecomsSongId String         @map("user_recoms_song_id") @unique
   responderId      String         @map("responder_id")
   responder        User           @relation(fields: [responderId], references: [id])
   userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
@@ -67,13 +67,13 @@ model UserRecomsSong {
   id           String        @id @unique @default(uuid())
   senderId     String        @map("sender_id")
   recomsSongId String        @map("recoms_song_id")
-  receiverId   String        @map("receiver_id")
+  receiverId   String?       @map("receiver_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   isAnoymous   Boolean       @default(false) @map("is_anoymous")
   isLiked      Boolean       @default(false) @map("is_liked")
   comment      String
-  replies      RecomsReply[]
-  receiver     User          @relation("UserReceivedRecom", fields: [receiverId], references: [id])
+  replies      RecomsReply?   
+  receiver     User?         @relation("UserReceivedRecom", fields: [receiverId], references: [id])
   recomsSong   RecomsSong    @relation(fields: [recomsSongId], references: [id])
   sender       User          @relation("UserSentRecom", fields: [senderId], references: [id])
 }
@@ -116,7 +116,7 @@ model FcmToken {
 model Session {
   id        String   @id @default(uuid())
   sid       String   @unique
-  data      String   @db.Text
+  data      String   
   expiresAt DateTime @map("expires_at")
 
   @@map("session")
