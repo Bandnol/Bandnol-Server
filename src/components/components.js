@@ -1,3 +1,5 @@
+import { NotSupportedSocialLoginError } from "../errors.js";
+
 export default {
   responses: {
     Success: {
@@ -9,6 +11,24 @@ export default {
             properties: {
               success: { type: "boolean", example: true },
               data: { type: "object" },
+              error: {
+                type: ["object", "null"],
+                example: null,
+              },
+            },
+          },
+        },
+      },
+    },
+    SuccessSocialLogin: {
+      description: "소셜 로그인 페이지로 리다이렉트합니다.",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              success: { type: "boolean", example: true },
+              data: { type: "object", nullable: true },
               error: {
                 type: ["object", "null"],
                 example: null,
@@ -172,5 +192,27 @@ export default {
         },
       },
     },
+    NotSupportedSocialLoginError: {
+        description: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요.",
+        content: {
+            "application/json": {
+                schema:{
+                    type: "object",
+                    properties: {
+                        success: { type: "boolean", example: false },
+                        data: {type: "object", nullable: true},
+                        error: {
+                            type: "object",
+                            properties: {
+                                errorCode: { type: "string" },
+                                reason: { type: "string" },
+                                data: { type: "object", nullable: true },
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
   },
 };

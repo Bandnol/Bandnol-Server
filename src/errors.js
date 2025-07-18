@@ -1,13 +1,13 @@
-export class NotFoundUserEmailError extends Error {
-    errorCode = "U1301";
-    statusCode = 404;
+export class NotSupportedSocialLoginError extends Error {
+    errorCode = "U1300";
+    statusCode = 401;
 
     constructor(reason, data) {
         super(reason);
         this.reason = reason;
         this.data = data;
     }
-}
+} 
 
 export class NotFoundKeywordError extends Error {
     errorCode = "R1300";
@@ -77,3 +77,5 @@ export class TokenError extends Error {
         this.data = data;
     }
 }
+
+

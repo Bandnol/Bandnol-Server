@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as NaverStrategy } from "passport-naver-v2";
 import { Strategy as KakaoStrategy } from "passport-kakao";
-import { NotFoundUserEmailError } from "../errors.js";
+import { NotSupportedSocialLoginError, UnauthorizedError } from "../errors.js";
 import { prisma } from "./db.config.js";
 import { generateToken } from "../utils/token.js";
 import { SocialType, Gender } from "@prisma/client";
@@ -83,11 +83,11 @@ const socialVerify = async (profile, type) => {
             name = account.name;
             email = account.email;
         } else {
-            throw new Error(`${type}은 지원하지 않는 소셜 로그인입니다.`);
+            throw new NotSupportedSocialLoginError("지원하지 않는 소셜 로그인입니다.")
         }
 
         if (!email) {
-            throw new NotFoundUserEmailError("해당 이메일을 찾을 수 없습니다.");
+            throw new UnauthorizedError("소셜 로그인에 실패했습니다. 이메일 정보를 가져올 수 없습니다.")
         }
 
         let user = await prisma.user.findFirst({ where: { email } });
@@ -132,7 +132,6 @@ const socialVerify = async (profile, type) => {
             },
         };
     } catch (err) {
-        console.error("Social verify failed:", err);
-        throw err;
+        next(err);
     }
 };

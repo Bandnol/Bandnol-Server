@@ -10,6 +10,10 @@ export const handleAllTracks = async (req, res, next) => {
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
     };
+
+    #swagger.responses[401] = {
+      $ref: "#/components/responses/TokenError"
+    };
   */
 
     const keyword = req.query.keyword;
@@ -109,6 +113,8 @@ export const searchRecomSong = async (req, res, next) => {
     // if (results.length === 0) {
     //   throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
     // }
+    
+    // 결과가 없을 때는 백엔드에서 에러 처리 안 하기로 해서 일단 주석처리 해놨습니당 -> statusCode 겹쳐서 하나만 처리
     
     const send = [];
     const receive = [];

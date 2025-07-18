@@ -2,7 +2,7 @@ import axios from 'axios';
 import qs from 'qs';
 
 import { searchTracksResponseDTO } from '../dtos/recoms.dto.js';
-import { NotFoundKeywordError } from '../errors.js';
+import { TokenError } from '../errors.js';
 
 export async function getSpotifyToken() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -32,6 +32,9 @@ export async function getSpotifyToken() {
 export async function searchSpotifyTracks(keyword, cursor) {
 
   const token = await getSpotifyToken();
+  if(!token){
+    TokenError("유효하지 않은 스포티파이 토큰입니다.");
+  }
 
   const res = await axios.get('https://api.spotify.com/v1/search', {
     headers: {
