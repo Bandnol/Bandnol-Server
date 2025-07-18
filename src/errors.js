@@ -12,7 +12,7 @@ export class NotSupportedSocialLoginError extends Error {
 
 export class NoUserError extends Error {
     errorCode = "U1301";
-    statusCode = 404;
+    statusCode = 401;
 
     constructor(reason,data){
         super(reason);

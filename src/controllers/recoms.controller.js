@@ -159,6 +159,22 @@ export const handleAddRecoms = async (req, res, next) => {
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/NotFoundSongError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/NoUserError"
+    };
+
+    #swagger.responses[409] = {
+        $ref: "#/components/responses/DuplicateRecoms"
+    };
+
+    #swagger.responses[409] = {
+        $ref: "#/components/responses/RecomsSongNotFoundError"
+    };
     */
 
     try {
