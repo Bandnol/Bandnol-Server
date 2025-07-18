@@ -8,16 +8,16 @@ datasource db {
 }
 
 model UserLikedArtist {
-  id              String       @id @unique @default(uuid())
-  createdAt       DateTime     @default(now()) @map("created_at")
-  updatedAt       DateTime     @updatedAt @map("updated_at")
-  artistId        String       @map("artist_id")
-  userId          String       @map("user_id")
-  artistName      String       @map("artist_name")
-  imgUrl          String       @map("img_url")
-  inactiveAt      DateTime?    @map("inactive_at")
-  inactiveStatus  Boolean      @default(false) @map("inactive_status")
-  user            User     @relation(fields: [userId], references: [id])
+  id             String    @id @unique @default(uuid())
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  artistId       String    @map("artist_id")
+  userId         String    @map("user_id")
+  artistName     String    @map("artist_name")
+  imgUrl         String    @map("img_url")
+  inactiveAt     DateTime? @map("inactive_at")
+  inactiveStatus Boolean   @default(false) @map("inactive_status")
+  user           User      @relation(fields: [userId], references: [id])
 }
 
 model Inquiry {
@@ -33,6 +33,7 @@ model RecomsSong {
   title           String           @db.VarChar(100)
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
+  preview_url     String?
   userRecomsSongs UserRecomsSong[]
 }
 
@@ -56,25 +57,25 @@ model RecomsReply {
   content          String
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
-  userRecomsSongId String         @map("user_recoms_song_id")
+  userRecomsSongId String         @unique @map("user_recoms_song_id")
   responderId      String         @map("responder_id")
   responder        User           @relation(fields: [responderId], references: [id])
   userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
 }
 
 model UserRecomsSong {
-  id           String        @id @unique @default(uuid())
-  senderId     String        @map("sender_id")
-  recomsSongId String        @map("recoms_song_id")
-  receiverId   String        @map("receiver_id")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  isAnoymous   Boolean       @default(false) @map("is_anoymous")
-  isLiked      Boolean       @default(false) @map("is_liked")
+  id           String       @id @unique @default(uuid())
+  senderId     String       @map("sender_id")
+  recomsSongId String       @map("recoms_song_id")
+  receiverId   String?      @map("receiver_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  isAnoymous   Boolean      @default(false) @map("is_anoymous")
+  isLiked      Boolean?     @default(false) @map("is_liked")
   comment      String
-  replies      RecomsReply[]
-  receiver     User          @relation("UserReceivedRecom", fields: [receiverId], references: [id])
-  recomsSong   RecomsSong    @relation(fields: [recomsSongId], references: [id])
-  sender       User          @relation("UserSentRecom", fields: [senderId], references: [id])
+  replies      RecomsReply?
+  receiver     User?        @relation("UserReceivedRecom", fields: [receiverId], references: [id])
+  recomsSong   RecomsSong   @relation(fields: [recomsSongId], references: [id])
+  sender       User         @relation("UserSentRecom", fields: [senderId], references: [id])
 }
 
 model User {
@@ -97,11 +98,11 @@ model User {
   fcmTokens       FcmToken[]
   receivedNotices Notification[]    @relation("NotificationReceiver")
   sentNotices     Notification[]    @relation("NotificationSender")
+  notifications   NotificationType?
   recomsReplies   RecomsReply[]
   likedArtist     UserLikedArtist[]
   receivedRecoms  UserRecomsSong[]  @relation("UserReceivedRecom")
   sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
-  notifications   NotificationType?
 }
 
 model FcmToken {
@@ -115,21 +116,21 @@ model FcmToken {
 model Session {
   id        String   @id @default(uuid())
   sid       String   @unique
-  data      String   @db.VarChar(512)
+  data      String
   expiresAt DateTime @map("expires_at")
 
   @@map("session")
 }
 
 model NotificationType {
-  id              String     @id @unique @default(uuid())
-  userId          String     @map("user_id") @unique
-  recomsReceived  Boolean    @map("recoms_received") @default(true)
-  recomsSent      Boolean    @map("recoms_sent") @default(true)
-  commentArrived  Boolean    @map("comment_arrived") @default(true)
-  notRecoms       Boolean    @map("not_recoms") @default(true)
-  announcement    Boolean    @default(true)
-  user            User       @relation(fields: [userId], references: [id])
+  id             String  @id @unique @default(uuid())
+  userId         String  @unique @map("user_id")
+  recomsReceived Boolean @default(true) @map("recoms_received")
+  recomsSent     Boolean @default(true) @map("recoms_sent")
+  commentArrived Boolean @default(true) @map("comment_arrived")
+  notRecoms      Boolean @default(true) @map("not_recoms")
+  announcement   Boolean @default(true)
+  user           User    @relation(fields: [userId], references: [id])
 }
 
 enum Gender {

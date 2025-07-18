@@ -45,3 +45,29 @@ export const receivedRecomsResponseDTO = (recomsData) => {
         replyId: recomsData.replies[0] ? recomsData.replies[0].id : null,
     };
 };
+
+export const getSongInfoResponseDTO = (songData) => {
+    //console.log(songData);
+    const artists =songData.artists.map(artist => artist.name).join(", ");
+        
+    return {
+        id: songData.id,
+        title: songData.name,
+        artistName: artists,
+        imgUrl : songData.album.images?.[0]?.url || null,
+        previewUrl: songData.preview_url || null
+    }
+}
+
+export const userRecomsSongResponseDTO = (userRecomsSongData) => {
+    return {
+        id: userRecomsSongData.id,
+        recomsSong: {
+            id: userRecomsSongData.recomsSongId,
+        },
+        sender: {
+            id: userRecomsSongData.senderId
+        },
+        comment: userRecomsSongData.comment
+    }
+}

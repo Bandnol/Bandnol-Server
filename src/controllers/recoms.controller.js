@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { sentRecomsSong, receivedRecomsSong, searchSong } from "../services/recoms.service.js";
+import { sentRecomsSong, receivedRecomsSong, searchSong, addRecoms } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
 
@@ -15,12 +15,15 @@ export const handleAllTracks = async (req, res, next) => {
       $ref: "#/components/responses/TokenError"
     };
   */
+  try{
+        const keyword = req.query.keyword;
+        const cursor = typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0;
 
-    const keyword = req.query.keyword;
-    const cursor = typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0;
-
-    const tracks = await searchSpotifyTracks(keyword, cursor);
-    res.status(StatusCodes.OK).success(tracks);
+        const tracks = await searchSpotifyTracks(keyword, cursor);
+        res.status(StatusCodes.OK).success(tracks);
+  }catch(err){
+    next(err);
+  }
 };
 
 export const handleSentRecomsSong = async (req, res, next) => {
@@ -144,3 +147,26 @@ export const searchRecomSong = async (req, res, next) => {
         next(err);
     }
 };
+
+export const handleAddRecoms = async (req, res, next) => {
+    /*
+    #swagger.summary = '노래 추천하기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+    */
+
+    try {
+        const userId = req.user.id;
+        const recomsSongId = await addRecoms(req.body, userId);
+        console.log(req.body);
+        res.status(StatusCodes.OK).success(recomsSongId);
+    } catch (err) {
+        next(err);
+    }
+}

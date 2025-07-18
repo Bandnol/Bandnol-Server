@@ -1,3 +1,4 @@
+// 도메인 : User
 export class NotSupportedSocialLoginError extends Error {
     errorCode = "U1300";
     statusCode = 401;
@@ -7,7 +8,30 @@ export class NotSupportedSocialLoginError extends Error {
         this.reason = reason;
         this.data = data;
     }
-} 
+}
+
+export class NoUserError extends Error {
+    errorCode = "U1301";
+    statusCode = 404;
+
+    constructor(reason,data){
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+// 도메인 : Recoms
+export class DuplicateRecoms extends Error {
+    errorCode = "R1200";
+    statusCode = 409;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
 
 export class NotFoundKeywordError extends Error {
     errorCode = "R1300";
@@ -54,6 +78,8 @@ export class UserMismatchError extends Error {
     }
 }
 
+
+// 도메인 : Token
 // 인증 정보가 제공되어 있지 않은 경우
 export class UnauthorizedError extends Error {
     errorCode = "T1200";
@@ -79,3 +105,14 @@ export class TokenError extends Error {
 }
 
 
+// 도메인 : Spotify
+export class NotFoundSongError extends Error {
+    errorCode = "S1300";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
