@@ -7,7 +7,7 @@ export class NotSupportedSocialLoginError extends Error {
         this.reason = reason;
         this.data = data;
     }
-} 
+}
 
 export class NotFoundKeywordError extends Error {
     errorCode = "R1300";
@@ -31,20 +31,8 @@ export class RecommendationNotFoundError extends Error {
     }
 }
 
-
-export class RecomsSongNotFoundError extends Error {
-    errorCode = "R1302";
-    statusCode = 404;
-
-    constructor(reason, data) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
 export class UserMismatchError extends Error {
-    errorCode = "R1303";
+    errorCode = "R1302";
     statusCode = 403;
 
     constructor(reason, data) {
@@ -78,4 +66,13 @@ export class TokenError extends Error {
     }
 }
 
+export class QueryParamError extends Error {
+    errorCode = "E1000";
+    statusCode = 400;
 
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}

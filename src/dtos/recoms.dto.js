@@ -45,3 +45,14 @@ export const receivedRecomsResponseDTO = (recomsData) => {
         replyId: recomsData.replies[0] ? recomsData.replies[0].id : null,
     };
 };
+
+export const commentResponseDTO = (comment) => {
+    return {
+        id: comment.id,
+        sender: {
+            id: comment.sender.id,
+            nickname: comment.sender.nickname,
+        },
+        comment: comment.comment,
+    };
+};
