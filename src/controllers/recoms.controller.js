@@ -1,5 +1,11 @@
 import { StatusCodes } from "http-status-codes";
-import { sentRecomsSong, receivedRecomsSong, searchSong, viewComment } from "../services/recoms.service.js";
+import {
+    sentRecomsSong,
+    receivedRecomsSong,
+    searchSong,
+    viewComment,
+    modifyLikeStatus,
+} from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
 
@@ -184,6 +190,44 @@ export const handleViewComments = async (req, res, next) => {
         const comment = await viewComment(req.params.recomsId, req.query.type, req.user.id);
 
         res.status(StatusCodes.OK).success(comment);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleModifyLikeStatus = async (req, res, next) => {
+    /*
+    #swagger.summary = '추천 곡에 좋아요/별로예요 누르기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/RequestBodyError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/UserMismatchError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecommendationNotFoundError"
+    };
+    */
+
+    try {
+        const status = await modifyLikeStatus(req.params.recomsId, req.user.id, req.body.isLiked);
+
+        res.status(StatusCodes.OK).success(status);
     } catch (err) {
         next(err);
     }

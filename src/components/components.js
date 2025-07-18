@@ -1,5 +1,3 @@
-import { NotSupportedSocialLoginError } from "../errors.js";
-
 export default {
     responses: {
         Success: {
@@ -194,6 +192,28 @@ export default {
         },
         QueryParamError: {
             description: "쿼리 파라미터가 올바르지 않습니다.",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    errorCode: { type: "string" },
+                                    reason: { type: "string" },
+                                    data: { type: "object", nullable: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        RequestBodyError: {
+            description: "Request Body가 올바르지 않습니다.",
             content: {
                 "application/json": {
                     schema: {

@@ -108,3 +108,13 @@ export const getComment = async (recomsId) => {
 
     return comment;
 };
+
+// 좋아요/별로예요 누르기
+export const patchLikeStatus = async (recomsId, isLiked) => {
+    const status = await prisma.userRecomsSong.update({
+        where: { id: recomsId },
+        data: { isLiked: isLiked },
+    });
+
+    return status;
+};

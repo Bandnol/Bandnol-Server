@@ -56,3 +56,10 @@ export const commentResponseDTO = (comment) => {
         comment: comment.comment,
     };
 };
+
+export const likeStatusResponseDTO = (status) => {
+    return {
+        id: status.id,
+        isLiked: status.isLiked,
+    };
+};

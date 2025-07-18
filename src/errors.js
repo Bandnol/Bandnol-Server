@@ -76,3 +76,14 @@ export class QueryParamError extends Error {
         this.data = data;
     }
 }
+
+export class RequestBodyError extends Error {
+    errorCode = "E1001";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
