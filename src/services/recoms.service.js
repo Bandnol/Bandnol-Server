@@ -1,14 +1,26 @@
-import { sentRecomsResponseDTO, receivedRecomsResponseDTO, commentResponseDTO } from "../dtos/recoms.dto.js";
-import { RecommendationNotFoundError, UserMismatchError, NotFoundKeywordError, QueryParamError } from "../errors.js";
+import {
+    sentRecomsResponseDTO,
+    receivedRecomsResponseDTO,
+    commentResponseDTO,
+    likeStatusResponseDTO,
+} from "../dtos/recoms.dto.js";
+import {
+    RecommendationNotFoundError,
+    UserMismatchError,
+    NotFoundKeywordError,
+    QueryParamError,
+    RequestBodyError,
+} from "../errors.js";
 import {
     getSentRecomsSong,
     getReceivedRecomsSong,
     findSongByKeyword,
     getComment,
+    patchLikeStatus,
 } from "../repositories/recoms.repository.js";
 
-export const sentRecomsSong = async (recomsId, userId) => {
-    const recomsData = await getSentRecomsSong(recomsId);
+export const sentRecomsSong = async (recomsId, userId, isLiked) => {
+    const recomsData = await getSentRecomsSong(recomsId, isLiked);
 
     if (!recomsData) {
         throw new RecommendationNotFoundError("해당 추천곡을 찾을 수 없습니다.");
@@ -61,4 +73,22 @@ export const viewComment = async (recomsId, type, userId) => {
 
     console.log(comment);
     return commentResponseDTO(comment);
+};
+
+export const modifyLikeStatus = async (recomsId, userId, isLiked) => {
+    if (![true, false, null].includes(isLiked)) {
+        throw new RequestBodyError("Request Body가 올바르지 않습니다.");
+    }
+
+    const status = await patchLikeStatus(recomsId, isLiked);
+
+    if (!status) {
+        throw new RecommendationNotFoundError("추천 곡을 찾을 수 없습니다.");
+    }
+
+    if (status.receiverId !== userId) {
+        throw new UserMismatchError("본인이 수신한 곡이 아닙니다. 좋아요/별로예요 권한이 없습니다.");
+    }
+
+    return likeStatusResponseDTO(status);
 };
