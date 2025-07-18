@@ -48,11 +48,11 @@ export const authenticateAccessToken = (req, res, next) => {
             console.log("JWT 토큰 검증 성공", {
                 action: "token:authenticate",
                 actionType: "success",
-                userId: user.userId,
+                userId: user.id,
             });
 
             req.user = {
-                userId: user.userId,
+                id: user.id,
             }; // 검증된 사용자 정보를 요청 객체에 추가
             next();
         });
@@ -94,7 +94,7 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
                 // }
 
                 req.user = {
-                    userId: null,
+                    id: null,
                 };
                 return next();
             }
@@ -102,11 +102,11 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
             console.log("JWT 토큰 검증 성공", {
                 action: "token:authenticate",
                 actionType: "success",
-                userId: user.userId,
+                userId: user.id,
             });
 
             req.user = {
-                userId: user.userId,
+                id: user.id,
             }; // 검증된 사용자 정보를 요청 객체에 추가
 
             // 확인용
@@ -116,7 +116,7 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
         });
     } else {
         req.user = {
-            userId: null,
+            id: null,
         };
 
         // 확인용

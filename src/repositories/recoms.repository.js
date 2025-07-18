@@ -84,3 +84,27 @@ export const findSongByKeyword = async (userId, keyword) => {
         },
     });
 };
+
+// 코멘트 조회
+export const getComment = async (recomsId) => {
+    const comment = await prisma.userRecomsSong.findFirst({
+        where: { id: recomsId },
+        select: {
+            id: true,
+            comment: true,
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+            receiver: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
+
+    return comment;
+};

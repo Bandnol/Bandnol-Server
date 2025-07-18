@@ -4,6 +4,7 @@ import {
     handleSentRecomsSong,
     handleReceivedRecomsSong,
     searchRecomSong,
+    handleViewComments,
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -13,5 +14,6 @@ router.get("/recoms/search/song", handleAllTracks);
 router.get("/:recomsId/sent", authenticateAccessToken, handleSentRecomsSong);
 router.get("/:recomsId/received", authenticateAccessToken, handleReceivedRecomsSong);
 router.get("/recoms/search/record", authenticateAccessToken, searchRecomSong);
+router.get("/recoms/:recomsId/comments", authenticateAccessToken, handleViewComments);
 
 export default router;
