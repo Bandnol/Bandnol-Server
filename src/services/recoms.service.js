@@ -99,16 +99,8 @@ export const searchRecomsSong = async (userId, keyword) => {
       throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
     }
 
-    const send = [];
-    const receive = [];
-
-    searchRecomsData.forEach((recom) => {
-        if (recom.senderId === userId) {
-            send.push(recom);
-        } else {
-            receive.push(recom);
-        }
-    });
+    const send = searchRecomsData.filter(r => r.senderId === userId);
+    const receive = searchRecomsData.filter(r => r.senderId !== userId);
 
     return {
         send: send.map(searchRecomsResponseDTO),
