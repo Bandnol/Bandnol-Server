@@ -25,7 +25,7 @@ import {
     createRecomsSong,
     createUserRecomsSong,
 } from "../repositories/recoms.repository.js";
-import { getUser } from "../repositories/users.repository.js";
+import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo } from "./spotify.service.js";
 import { checkAuth, checkAuthByType } from "../utils/validate.js";
 
@@ -50,7 +50,7 @@ export const searchSong = async (userId, keyword) => {
 
 export const addRecoms = async (data, userId) => {
     // 로그인한 사용자인지 확인
-    const recomsUser = await getUser(userId);
+    const recomsUser = await getUserById(userId);
     if (!recomsUser) {
         throw new NoUserError("사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다.");
     }
