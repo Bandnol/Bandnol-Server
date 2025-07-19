@@ -9,7 +9,6 @@ export class NotSupportedSocialLoginError extends Error {
         this.data = data;
     }
 }
-
 export class NoUserError extends Error {
     errorCode = "U1301";
     statusCode = 401;
@@ -55,20 +54,8 @@ export class RecommendationNotFoundError extends Error {
     }
 }
 
-
-export class RecomsSongNotFoundError extends Error {
-    errorCode = "R1302";
-    statusCode = 404;
-
-    constructor(reason, data) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
 export class UserMismatchError extends Error {
-    errorCode = "R1303";
+    errorCode = "R1302";
     statusCode = 403;
 
     constructor(reason, data) {
@@ -104,10 +91,30 @@ export class TokenError extends Error {
     }
 }
 
-
 // 도메인 : Spotify
 export class NotFoundSongError extends Error {
     errorCode = "S1300";
+    statusCode = 400;
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class QueryParamError extends Error {
+    errorCode = "E1000";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class RequestBodyError extends Error {
+    errorCode = "E1001";
     statusCode = 400;
 
     constructor(reason, data) {

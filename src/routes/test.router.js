@@ -12,7 +12,7 @@ router.post("/test", handleTest);
 // 토큰 발급
 router.get("/short-access-token", (req, res) => {
     res.status(200).json({
-        token: generateToken({ userId: req.body.userId }),
+        token: generateToken({ id: req.body.id }),
     });
 });
 

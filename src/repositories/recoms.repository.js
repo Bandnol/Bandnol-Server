@@ -135,3 +135,37 @@ export const createUserRecomsSong = async (data, userId, recomsSong) => {
     });
     return created;
 }
+
+// 코멘트 조회
+export const getComment = async (recomsId) => {
+    const comment = await prisma.userRecomsSong.findFirst({
+        where: { id: recomsId },
+        select: {
+            id: true,
+            comment: true,
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+            receiver: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
+
+    return comment;
+};
+
+// 좋아요/별로예요 누르기
+export const patchLikeStatus = async (recomsId, isLiked) => {
+    const status = await prisma.userRecomsSong.update({
+        where: { id: recomsId },
+        data: { isLiked: isLiked },
+    });
+
+    return status;
+};

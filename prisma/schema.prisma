@@ -33,7 +33,7 @@ model RecomsSong {
   title           String           @db.VarChar(100)
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
-  preview_url     String?
+  previewUrl      String?          @map("preview_url")
   userRecomsSongs UserRecomsSong[]
 }
 

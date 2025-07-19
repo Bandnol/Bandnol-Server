@@ -4,7 +4,9 @@ import {
     handleSentRecomsSong,
     handleReceivedRecomsSong,
     searchRecomSong,
-    handleAddRecoms
+    handleAddRecoms,
+    handleViewComments,
+    handleModifyLikeStatus,
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -15,5 +17,7 @@ router.get("/:recomsId/sent", authenticateAccessToken, handleSentRecomsSong);
 router.get("/:recomsId/received", authenticateAccessToken, handleReceivedRecomsSong);
 router.get("/search/record", authenticateAccessToken, searchRecomSong);
 router.post("/",authenticateAccessToken, handleAddRecoms);
+router.get("/:recomsId/comments", authenticateAccessToken, handleViewComments);
+router.patch("/:recomsId/likes", authenticateAccessToken, handleModifyLikeStatus);
 
 export default router;
