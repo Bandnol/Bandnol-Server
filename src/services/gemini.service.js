@@ -1,6 +1,6 @@
 // gemini.controller.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getUser } from "../repositories/users.repository.js";
+import { getUserById } from "../repositories/users.repository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -10,7 +10,7 @@ const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro-latest" }
 
 export const genAIComment = async (data, userId) => {
 
-  const user = await getUser(userId);
+  const user = await getUserById(userId);
   if(!user){
       throw new NoUserError("사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다.");
   }
