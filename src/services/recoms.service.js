@@ -33,15 +33,29 @@ export const receivedRecomsSong = async (recomsId, userId) => {
 };
 
 export const searchRecomsSong = async (userId, keyword) => {
-  if (!keyword.trim()) {
-    throw new MissingSearchQueryError("검색어가 입력되지 않았습니다.");
-  }
+    if (!keyword.trim()) {
+      throw new MissingSearchQueryError("검색어가 입력되지 않았습니다.");
+    }
 
-  const searchRecomsData = await findSongByKeyword(userId, keyword);
+    const searchRecomsData = await findSongByKeyword(userId, keyword);
 
-  if (!searchRecomsData || searchRecomsData.length === 0) {
-    throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
-  }
+    if (!searchRecomsData || searchRecomsData.length === 0) {
+      throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
+    }
 
-  return searchRecomsResponseDTO(searchRecomsData, userId);
+    const send = [];
+    const receive = [];
+
+    searchRecomsData.forEach((recom) => {
+        if (recom.senderId === userId) {
+            send.push(recom);
+        } else {
+            receive.push(recom);
+        }
+    });
+
+    return {
+        send: send.map(searchRecomsResponseDTO),
+        receive: receive.map((item) => searchRecomsResponseDTO(item, true)), // true → isReceived
+    };
 };

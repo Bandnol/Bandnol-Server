@@ -46,30 +46,23 @@ export const receivedRecomsResponseDTO = (recomsData) => {
     };
 };
 
-export const searchRecomsResponseDTO = (searchRecomsData, userId) => {
-    const send = [];
-    const receive = [];
+export const searchRecomsResponseDTO = (recom, isReceived = false) => {
+    const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
 
-    searchRecomsData.forEach((recom) => {
-        const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
+    const searchRecomsData = {
+        date: kstDate.toISOString().slice(0, 10),
+        comment: recom.comment,
+        title: recom.recomsSong.title,
+        artistName: recom.recomsSong.artistName,
+        imageUrl: recom.recomsSong.imgUrl || null,
+    };
 
-        const searchData = {
-            date: kstDate.toISOString().slice(0, 10), // "YYYY-MM-DD",
-            comment: recom.comment,
-            title: recom.recomsSong.title,
-            artistName: recom.recomsSong.artistName,
-            imageUrl: recom.recomsSong.imgUrl || null,
+    if (isReceived) {
+        return {
+            senderNickname: recom.sender.nickname,
+            ...searchRecomsData,
         };
+    }
 
-        if (recom.senderId === userId) {
-            send.push(searchData);
-        } else {
-            receive.push({
-                senderNickname: recom.sender.nickname,
-                ...searchData,
-            });
-        }
-  });
-
-  return { send, receive };
+    return searchRecomsData;
 };

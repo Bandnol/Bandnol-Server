@@ -77,105 +77,106 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
 
 export const handleSearchRecomSong = async (req, res, next) => {
 
-  /*
-    #swagger.summary = '추천 기록 검색 API'
-    #swagger.security = [{ bearerAuth: [] }]
-    #swagger.parameters['keyword'] = {
-      in: 'query',
-      name: 'keyword',
-      required: true,
-      schema: { type: 'string', example: 'Blueming' },
-      description: '검색어(곡 제목 또는 아티스트명)'
-    }
+    /*
+        #swagger.summary = '추천 기록 검색 API'
+        #swagger.security = [{ bearerAuth: [] }]
+        #swagger.parameters['keyword'] = {
+            in: 'query',
+            name: 'keyword',
+            required: true,
+            schema: { type: 'string', example: 'Blueming' },
+            description: '검색어(곡 제목 또는 아티스트명)'
+        }
 
-    #swagger.responses[200] = {
-      description: '검색 성공 응답',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: true },
-              data: {
-                type: 'object',
-                properties: {
-                  send: {
-                    type: 'array',
-                    description: '내가 발신한 곡 리스트',
-                    items: { $ref: '#/components/schemas/RecomsSongItem' }
-                  },
-                  receive: {
-                    type: 'array',
-                    description: '내가 수신한 곡 리스트',
-                    items: {
-                      allOf: [
-                        { $ref: '#/components/schemas/RecomsSongItem' },
-                        {
-                          type: 'object',
-                          properties: {
-                            senderNickname: { type: 'string', example: 'noshel' }
-                          }
+        #swagger.responses[200] = {
+            description: '검색 성공 응답',
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            success: { type: 'boolean', example: true },
+                            data: {
+                                type: 'object',
+                                properties: {
+                                    send: {
+                                        type: 'array',
+                                        description: '내가 발신한 곡 리스트',
+                                        items: { $ref: '#/components/schemas/RecomsSongItem' }
+                                    },
+                                    receive: {
+                                        type: 'array',
+                                        description: '내가 수신한 곡 리스트',
+                                        items: {
+                                            allOf: [
+                                                { $ref: '#/components/schemas/RecomsSongItem' },
+                                                {
+                                                    type: 'object',
+                                                    properties: {
+                                                        senderNickname: { type: 'string', example: 'noshel' }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            error: { type: 'object', nullable: true, example: null }
                         }
-                      ]
                     }
-                  }
                 }
-              },
-              error: { type: 'object', nullable: true, example: null }
             }
-          }
         }
-      }
-    }
 
-    #swagger.responses[400] = {
-      description: '검색어 미입력',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: false },
-              data: { type: 'string', nullable: true, example: null },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string', example: 'RS1300' },
-                  message: { type: 'string', example: '검색어를 입력하세요.' }
+        #swagger.responses[400] = {
+            description: '검색어 미입력',
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            success: { type: 'boolean', example: false },
+                            data: { type: 'string', nullable: true, example: null },
+                            error: {
+                                type: 'object',
+                                properties: {
+                                    code: { type: 'string', example: 'RS1300' },
+                                    message: { type: 'string', example: '검색어를 입력하세요.' }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
-    }
 
-    #swagger.responses[404] = {
-      description: '검색 결과 없음',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean', example: false },
-              data: { type: 'string', nullable: true, example: null },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string', example: 'RS1301' },
-                  message: { type: 'string', example: '검색 결과가 없습니다.' }
+        #swagger.responses[404] = {
+            description: '검색 결과 없음',
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            success: { type: 'boolean', example: false },
+                            data: { type: 'string', nullable: true, example: null },
+                            error: {
+                                type: 'object',
+                                properties: {
+                                    code: { type: 'string', example: 'RS1301' },
+                                    message: { type: 'string', example: '검색 결과가 없습니다.' }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+    */
+
+    try {
+        const searchRecomsData = await searchRecomsSong(req.user.userId, req.query.keyword);
+        res.status(StatusCodes.OK).success(searchRecomsData);
+    } catch (err) {
+        next(err);
     }
-  */  
-  try {
-    const searchRecomsData = await searchRecomsSong(req.user.userId, req.query.keyword);
-    res.status(StatusCodes.OK).success( searchRecomsData );
-  } catch(err) {
-    next(err);
-  }  
 };
