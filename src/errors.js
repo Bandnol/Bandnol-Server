@@ -13,7 +13,7 @@ export class NoUserError extends Error {
     errorCode = "U1301";
     statusCode = 401;
 
-    constructor(reason,data){
+    constructor(reason, data) {
         super(reason);
         this.reason = reason;
         this.data = data;
@@ -65,7 +65,6 @@ export class UserMismatchError extends Error {
     }
 }
 
-
 // 도메인 : Token
 // 인증 정보가 제공되어 있지 않은 경우
 export class UnauthorizedError extends Error {
@@ -102,6 +101,7 @@ export class NotFoundSongError extends Error {
     }
 }
 
+// 도메인 : 기타
 export class QueryParamError extends Error {
     errorCode = "E1000";
     statusCode = 400;

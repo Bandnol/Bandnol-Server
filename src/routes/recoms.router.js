@@ -7,6 +7,7 @@ import {
     handleAddRecoms,
     handleViewComments,
     handleModifyLikeStatus,
+    handleViewReplies,
     handleAIComment
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
@@ -20,6 +21,7 @@ router.get("/search/record", authenticateAccessToken, searchRecomSong);
 router.post("/",authenticateAccessToken, handleAddRecoms);
 router.get("/:recomsId/comments", authenticateAccessToken, handleViewComments);
 router.patch("/:recomsId/likes", authenticateAccessToken, handleModifyLikeStatus);
+router.get("/:recomsId/replies", authenticateAccessToken, handleViewReplies);
 router.post("/ai-comment",authenticateAccessToken, handleAIComment);
 
 export default router;
