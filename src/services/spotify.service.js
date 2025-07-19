@@ -47,14 +47,19 @@ export async function searchSpotifyTracks(keyword, cursor = 0) {
       },
     });
 
+    // console.log(res.data.tracks);
+
     const result = res.data.tracks.items.map((track) =>
       searchTracksResponseDTO({
         id: track.id,
+        title: track.name,
         artist: track.artists.map((a) => a.name).join(', '),
         album: track.album.name,
         albumImg: track.album.images?.[0]?.url || null,
       })
     );
+
+    console.log(result);
 
     return result;
   } catch (err) {
