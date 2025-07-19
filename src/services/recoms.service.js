@@ -135,4 +135,3 @@ export const modifyLikeStatus = async (recomsId, userId, isLiked) => {
 
     return likeStatusResponseDTO(status);
 };
-
