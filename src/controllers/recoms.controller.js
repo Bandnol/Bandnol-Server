@@ -10,6 +10,7 @@ import {
 } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
+import { genAIComment } from "../services/gemini.service.js"; 
 
 export const handleAllTracks = async (req, res, next) => {
     /*
@@ -305,9 +306,38 @@ export const handleAddRecoms = async (req, res, next) => {
 
     try {
         const userId = req.user.id;
-        const recomsSongId = await addRecoms(req.body, userId);
+        const recomsSong = await addRecoms(req.body, userId);
         console.log(req.body);
-        res.status(StatusCodes.OK).success(recomsSongId);
+        res.status(StatusCodes.OK).success(recomsSong);
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const handleAIComment = async (req, res, next) => {
+   /*
+    #swagger.summary = 'AI를 이용하여 코멘트 작성하기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/NoUserError"
+    };
+    
+    */
+
+    try {
+        const userId = req.user.id;
+        console.log(req.body);
+
+        const newComment = await genAIComment(req.body, userId);
+        res.status(StatusCodes.OK).success(newComment);
     } catch (err) {
         next(err);
     }
