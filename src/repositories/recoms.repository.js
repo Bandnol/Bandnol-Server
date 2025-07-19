@@ -1,4 +1,5 @@
 import { prisma } from "../configs/db.config.js";
+import { startOfDay, endOfDay } from "date-fns";
 
 // 발신한 추천 곡 반환
 export const getSentRecomsSong = async (recomsId) => {
@@ -26,7 +27,7 @@ export const getSentRecomsSong = async (recomsId) => {
             },
         },
     });
-
+    console.log(recomsData);
     return recomsData;
 };
 
@@ -89,4 +90,95 @@ export const findSongByKeyword = async (userId, keyword) => {
     });
 
     return searchRecomsData;
+};
+
+export const getSenderToday = async (userId) => {
+    return await prisma.userRecomsSong.findFirst({
+        where: {
+            senderId: userId,
+            createdAt: {
+                // 오늘과 생성 날짜가 같은지 (하루에 2번 추천하는지 확인 용도)
+                gte: startOfDay(new Date()),
+                lt: endOfDay(new Date()),
+            },
+        },
+    });
+};
+
+export const getRecomsSong = async (recomsSongId) => {
+    return await prisma.recomsSong.findUnique({
+        where: {
+            id: recomsSongId,
+        },
+    });
+};
+
+export const createRecomsSong = async (recomsSong) => {
+    const created = await prisma.recomsSong.create({
+        data: {
+            id: recomsSong.id,
+            title: recomsSong.title,
+            artistName: recomsSong.artistName,
+            imgUrl: recomsSong.imgUrl,
+            previewUrl: recomsSong.previewUrl,
+        },
+    });
+    return created;
+};
+
+export const createUserRecomsSong = async (data, userId, recomsSong) => {
+    const created = await prisma.userRecomsSong.create({
+        data: {
+            sender: {
+                connect: { id: userId },
+            },
+            recomsSong: {
+                connect: { id: recomsSong.id },
+            },
+            isAnoymous: data.isAnoymous,
+            comment: data.comment,
+        },
+    });
+    return created;
+};
+
+// 코멘트 조회
+export const getCommentAndReply = async (recomsId) => {
+    const comment = await prisma.userRecomsSong.findFirst({
+        where: { id: recomsId },
+        select: {
+            id: true,
+            comment: true,
+            replies: {
+                select: {
+                    id: true,
+                    content: true,
+                },
+            },
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+            receiver: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+        },
+    });
+
+    return comment;
+};
+
+// 좋아요/별로예요 누르기
+export const patchLikeStatus = async (recomsId, isLiked) => {
+    const status = await prisma.userRecomsSong.update({
+        where: { id: recomsId },
+        data: { isLiked: isLiked },
+    });
+
+    return status;
 };

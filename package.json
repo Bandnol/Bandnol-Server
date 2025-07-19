@@ -21,10 +21,13 @@
     },
     "homepage": "https://github.com/Bandnol/Bandnol-Server#readme",
     "dependencies": {
+        "@google/generative-ai": "^0.24.1",
         "@prisma/client": "^6.11.1",
         "@quixo3/prisma-session-store": "^3.1.13",
+        "aws-sdk": "^2.1692.0",
         "axios": "^1.10.0",
         "cors": "^2.8.5",
+        "date-fns": "^4.1.0",
         "dotenv": "^17.2.0",
         "express": "^5.0.0",
         "express-session": "^1.18.1",
@@ -38,7 +41,8 @@
         "prisma": "^6.11.1",
         "spotify-web-api-node": "^5.0.2",
         "swagger-autogen": "^2.23.7",
-        "swagger-ui-express": "^5.0.1"
+        "swagger-ui-express": "^5.0.1",
+        "uuid": "^11.1.0"
     },
     "devDependencies": {
         "nodemon": "^3.1.10"

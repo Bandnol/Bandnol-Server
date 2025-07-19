@@ -1,26 +1,17 @@
-export class MissingSearchQueryError extends Error {
-    errorCode = "RS1300";
+// 도메인 : User
+export class NotSupportedSocialLoginError extends Error {
+    errorCode = "U1300";
+    statusCode = 401;
 
-    constructor(reason = "검색어를 입력하세요.", data = null) {
+    constructor(reason, data) {
         super(reason);
         this.reason = reason;
         this.data = data;
     }
 }
-
-export class RecommendationNotFoundError extends Error {
-    errorCode = "RS1301";
-
-    constructor(reason = "추천 기록이 존재하지 않습니다.", data = null) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
-export class NotFoundUserEmail extends Error {
+export class NoUserError extends Error {
     errorCode = "U1301";
-    statusCode = 404;
+    statusCode = 401;
 
     constructor(reason, data) {
         super(reason);
@@ -29,7 +20,19 @@ export class NotFoundUserEmail extends Error {
     }
 }
 
-export class NotFoundKeyword extends Error {
+// 도메인 : Recoms
+export class DuplicateRecoms extends Error {
+    errorCode = "R1200";
+    statusCode = 409;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class NotFoundKeywordError extends Error {
     errorCode = "R1300";
     statusCode = 404;
 
@@ -40,11 +43,11 @@ export class NotFoundKeyword extends Error {
     }
 }
 
-export class RecomsSongNotFoundError extends Error {
+export class RecommendationNotFoundError extends Error {
     errorCode = "R1301";
     statusCode = 404;
 
-    constructor(reason, data) {
+    constructor(reason, data = null) {
         super(reason);
         this.reason = reason;
         this.data = data;
@@ -62,6 +65,7 @@ export class UserMismatchError extends Error {
     }
 }
 
+// 도메인 : Token
 // 인증 정보가 제공되어 있지 않은 경우
 export class UnauthorizedError extends Error {
     errorCode = "T1200";
@@ -78,6 +82,51 @@ export class UnauthorizedError extends Error {
 export class TokenError extends Error {
     errorCode = "T1201";
     statusCode = 401;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+// 도메인 : Spotify
+export class NotFoundSongError extends Error {
+    errorCode = "S1300";
+    statusCode = 400;
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+// 도메인 : 기타
+export class QueryParamError extends Error {
+    errorCode = "E1000";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class RequestBodyError extends Error {
+    errorCode = "E1001";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class NoModifyDataError extends Error {
+    errorCode = "1300";
+    statusCode = 400;
 
     constructor(reason, data) {
         super(reason);

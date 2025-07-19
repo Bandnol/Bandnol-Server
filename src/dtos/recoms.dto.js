@@ -20,7 +20,7 @@ export const sentRecomsResponseDTO = (recomsData) => {
             id: recomsData.receiver.id,
             nickname: recomsData.receiver.nickname,
         },
-        replyId: recomsData.replies[0] ? recomsData.replies[0].id : null,
+        replyId: recomsData.replies ? recomsData.replies.id : null,
     };
 };
 
@@ -65,4 +65,61 @@ export const searchRecomsResponseDTO = (recom, isReceived = false) => {
     }
 
     return searchRecomsData;
+};
+
+export const getSongInfoResponseDTO = (songData) => {
+    //console.log(songData);
+    const artists = songData.artists.map((artist) => artist.name).join(", ");
+
+    return {
+        id: songData.id,
+        title: songData.name,
+        artistName: artists,
+        imgUrl: songData.album.images?.[0]?.url || null,
+        previewUrl: songData.previewUrl || null,
+    };
+};
+
+export const userRecomsSongResponseDTO = (userRecomsSongData) => {
+    return {
+        id: userRecomsSongData.id,
+        recomsSong: {
+            id: userRecomsSongData.recomsSongId,
+        },
+        sender: {
+            id: userRecomsSongData.senderId,
+        },
+        comment: userRecomsSongData.comment,
+    };
+};
+export const commentResponseDTO = (comment) => {
+    return {
+        id: comment.id,
+        sender: {
+            id: comment.sender.id,
+            nickname: comment.sender.nickname,
+        },
+        comment: comment.comment,
+    };
+};
+
+export const likeStatusResponseDTO = (status) => {
+    return {
+        id: status.id,
+        isLiked: status.isLiked,
+    };
+};
+
+export const replyResponseDTO = (reply) => {
+    return {
+        id: reply.id,
+        receiver: {
+            id: reply.receiver.id,
+            nickname: reply.receiver.nickname,
+        },
+        replies: {
+            id: reply.replies.id,
+            content: reply.replies.content,
+        },
+    };
 };
