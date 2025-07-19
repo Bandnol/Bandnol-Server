@@ -45,3 +45,31 @@ export const receivedRecomsResponseDTO = (recomsData) => {
         replyId: recomsData.replies[0] ? recomsData.replies[0].id : null,
     };
 };
+
+export const searchRecomsResponseDTO = (searchRecomsData, userId) => {
+    const send = [];
+    const receive = [];
+
+    searchRecomsData.forEach((recom) => {
+        const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
+
+        const searchData = {
+            date: kstDate.toISOString().slice(0, 10), // "YYYY-MM-DD",
+            comment: recom.comment,
+            title: recom.recomsSong.title,
+            artistName: recom.recomsSong.artistName,
+            imageUrl: recom.recomsSong.imgUrl || null,
+        };
+
+        if (recom.senderId === userId) {
+            send.push(searchData);
+        } else {
+            receive.push({
+                senderNickname: recom.sender.nickname,
+                ...searchData,
+            });
+        }
+  });
+
+  return { send, receive };
+};

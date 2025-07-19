@@ -63,7 +63,7 @@ export const getReceivedRecomsSong = async (recomsId) => {
 };
 
 export const findSongByKeyword = async (userId, keyword) => {
-    return await prisma.userRecomsSong.findMany({
+    const searchRecomsData =  await prisma.userRecomsSong.findMany({
         where: {
             AND: [
                 {
@@ -79,8 +79,14 @@ export const findSongByKeyword = async (userId, keyword) => {
         },
         include: {
             recomsSong: true,
-            sender: { select: { id: true, nickname: true } },
-            receiver: { select: { id: true, nickname: true } },
+            sender: { 
+                select: { 
+                    id: true, 
+                    nickname: true 
+                } 
+            }
         },
     });
+
+    return searchRecomsData;
 };

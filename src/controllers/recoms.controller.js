@@ -1,9 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { sentRecomsSong, receivedRecomsSong, searchSong } from "../services/recoms.service.js";
+import { sentRecomsSong, receivedRecomsSong, searchRecomsSong } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
-import { MissingSearchQueryError } from "../errors.js";
-import { RecommendationNotFoundError } from "../errors.js";
-
 
 export const handleAllTracks = async (req, res, next) => {
     /*
@@ -48,7 +45,37 @@ export const handleSentRecomsSong = async (req, res, next) => {
         next(err);
     }
 };
-export const searchRecomSong = async (req, res, next) => {
+
+export const handleReceivedRecomsSong = async (req, res, next) => {
+    /*
+    #swagger.summary = '수신한 추천 곡 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/Failed"
+    };
+
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/Failed"
+    };
+    */
+
+    try {
+        const recomsData = await receivedRecomsSong(req.params.recomsId, req.user.userId);
+        res.status(StatusCodes.OK).success(recomsData);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleSearchRecomSong = async (req, res, next) => {
 
   /*
     #swagger.summary = '추천 기록 검색 API'
@@ -146,46 +173,9 @@ export const searchRecomSong = async (req, res, next) => {
     }
   */  
   try {
-    const { keyword } = req.query;
-    const userId = req.user.userId; 
-
-    // 1) 검색어 없으면
-    if (!keyword || keyword.trim() === "") {
-      throw new MissingSearchQueryError();
-    }
-
-    const results = await searchSong(userId, keyword);
-
-    // 2) 결과가 없으면
-    if (results.length === 0) {
-      throw new RecommendationNotFoundError();
-    }
-    
-    const send = [];
-    const receive = [];
-
-    for (const item of results) {
-      const commonData = {
-        date: item.createdAt,
-        comment: item.comment,
-        title: item.recomsSong.title,
-        artistName: item.recomsSong.artistName,
-        imageUrl: item.recomsSong.imgUrl,
-      };
-
-      if (item.senderId === userId) {
-        send.push(commonData);
-      }
-      if (item.receiverId === userId) {
-        receive.push({
-          ...commonData,
-          senderNickname: item.sender.nickname,
-        });
-      }
-    }
-
-    res.status(200).success({ send, receive }); 
-  } catch (err) {
+    const searchRecomsData = await searchRecomsSong(req.user.userId, req.query.keyword);
+    res.status(StatusCodes.OK).success( searchRecomsData );
+  } catch(err) {
     next(err);
-  }
-} 
+  }  
+};

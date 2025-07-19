@@ -1,5 +1,5 @@
-import { sentRecomsResponseDTO, receivedRecomsResponseDTO } from "../dtos/recoms.dto.js";
-import { RecomsSongNotFoundError, UserMismatchError, MissingSearchQueryError } from "../errors.js";
+import { sentRecomsResponseDTO, receivedRecomsResponseDTO, searchRecomsResponseDTO } from "../dtos/recoms.dto.js";
+import { RecomsSongNotFoundError, UserMismatchError, MissingSearchQueryError, RecommendationNotFoundError } from "../errors.js";
 import { getSentRecomsSong, getReceivedRecomsSong, findSongByKeyword } from "../repositories/recoms.repository.js";
 
 export const sentRecomsSong = async (recomsId, userId) => {
@@ -32,10 +32,16 @@ export const receivedRecomsSong = async (recomsId, userId) => {
     return receivedRecomsResponseDTO(recomsData);
 };
 
-export const searchSong = async (userId, keyword) => {
-    if (!keyword) {
-        throw new MissingSearchQueryError();
-    }
+export const searchRecomsSong = async (userId, keyword) => {
+  if (!keyword.trim()) {
+    throw new MissingSearchQueryError("검색어가 입력되지 않았습니다.");
+  }
 
-    return await findSongByKeyword(userId, keyword);
+  const searchRecomsData = await findSongByKeyword(userId, keyword);
+
+  if (!searchRecomsData || searchRecomsData.length === 0) {
+    throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
+  }
+
+  return searchRecomsResponseDTO(searchRecomsData, userId);
 };
