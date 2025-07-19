@@ -55,7 +55,7 @@ export const getSongInfoResponseDTO = (songData) => {
         title: songData.name,
         artistName: artists,
         imgUrl: songData.album.images?.[0]?.url || null,
-        previewUrl: songData.preview_url || null,
+        previewUrl: songData.previewUrl || null,
     };
 };
 
