@@ -54,9 +54,9 @@ export class RecommendationNotFoundError extends Error {
     }
 }
 
-export class UserMismatchError extends Error {
+export class RecomsNotFoundOrAuthError extends Error {
     errorCode = "R1302";
-    statusCode = 403;
+    statusCode = 404;
 
     constructor(reason, data) {
         super(reason);
