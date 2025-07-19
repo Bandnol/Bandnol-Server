@@ -6,6 +6,7 @@ import {
     viewComment,
     modifyLikeStatus,
     addRecoms,
+    viewReplies,
 } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
@@ -21,15 +22,15 @@ export const handleAllTracks = async (req, res, next) => {
       $ref: "#/components/responses/TokenError"
     };
   */
-  try{
+    try {
         const keyword = req.query.keyword;
         const cursor = typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0;
 
         const tracks = await searchSpotifyTracks(keyword, cursor);
         res.status(StatusCodes.OK).success(tracks);
-  }catch(err){
-    next(err);
-  }
+    } catch (err) {
+        next(err);
+    }
 };
 
 export const handleSentRecomsSong = async (req, res, next) => {
@@ -193,7 +194,6 @@ export const handleViewComments = async (req, res, next) => {
 
     try {
         const comment = await viewComment(req.params.recomsId, req.query.type, req.user.id);
-
         res.status(StatusCodes.OK).success(comment);
     } catch (err) {
         next(err);
@@ -231,8 +231,44 @@ export const handleModifyLikeStatus = async (req, res, next) => {
 
     try {
         const status = await modifyLikeStatus(req.params.recomsId, req.user.id, req.body.isLiked);
-
         res.status(StatusCodes.OK).success(status);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleViewReplies = async (req, res, next) => {
+    /*
+    #swagger.summary = '답장 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/QueryParamError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/UserMismatchError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecommendationNotFoundError"
+    };
+    */
+
+    try {
+        const reply = await viewReplies(req.params.recomsId, req.query.type, req.user.id);
+        res.status(StatusCodes.OK).success(reply);
     } catch (err) {
         next(err);
     }
@@ -275,4 +311,4 @@ export const handleAddRecoms = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-}
+};

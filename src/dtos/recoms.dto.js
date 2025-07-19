@@ -20,7 +20,7 @@ export const sentRecomsResponseDTO = (recomsData) => {
             id: recomsData.receiver.id,
             nickname: recomsData.receiver.nickname,
         },
-        replyId: recomsData.replies[0] ? recomsData.replies[0].id : null,
+        replyId: recomsData.replies ? recomsData.replies.id : null,
     };
 };
 
@@ -48,16 +48,16 @@ export const receivedRecomsResponseDTO = (recomsData) => {
 
 export const getSongInfoResponseDTO = (songData) => {
     //console.log(songData);
-    const artists =songData.artists.map(artist => artist.name).join(", ");
-        
+    const artists = songData.artists.map((artist) => artist.name).join(", ");
+
     return {
         id: songData.id,
         title: songData.name,
         artistName: artists,
-        imgUrl : songData.album.images?.[0]?.url || null,
-        previewUrl: songData.preview_url || null
-    }
-}
+        imgUrl: songData.album.images?.[0]?.url || null,
+        previewUrl: songData.preview_url || null,
+    };
+};
 
 export const userRecomsSongResponseDTO = (userRecomsSongData) => {
     return {
@@ -66,11 +66,11 @@ export const userRecomsSongResponseDTO = (userRecomsSongData) => {
             id: userRecomsSongData.recomsSongId,
         },
         sender: {
-            id: userRecomsSongData.senderId
+            id: userRecomsSongData.senderId,
         },
-        comment: userRecomsSongData.comment
-    }
-}
+        comment: userRecomsSongData.comment,
+    };
+};
 export const commentResponseDTO = (comment) => {
     return {
         id: comment.id,
@@ -86,5 +86,19 @@ export const likeStatusResponseDTO = (status) => {
     return {
         id: status.id,
         isLiked: status.isLiked,
+    };
+};
+
+export const replyResponseDTO = (reply) => {
+    return {
+        id: reply.id,
+        receiver: {
+            id: reply.receiver.id,
+            nickname: reply.receiver.nickname,
+        },
+        replies: {
+            id: reply.replies.id,
+            content: reply.replies.content,
+        },
     };
 };

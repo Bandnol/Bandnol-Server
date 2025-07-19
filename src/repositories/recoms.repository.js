@@ -1,5 +1,5 @@
 import { prisma } from "../configs/db.config.js";
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay } from "date-fns";
 
 // 발신한 추천 곡 반환
 export const getSentRecomsSong = async (recomsId) => {
@@ -27,7 +27,7 @@ export const getSentRecomsSong = async (recomsId) => {
             },
         },
     });
-
+    console.log(recomsData);
     return recomsData;
 };
 
@@ -95,54 +95,60 @@ export const getSenderToday = async (userId) => {
                 gte: startOfDay(new Date()),
                 lt: endOfDay(new Date()),
             },
-        }
-    })
-}
- 
+        },
+    });
+};
+
 export const getRecomsSong = async (recomsSongId) => {
     return await prisma.recomsSong.findUnique({
         where: {
-            id: recomsSongId
-        }
-    })
-}
+            id: recomsSongId,
+        },
+    });
+};
 
 export const createRecomsSong = async (recomsSong) => {
     const created = await prisma.recomsSong.create({
-      data: {
-        id: recomsSong.id,
-        title: recomsSong.title,
-        artistName: recomsSong.artistName,
-        imgUrl: recomsSong.imgUrl,
-        previewUrl: recomsSong.preview_url
-      }
+        data: {
+            id: recomsSong.id,
+            title: recomsSong.title,
+            artistName: recomsSong.artistName,
+            imgUrl: recomsSong.imgUrl,
+            previewUrl: recomsSong.preview_url,
+        },
     });
     return created;
-}
+};
 
 export const createUserRecomsSong = async (data, userId, recomsSong) => {
     const created = await prisma.userRecomsSong.create({
         data: {
             sender: {
-                connect: { id : userId}
+                connect: { id: userId },
             },
             recomsSong: {
-                connect: { id : recomsSong.id }
+                connect: { id: recomsSong.id },
             },
             isAnoymous: data.isAnoymous,
-            comment: data.comment
-        }
+            comment: data.comment,
+        },
     });
     return created;
-}
+};
 
 // 코멘트 조회
-export const getComment = async (recomsId) => {
+export const getCommentAndReply = async (recomsId) => {
     const comment = await prisma.userRecomsSong.findFirst({
         where: { id: recomsId },
         select: {
             id: true,
             comment: true,
+            replies: {
+                select: {
+                    id: true,
+                    content: true,
+                },
+            },
             sender: {
                 select: {
                     id: true,
@@ -152,6 +158,7 @@ export const getComment = async (recomsId) => {
             receiver: {
                 select: {
                     id: true,
+                    nickname: true,
                 },
             },
         },
