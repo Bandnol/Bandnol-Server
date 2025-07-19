@@ -344,5 +344,27 @@ export default {
                 }
             }
         },
+        NoModifyDataError: {
+            description: "수정할 데이터가 없습니다.",
+            content: {
+                "application/json": {
+                    schema:{
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: {type: "object", nullable: true},
+                            error: {
+                                type: "object",
+                                properties: {
+                                    errorCode: { type: "string" },
+                                    reason: { type: "string" },
+                                    data: { type: "object", nullable: true },
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     },
 }

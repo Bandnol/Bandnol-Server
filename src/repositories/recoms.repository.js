@@ -114,7 +114,7 @@ export const createRecomsSong = async (recomsSong) => {
             title: recomsSong.title,
             artistName: recomsSong.artistName,
             imgUrl: recomsSong.imgUrl,
-            previewUrl: recomsSong.preview_url,
+            previewUrl: recomsSong.previewUrl,
         },
     });
     return created;

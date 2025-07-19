@@ -123,3 +123,14 @@ export class RequestBodyError extends Error {
         this.data = data;
     }
 }
+
+export class NoModifyDataError extends Error {
+    errorCode = "1300";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}

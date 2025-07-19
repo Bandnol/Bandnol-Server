@@ -13,3 +13,12 @@ export const getUserByOwnId = async (checkingOwnId) => {
     })
     return userData;
 }
+
+export const modifyUser = async (userId, data) => {
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: data,
+  });
+
+  return updatedUser;
+}
