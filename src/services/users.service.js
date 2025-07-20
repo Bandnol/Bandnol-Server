@@ -32,25 +32,35 @@ export const modifyUserInfo = async (userId, data) => {
     }
   }
   
-  // 시간 형식 검사: HH:mm
+    // 시간 형식 검사: HHmm
   if (updates.recomsTime) {
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if (!timeRegex.test(updates.recomsTime)) {
-      throw new InvalidRecomsTimeError("추천 시간은 HH:mm 형식이어야 합니다.");
-    }
-  }
+    const timeRegex = /^([01]\d|2[0-3])[0-5]\d$/;
+  if(!timeRegex.test(updates.recomsTime)) {
+        throw new InvalidRecomsTimeError("추천 시간은 HHmm 형식이어야 합니다.");
+      }
+   }
 
-  // 날짜 형식 검사: YYYY-MM-DD
+  /// 날짜 형식 검사: YYYY-MM-DD
   if (updates.birth) {
-    const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!birthRegex.test(updates.birth)) {
-      throw new InvalidDateTypeError("날짜 형식은 반드시 YYYY-MM-DD 형식이어야 합니다.");
+    if (typeof updates.birth === "string") {
+        const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!birthRegex.test(updates.birth)) {
+            throw new InvalidDateTypeError("날짜 형식은 반드시 YYYY-MM-DD 형식이어야 합니다.");
+        }
+
+        const parsedDate = new Date(updates.birth);
+        if (isNaN(parsedDate.getTime())) {
+            throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
+        }
+
+        updates.birth = parsedDate;
+    } else if (updates.birth instanceof Date) {
+        if (isNaN(updates.birth.getTime())) {
+            throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
+        }
+    } else {
+        throw new InvalidDateTypeError("birth 값은 문자열(YYYY-MM-DD)이거나 Date여야 합니다.");
     }
-    const parsedDate = new Date(updates.birth);
-    if (isNaN(parsedDate.getTime())) {
-      throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
-    }
-    updates.birth = parsedDate;
   }
 
   const isModified = Object.keys(updates).length > 0;
