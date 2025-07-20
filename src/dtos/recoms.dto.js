@@ -126,6 +126,24 @@ export const replyResponseDTO = (reply) => {
     };
 };
 
+export const calendarRecomsResponseDTO = (data, status) => {
+    return data.map(item => {
+        const base = {
+            date: item.createdAt.toISOString().slice(0, 10),
+            title: item.recomsSong.title,
+            artistName: item.recomsSong.artistName,
+            imageUrl: item.recomsSong.imgUrl,
+            comment: item.comment,
+        };
+
+        if (status === 'recommended') {
+            base.senderNickname = item.sender.nickname;
+        }
+
+        return base;
+    });
+};
+
 export const createdReplyResponseDTO = (reply) => {
     return {
         id: reply.id,

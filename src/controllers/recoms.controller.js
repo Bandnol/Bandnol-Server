@@ -7,6 +7,7 @@ import {
     modifyLikeStatus,
     addRecoms,
     viewReplies,
+    calendarRecomsSong,
     sendReplies,
 } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
@@ -293,6 +294,39 @@ export const handleAIComment = async (req, res, next) => {
         next(err);
     }
 };
+
+export const handleCalendarRecomSong = async (req, res, next) => {
+
+    /*
+        #swagger.summary = '추천 기록 캘린더 조회 API'
+
+        #swagger.security = [{
+            bearerAuth: []
+        }]
+
+        #swagger.responses[200] = {
+            $ref: "#/components/responses/Success"
+        };
+
+        #swagger.responses[400] = {
+            $ref: "#/components/responses/QueryParamError"
+        };
+
+        #swagger.responses[401] = {
+            $ref: "#/components/responses/TokenError"
+        };
+
+        #swagger.responses[404] = {
+            $ref: "#/components/responses/RecommendationNotFoundError"
+        };
+    */
+
+    try {
+      const calendarRecomsData = await calendarRecomsSong(req.user.id, req.query.year, req.query.month, req.query.status);
+      res.status(StatusCodes.OK).success(calendarRecomsData);
+    } catch(err) {
+      next(err);
+    }  
 
 export const handleSendReplies = async (req, res, next) => {
     /*

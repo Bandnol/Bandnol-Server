@@ -6,6 +6,7 @@ import {
     likeStatusResponseDTO,
     userRecomsSongResponseDTO,
     replyResponseDTO,
+    calendarRecomsResponseDTO,
     createdReplyResponseDTO,
 } from "../dtos/recoms.dto.js";
 import {
@@ -26,6 +27,7 @@ import {
     getRecomsSong,
     createRecomsSong,
     createUserRecomsSong,
+    getCalendarRecomsSong,
     createReply,
 } from "../repositories/recoms.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
@@ -133,6 +135,20 @@ export const viewReplies = async (recomsId, type, userId) => {
         throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
     }
     return replyResponseDTO(data);
+};
+
+export const calendarRecomsSong = async (userId, year, month, status) => {
+    if (!["recommending", "recommended"].includes(status)) {
+        throw new QueryParamError("잘못된 추천 상태입니다. 'recommending' 또는 'recommended'만 가능합니다.");
+    }
+
+    if (!year || !month) {
+        throw new QueryParamError("year와 month 쿼리 파라미터가 누락되었습니다.");
+    }
+
+    const data = await getCalendarRecomsSong(userId, year, month, status);
+
+    return calendarRecomsResponseDTO(data, status);
 };
 
 export const sendReplies = async (recomsId, userId, content) => {

@@ -173,6 +173,39 @@ export const patchLikeStatus = async (recomsId, userId, isLiked) => {
     return status;
 };
 
+export const getCalendarRecomsSong = async (userId, year, month, status) => {
+    const startDate = new Date(`${year}-${month}-01`);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+
+    const whereClause = {
+        createdAt: {
+            gte: startDate,
+            lt: endDate,
+        },
+        ...(status === 'recommending' ? { senderId: userId } : { receiverId: userId }),
+    };
+
+    const calendarsData = await prisma.userRecomsSong.findMany({
+        where: whereClause,
+        include: {
+            recomsSong: {
+                select: {
+                    title: true,
+                    artistName: true,
+                    imgUrl: true,
+                },
+            },
+            sender: {
+                select: {
+                    nickname: true,
+                },
+            },
+        },
+    });
+
+    return calendarsData;
+
 export const createReply = async (recomsId, userId, content) => {
     // 권한이 있는 유저인지 체크
     const recomsSong = await prisma.userRecomsSong.findUnique({
