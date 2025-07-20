@@ -43,7 +43,7 @@ export class InvalidRecomsTimeError extends Error {
     }
 }
 
-export class DuplicateRecoms extends Error {
+export class DuplicateRecomsError extends Error {
     errorCode = "R1200";
     statusCode = 409;
 

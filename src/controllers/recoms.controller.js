@@ -235,6 +235,22 @@ export const handleAddRecoms = async (req, res, next) => {
         bearerAuth: []
     }]
 
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              id: { type: "string", example: "6ZGQHCOhbYCNgbOkc9PVjN" },
+              isAnoymous: { type: "boolean", example: "true" },
+              comment: { type: "string", example: "여름에 잘 어울리는 곡입니다. ~ " },
+            },
+          }
+        }
+      }
+    };
+
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
@@ -273,6 +289,22 @@ export const handleAIComment = async (req, res, next) => {
     #swagger.security = [{
         bearerAuth: []
     }]
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              title: { type: "string", example: "좋은날" },
+              artist: { type: "string", example: "아이유" },
+              prompt: { type: "string", example: "존댓말로 가수를 강조하는 느낌으로 작성해줘" },
+            },
+          }
+        }
+      }
+    };
 
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
@@ -327,7 +359,7 @@ export const handleCalendarRecomSong = async (req, res, next) => {
     } catch(err) {
       next(err);
     }  
-
+  }
 export const handleSendReplies = async (req, res, next) => {
     /*
     #swagger.summary = '답장 전송 API'
