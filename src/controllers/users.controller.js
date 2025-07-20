@@ -46,12 +46,12 @@ export const handleModifyUserInfo = async (req, res, next) => {
           schema: {
             type: "object",
             properties: {
-              nickname: { type: "string" },
-              ownId: { type: "string" },
-              gender: { type: "string" },
-              birth: { type: "string", format: "date" },
-              recomsTime: { type: "string" },
-              bio: { type: "string" },
+              nickname: { type: "string", example: "징니" },
+              ownId: { type: "string", example: "jingni" },
+              gender: { type: "string", example: "WOMAN" },
+              birth: { type: "string", format: "date", example: "2004-03-08" },
+              recomsTime: { type: "string", example: "09:00" },
+              bio: { type: "string", example: "안뇽하세용 ~ 징니에요 ~ " },
             },
           }
         }

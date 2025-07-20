@@ -19,7 +19,7 @@ export default {
             },
         },
         SuccessSocialLogin: {
-            description: "소셜 로그인 페이지로 리다이렉트합니다.",
+            description: "소셜 로그인 성공 -> redirect url로 콜백될 때",
             content: {
                 "application/json": {
                     schema: {
@@ -37,7 +37,7 @@ export default {
             },
         },
         RecommendationNotFoundError: {
-            description: "추천 기록이 없습니다.",
+            description: "추천 곡 및 추천 기록이 없을 때 ",
             content: {
                 "application/json": {
                     schema: {
@@ -48,31 +48,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        NotFoundUserEmailError: {
-            description: "해당 이메일을 찾을 수 없습니다.",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            success: { type: "boolean", example: false },
-                            data: { type: "object", nullable: true },
-                            error: {
-                                type: "object",
-                                properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "R1301" },
+                                    message: { type: "string", example: "추천 곡 및 추천 기록이 없습니다." }
                                 },
                             },
                         },
@@ -81,7 +58,7 @@ export default {
             },
         },
         NotFoundKeywordError: {
-            description: "검색어를 입력하세요.",
+            description: "검색어가 없을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -92,9 +69,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object" },
+                                    code: { type: "string", example: "R1300" },
+                                    message: { type: "string", example: "검색어를 입력하세요." }
                                 },
                             },
                         },
@@ -103,7 +79,7 @@ export default {
             },
         },
         UnauthorizedError: {
-            description: "Authorization이 제공되지 않았습니다.",
+            description: "인증 정보가 잘못되었을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -114,9 +90,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "T1200" },
+                                    message: { type: "string", example: "Authorization이 제공되지 않았습니다." }
                                 },
                             },
                         },
@@ -125,7 +100,7 @@ export default {
             },
         },
         TokenError: {
-            description: "토큰을 확인해주세요. (만료된 토큰, 올바르지 않은 토큰, 유효하지 않은 토큰 등)",
+            description: "만료된 토큰, 올바르지 않은 토큰, 유효하지 않은 토큰 등 토큰에 문제가 발생했을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -136,9 +111,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "T1201" },
+                                    message: { type: "string", example: "토큰을 확인해주세요. (만료된 토큰, 올바르지 않은 토큰, 유효하지 않은 토큰 등)" }
                                 },
                             },
                         },
@@ -147,7 +121,7 @@ export default {
             },
         },
         NotSupportedSocialLoginError: {
-            description: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요.",
+            description: "지원하지 않는 소셜 로그인을 사용하려 할 때",
             content: {
                 "application/json": {
                     schema: {
@@ -158,9 +132,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "U1300" },
+                                    message: { type: "string", example: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요." }
                                 },
                             },
                         },
@@ -169,7 +142,7 @@ export default {
             },
         },
         QueryParamError: {
-            description: "쿼리 파라미터가 올바르지 않습니다.",
+            description: "쿼리 파라미터가 올바르지 않을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -180,9 +153,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "E1000" },
+                                    message: { type: "string", example: "쿼리 파라미터가 올바르지 않습니다." }
                                 },
                             },
                         },
@@ -191,7 +163,7 @@ export default {
             },
         },
         RequestBodyError: {
-            description: "Request Body가 올바르지 않습니다.",
+            description: "Request Body가 올바르지 않을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -202,31 +174,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        NotSupportedSocialLoginError: {
-            description: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요.",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            success: { type: "boolean", example: false },
-                            data: { type: "object", nullable: true },
-                            error: {
-                                type: "object",
-                                properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "E1001" },
+                                    message: { type: "string", example: "Request Body가 올바르지 않습니다." }
                                 },
                             },
                         },
@@ -235,7 +184,7 @@ export default {
             },
         },
         NoUserError: {
-            description: "사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다.",
+            description: "DB에 해당 유저가 없을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -246,9 +195,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "U1301" },
+                                    message: { type: "string", example: "사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다." }
                                 },
                             },
                         },
@@ -257,7 +205,7 @@ export default {
             },
         },
         DuplicateRecomsError: {
-            description: "오늘은 이미 노래를 추천하셨습니다.",
+            description: "노래를 하루에 2번 이상 추천하려고 할 때",
             content: {
                 "application/json": {
                     schema: {
@@ -268,9 +216,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "R1200" },
+                                    message: { type: "string", example: "오늘은 이미 노래를 추천하셨습니다." }
                                 },
                             },
                         },
@@ -279,7 +226,7 @@ export default {
             },
         },
         NotFoundSongError: {
-            description: "트랙 ID가 존재하지 않습니다.",
+            description: "트랙 ID가 존재하지 않을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -290,31 +237,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        RecomsSongNotFoundError: {
-            description: "트랙 ID가 존재하지 않습니다.",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            success: { type: "boolean", example: false },
-                            data: { type: "object", nullable: true },
-                            error: {
-                                type: "object",
-                                properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "S1300" },
+                                    message: { type: "string", example: "트랙 ID가 존재하지 않습니다." }
                                 },
                             },
                         },
@@ -323,7 +247,7 @@ export default {
             },
         },
         RecomsNotFoundOrAuthError: {
-            description: "추천 곡이 없거나 접근 권한이 없습니다.",
+            description: "추천 곡이 없거나 추천 곡에 대한 접근 권한이 없을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -334,9 +258,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "R1302" },
+                                    message: { type: "string", example: "추천 곡이 없거나 접근 권한이 없습니다." }
                                 },
                             },
                         },
@@ -356,9 +279,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                    code: { type: "string", example: "R1200" },
+                                    message: { type: "string", example: "이미 해당 추천곡에 대한 답장이 존재합니다." }
                                 },
                             },
                         },
@@ -367,7 +289,7 @@ export default {
             },
         },
         NoModifyDataError: {
-            description: "수정할 데이터가 없습니다.",
+            description: "수정할 데이터 없을 때",
             content: {
                 "application/json": {
                     schema:{
@@ -378,9 +300,8 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object", nullable: true },
+                                     code: { type: "string", example: "E1300" },
+                                    message: { type: "string", example: "수정할 데이터가 없습니다." }
                                 }
                             }
                         }
