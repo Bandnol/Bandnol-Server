@@ -9,6 +9,7 @@ import {
     viewReplies,
     calendarRecomsSong,
     sendReplies,
+    listRecomsSong,
 } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
@@ -327,6 +328,7 @@ export const handleCalendarRecomSong = async (req, res, next) => {
     } catch(err) {
       next(err);
     }  
+};
 
 export const handleSendReplies = async (req, res, next) => {
     /*
@@ -363,4 +365,13 @@ export const handleSendReplies = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+export const handleListRecomSong = async (req, res, next) => {
+    try {
+      const listRecomsData = await listRecomsSong(req.user.id);
+      res.status(StatusCodes.OK).success(listRecomsData);
+    } catch(err) {
+      next(err);
+    }  
 };
