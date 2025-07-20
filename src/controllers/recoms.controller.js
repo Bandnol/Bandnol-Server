@@ -7,10 +7,11 @@ import {
     modifyLikeStatus,
     addRecoms,
     viewReplies,
+    sendReplies,
 } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
-import { genAIComment } from "../services/gemini.service.js"; 
+import { genAIComment } from "../services/gemini.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
     /*
@@ -50,12 +51,8 @@ export const handleSentRecomsSong = async (req, res, next) => {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.responses[403] = {
-        $ref: "#/components/responses/UserMismatchError"
-    };
-
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecommendationNotFoundError"
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
     };
     */
 
@@ -83,12 +80,8 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.responses[403] = {
-        $ref: "#/components/responses/UserMismatchError"
-    };
-
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecommendationNotFoundError"
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
     };
     */
 
@@ -154,12 +147,8 @@ export const handleViewComments = async (req, res, next) => {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.responses[403] = {
-        $ref: "#/components/responses/UserMismatchError"
-    };
-
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecommendationNotFoundError"
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
     };
     */
 
@@ -191,12 +180,8 @@ export const handleModifyLikeStatus = async (req, res, next) => {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.responses[403] = {
-        $ref: "#/components/responses/UserMismatchError"
-    };
-
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecommendationNotFoundError"
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
     };
     */
 
@@ -228,12 +213,8 @@ export const handleViewReplies = async (req, res, next) => {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.responses[403] = {
-        $ref: "#/components/responses/UserMismatchError"
-    };
-
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecommendationNotFoundError"
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
     };
     */
 
@@ -282,10 +263,10 @@ export const handleAddRecoms = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-}
+};
 
 export const handleAIComment = async (req, res, next) => {
-   /*
+    /*
     #swagger.summary = 'AI를 이용하여 코멘트 작성하기 API'
 
     #swagger.security = [{
@@ -308,6 +289,43 @@ export const handleAIComment = async (req, res, next) => {
 
         const newComment = await genAIComment(req.body, userId);
         res.status(StatusCodes.OK).success(newComment);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleSendReplies = async (req, res, next) => {
+    /*
+    #swagger.summary = '답장 전송 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/RequestBodyError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
+
+    #swagger.responses[409] = {
+        $ref: "#/components/responses/DuplicateReplyError"
+    };
+    */
+
+    try {
+        const reply = await sendReplies(req.params.recomsId, req.user.id, req.body.content);
+        res.status(StatusCodes.OK).success(reply);
     } catch (err) {
         next(err);
     }
