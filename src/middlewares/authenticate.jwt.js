@@ -8,9 +8,9 @@ dotenv.config();
 const { JWT_SECRET } = process.env;
 
 /**
- * Bearer 토큰을 추출하고 검증하는 미들웨어
- * 로그인한 사용자만 접근 가능한 API에 사용
- */
+ 
+Bearer 토큰을 추출하고 검증하는 미들웨어
+로그인한 사용자만 접근 가능한 API에 사용*/
 export const authenticateAccessToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
@@ -48,11 +48,11 @@ export const authenticateAccessToken = (req, res, next) => {
             console.log("JWT 토큰 검증 성공", {
                 action: "token:authenticate",
                 actionType: "success",
-                userId: user.userId,
+                userId: user.id,
             });
 
             req.user = {
-                userId: user.userId,
+                id: user.id,
             }; // 검증된 사용자 정보를 요청 객체에 추가
             next();
         });
@@ -60,11 +60,10 @@ export const authenticateAccessToken = (req, res, next) => {
         next(new UnauthorizedError("Authorization이 제공되지 않았습니다."));
     }
 };
-
 /**
- * 로그인된 경우에만 사용자 권한을 검증하는 미들웨어
- * 로그인한 사용자는 유저 정보를, 비로그인은 null 처리하는 API에 사용
- */
+ 
+로그인된 경우에만 사용자 권한을 검증하는 미들웨어
+로그인한 사용자는 유저 정보를, 비로그인은 null 처리하는 API에 사용*/
 export const autheticateAccessTokenIfExists = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
@@ -94,7 +93,7 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
                 // }
 
                 req.user = {
-                    userId: null,
+                    id: null,
                 };
                 return next();
             }
@@ -102,11 +101,11 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
             console.log("JWT 토큰 검증 성공", {
                 action: "token:authenticate",
                 actionType: "success",
-                userId: user.userId,
+                userId: user.id,
             });
 
             req.user = {
-                userId: user.userId,
+                id: user.id,
             }; // 검증된 사용자 정보를 요청 객체에 추가
 
             // 확인용
@@ -116,7 +115,7 @@ export const autheticateAccessTokenIfExists = (req, res, next) => {
         });
     } else {
         req.user = {
-            userId: null,
+            id: null,
         };
 
         // 확인용

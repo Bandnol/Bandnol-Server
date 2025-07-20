@@ -1,7 +1,19 @@
 import { StatusCodes } from "http-status-codes";
-import { recomsSong } from "../services/recoms.service.js";
-import { searchSong } from "../services/recoms.service.js";
+import {
+    sentRecomsSong,
+    receivedRecomsSong,
+    searchRecomsSong,
+    viewComment,
+    modifyLikeStatus,
+    addRecoms,
+    viewReplies,
+    calendarRecomsSong,
+    sendReplies,
+    listRecomsSong,
+} from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
+import { NotFoundKeywordError } from "../errors.js";
+import { genAIComment } from "../services/gemini.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
     /*
@@ -9,140 +21,389 @@ export const handleAllTracks = async (req, res, next) => {
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
     };
+
+    #swagger.responses[401] = {
+      $ref: "#/components/responses/TokenError"
+    };
   */
+    try {
+        const keyword = req.query.keyword;
+        const cursor = typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0;
 
-    const keyword = req.query.keyword;
-    const cursor = typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0;
-
-    const tracks = await searchSpotifyTracks(keyword, cursor);
-    res.status(StatusCodes.OK).success(tracks);
+        const tracks = await searchSpotifyTracks(keyword, cursor);
+        res.status(StatusCodes.OK).success(tracks);
+    } catch (err) {
+        next(err);
+    }
 };
 
-export const handleRecomsSong = async (req, res, next) => {
+export const handleSentRecomsSong = async (req, res, next) => {
     /*
-    #swagger.summary = '수신/발신한 추천 곡 조회 API'
+    #swagger.summary = '발신한 추천 곡 조회 API'
 
-    #swagger.parameters['recomsId'] = {
-        in: 'path',
-        required: true,
-        schema: { type: 'string' },
-        description: '추천 곡 ID'
-    }
+    #swagger.security = [{
+        bearerAuth: []
+    }]
 
     #swagger.responses[200] = {
-    description: "수신/발신한 추천 곡 조회 성공 응답",
-    content: {
-        "application/json": {
-        schema: {
-            type: "object",
-            properties: {
-            success: { type: "boolean", example: true },
-            data: {
-                type: "object",
-                properties: {
-                id: { type: "string", example: "recom-001" },
-                createdAt: { type: "string", format: "date", example: "2025-07-11" },
-                isAnoymous: { type: "boolean", example: false },
-                isLiked: { type: "boolean", example: true },
-                recomsSong: {
-                    type: "object",
-                    properties: {
-                    id: { type: "string", example: "7tI8dRuH2Yc6RuoTjxo4dU" },
-                    title: { type: "string", example: "Dangerously" },
-                    artistName: { type: "string", example: "Charlie Puth" },
-                    imgUrl: { type: "string", nullable: true, example: "https://i.scdn.co/image/..." },
-                    previewUrl: { type: "string", nullable: true, example: null }
-                    }
-                },
-                sender: {
-                    type: "object",
-                    properties: {
-                    id: { type: "string", example: "7tI8dRuH2Yc6RuoTjxo4dU" },
-                    nickname: { type: "string", example: "보내는이" }
-                    }
-                },
-                receiver: {
-                    type: "object",
-                    properties: {
-                    id: { type: "string", example: "7tI8dRuH2Yc6RuoTjxo4dU" },
-                    nickname: { type: "string", example: "받는이" }
-                    }
-                },
-                replyId: { type: "string", nullable: true, example: "7tI8dRuH2Yc6RuoTjxo4dU },
-                }
-            }
-            error: { type: "object", nullable: true, example: null },
-            }
-        }
-        }
-    }
-    }
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
 
     #swagger.responses[404] = {
-    description: "수신/발신한 추천 곡 조회 실패 응답",
-    content: {
-        "application/json": {
-        schema: {
-            type: "object",
-            properties: {
-            success: { type: "boolean", example: false },
-            data: { type: "string", nullable: true, example: null },
-            error: {
-                type: "object",
-                properties: {
-                code: { type: "string", example: "R1301" },
-                message: { type: "string", example: "해당 추천곡을 찾을 수 없습니다." }
-                }
-            }
-            }
-        }
-        }
-    }
-    }
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
     */
 
     try {
-        console.log("추천 곡 조회를 요청했습니다!");
-
-        const recomsData = await recomsSong(req.params.recomsId);
-        console.log(recomsData);
+        const recomsData = await sentRecomsSong(req.params.recomsId, req.user.id);
         res.status(StatusCodes.OK).success(recomsData);
     } catch (err) {
         next(err);
     }
 };
 
-export const searchRecomSong = async (req, res, next) => {
-  try {
-    const { keyword } = req.query;
-    const userId = req.user.userId; 
-    const results = await searchSong(userId, keyword);
+export const handleReceivedRecomsSong = async (req, res, next) => {
+    /*
+    #swagger.summary = '수신한 추천 곡 조회 API'
 
-    const send = [];
-    const receive = [];
+    #swagger.security = [{
+        bearerAuth: []
+    }]
 
-    for (const item of results) {
-      const commonData = {
-        date: item.createdAt,
-        comment: item.comment,
-        title: item.recomsSong.title,
-        artistName: item.recomsSong.artistName,
-        imageUrl: item.recomsSong.imgUrl,
-      };
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
 
-      if (item.senderId === userId) {
-        send.push(commonData);
-      }
-      if (item.receiverId === userId) {
-        receive.push({
-          ...commonData,
-          senderNickname: item.sender.nickname,
-        });
-      }
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
+    */
+
+    try {
+        const recomsData = await receivedRecomsSong(req.params.recomsId, req.user.id);
+        res.status(StatusCodes.OK).success(recomsData);
+    } catch (err) {
+        next(err);
     }
+};
 
-    res.status(200).success({ send, receive }); 
-  } catch (err) {
-    next(err);
-  }
-} 
+export const handleSearchRecomSong = async (req, res, next) => {
+
+    /*
+        #swagger.summary = '추천 기록 검색 API'
+
+        #swagger.security = [{
+            bearerAuth: []
+        }]
+
+        #swagger.responses[200] = {
+            $ref: "#/components/responses/Success"
+        };
+
+        #swagger.responses[400] = {
+            $ref: "#/components/responses/QueryParamError"
+        };
+
+        #swagger.responses[401] = {
+            $ref: "#/components/responses/TokenError"
+        };
+
+        #swagger.responses[404] = {
+            $ref: "#/components/responses/RecommendationNotFoundError"
+        };
+    */
+
+    try {
+        const searchRecomsData = await searchRecomsSong(req.user.id, req.query.keyword);
+        res.status(StatusCodes.OK).success(searchRecomsData);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleViewComments = async (req, res, next) => {
+    /*
+    #swagger.summary = '코멘트 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/QueryParamError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
+    */
+
+    try {
+        const comment = await viewComment(req.params.recomsId, req.query.type, req.user.id);
+        res.status(StatusCodes.OK).success(comment);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleModifyLikeStatus = async (req, res, next) => {
+    /*
+    #swagger.summary = '추천 곡에 좋아요/별로예요 누르기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/RequestBodyError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
+    */
+
+    try {
+        const status = await modifyLikeStatus(req.params.recomsId, req.user.id, req.body.isLiked);
+        res.status(StatusCodes.OK).success(status);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleViewReplies = async (req, res, next) => {
+    /*
+    #swagger.summary = '답장 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/QueryParamError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
+    */
+
+    try {
+        const reply = await viewReplies(req.params.recomsId, req.query.type, req.user.id);
+        res.status(StatusCodes.OK).success(reply);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleAddRecoms = async (req, res, next) => {
+    /*
+    #swagger.summary = '노래 추천하기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              id: { type: "string", example: "6ZGQHCOhbYCNgbOkc9PVjN" },
+              isAnoymous: { type: "boolean", example: "true" },
+              comment: { type: "string", example: "여름에 잘 어울리는 곡입니다. ~ " },
+            },
+          }
+        }
+      }
+    };
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/NotFoundSongError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/NoUserError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/NotFoundKeywordError"
+    };
+
+    #swagger.responses[409] = {
+        $ref: "#/components/responses/DuplicateRecomsError"
+    };
+    */
+
+    try {
+        const userId = req.user.id;
+        const recomsSong = await addRecoms(req.body, userId);
+        console.log(req.body);
+        res.status(StatusCodes.OK).success(recomsSong);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleAIComment = async (req, res, next) => {
+    /*
+    #swagger.summary = 'AI를 이용하여 코멘트 작성하기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              title: { type: "string", example: "좋은날" },
+              artist: { type: "string", example: "아이유" },
+              prompt: { type: "string", example: "존댓말로 가수를 강조하는 느낌으로 작성해줘" },
+            },
+          }
+        }
+      }
+    };
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/NoUserError"
+    };
+    
+    */
+
+    try {
+        const userId = req.user.id;
+        console.log(req.body);
+
+        const newComment = await genAIComment(req.body, userId);
+        res.status(StatusCodes.OK).success(newComment);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleCalendarRecomSong = async (req, res, next) => {
+
+    /*
+        #swagger.summary = '추천 기록 캘린더 조회 API'
+
+        #swagger.security = [{
+            bearerAuth: []
+        }]
+
+        #swagger.responses[200] = {
+            $ref: "#/components/responses/Success"
+        };
+
+        #swagger.responses[400] = {
+            $ref: "#/components/responses/QueryParamError"
+        };
+
+        #swagger.responses[401] = {
+            $ref: "#/components/responses/TokenError"
+        };
+
+        #swagger.responses[404] = {
+            $ref: "#/components/responses/RecommendationNotFoundError"
+        };
+    */
+
+    try {
+      const calendarRecomsData = await calendarRecomsSong(req.user.id, req.query.year, req.query.month, req.query.status);
+      res.status(StatusCodes.OK).success(calendarRecomsData);
+    } catch(err) {
+      next(err);
+    }  
+};
+
+export const handleSendReplies = async (req, res, next) => {
+    /*
+    #swagger.summary = '답장 전송 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/RequestBodyError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+    };
+
+    #swagger.responses[409] = {
+        $ref: "#/components/responses/DuplicateReplyError"
+    };
+    */
+
+    try {
+        const reply = await sendReplies(req.params.recomsId, req.user.id, req.body.content);
+        res.status(StatusCodes.OK).success(reply);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleListRecomSong = async (req, res, next) => {
+    try {
+      const listRecomsData = await listRecomsSong(req.user.id);
+      res.status(StatusCodes.OK).success(listRecomsData);
+    } catch(err) {
+      next(err);
+    }  
+};

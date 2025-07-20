@@ -9,6 +9,7 @@ import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
 import { googleStrategy, naverStrategy, kakaoStrategy } from "./configs/auth.config.js";
+import components from "./components/components.js";
 
 dotenv.config();
 
@@ -95,6 +96,16 @@ app.get("/openapi.json", async (req, res, next) => {
             description: "Bandnol 프로젝트의 API 명세입니다.",
         },
         host: "localhost:3000",
+        components: {
+            ...components,
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT",
+                },
+            },
+        },
     };
 
     const result = await swaggerAutogen(options)(outputFile, routes, doc);
