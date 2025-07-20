@@ -27,7 +27,7 @@ export const createInquiry = async (userName, userEmail, text) => {
     console.log(userName,userEmail,text);
     const newInquiry = await prisma.inquiry.create({
         data: {
-            //name: userName
+            name: userName,
             email: userEmail,
             content: text
         }
