@@ -105,7 +105,6 @@ model User {
   likedArtist     UserLikedArtist[]
   receivedRecoms  UserRecomsSong[]  @relation("UserReceivedRecom")
   sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
-  notifications   NotificationType?
   @@index([isDelivered, recomsTime])
 }
 
