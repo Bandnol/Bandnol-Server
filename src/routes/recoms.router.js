@@ -10,6 +10,7 @@ import {
     handleViewReplies,
     handleAIComment,
     handleCalendarRecomSong
+    handleSendReplies,
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -25,5 +26,13 @@ router.patch("/:recomsId/likes", authenticateAccessToken, handleModifyLikeStatus
 router.get("/:recomsId/replies", authenticateAccessToken, handleViewReplies);
 router.post("/ai-comment",authenticateAccessToken, handleAIComment);
 router.get("/calendars", authenticateAccessToken, handleCalendarRecomSong);
+router.get("/search/record", authenticateAccessToken, handleSearchRecomSong);
+router.post("/", authenticateAccessToken, handleAddRecoms);
+router.get("/:recomsId/comments", authenticateAccessToken, handleViewComments);
+router.patch("/:recomsId/likes", authenticateAccessToken, handleModifyLikeStatus);
+router.get("/:recomsId/replies", authenticateAccessToken, handleViewReplies);
+router.post("/ai-comment", authenticateAccessToken, handleAIComment);
+router.get("/calendars", authenticateAccessToken, handleCalendarRecomSong);
+router.post("/:recomsId/replies", authenticateAccessToken, handleSendReplies);
 
 export default router;

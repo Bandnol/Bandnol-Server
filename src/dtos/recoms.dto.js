@@ -15,6 +15,7 @@ export const sentRecomsResponseDTO = (recomsData) => {
             title: recomsData.recomsSong.title,
             artistName: recomsData.recomsSong.artistName,
             imgUrl: recomsData.recomsSong.imgUrl,
+            previewUrl: recomsData.recomsSong.previewUrl,
         },
         receiver: {
             id: recomsData.receiver.id,
@@ -37,12 +38,13 @@ export const receivedRecomsResponseDTO = (recomsData) => {
             title: recomsData.recomsSong.title,
             artistName: recomsData.recomsSong.artistName,
             imgUrl: recomsData.recomsSong.imgUrl,
+            previewUrl: recomsData.recomsSong.previewUrl,
         },
         sender: {
             id: recomsData.sender.id,
             nickname: recomsData.sender.nickname,
         },
-        replyId: recomsData.replies[0] ? recomsData.replies[0].id : null,
+        replyId: recomsData.replies ? recomsData.replies.id : null,
     };
 };
 
@@ -140,4 +142,11 @@ export const calendarRecomsResponseDTO = (data, status) => {
 
         return base;
     });
+};
+
+export const createdReplyResponseDTO = (reply) => {
+    return {
+        id: reply.id,
+        content: reply.content,
+    };
 };
