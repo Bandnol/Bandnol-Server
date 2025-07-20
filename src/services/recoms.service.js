@@ -8,14 +8,11 @@ import {
     replyResponseDTO,
 } from "../dtos/recoms.dto.js";
 import {
-    NotFoundKeywordError,
     QueryParamError,
     RequestBodyError,
     NoUserError,
     DuplicateRecoms,
     NotFoundSongError,
-    MissingSearchQueryError,
-    RecommendationNotFoundError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -90,15 +87,10 @@ export const viewComment = async (recomsId, type, userId) => {
 
 export const searchRecomsSong = async (userId, keyword) => {
     if (!keyword.trim()) {
-      throw new MissingSearchQueryError("검색어가 입력되지 않았습니다.");
+      throw new QueryParamError("검색어가 입력되지 않았습니다.");
     }
 
     const searchRecomsData = await findSongByKeyword(userId, keyword);
-
-    if (!searchRecomsData || searchRecomsData.length === 0) {
-      throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
-    }
-
     const send = searchRecomsData.filter(r => r.senderId === userId);
     const receive = searchRecomsData.filter(r => r.senderId !== userId);
 
