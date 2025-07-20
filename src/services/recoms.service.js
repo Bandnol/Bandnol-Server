@@ -6,16 +6,14 @@ import {
     likeStatusResponseDTO,
     userRecomsSongResponseDTO,
     replyResponseDTO,
+    calendarRecomsResponseDTO,
 } from "../dtos/recoms.dto.js";
 import {
-    NotFoundKeywordError,
     QueryParamError,
     RequestBodyError,
     NoUserError,
     DuplicateRecoms,
     NotFoundSongError,
-    MissingSearchQueryError,
-    RecommendationNotFoundError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -27,6 +25,7 @@ import {
     getRecomsSong,
     createRecomsSong,
     createUserRecomsSong,
+    getCalendarRecomsSong,
 } from "../repositories/recoms.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo } from "./spotify.service.js";
@@ -90,25 +89,12 @@ export const viewComment = async (recomsId, type, userId) => {
 
 export const searchRecomsSong = async (userId, keyword) => {
     if (!keyword.trim()) {
-      throw new MissingSearchQueryError("검색어가 입력되지 않았습니다.");
+      throw new QueryParamError("검색어가 입력되지 않았습니다.");
     }
 
     const searchRecomsData = await findSongByKeyword(userId, keyword);
-
-    if (!searchRecomsData || searchRecomsData.length === 0) {
-      throw new RecommendationNotFoundError("추천 기록이 존재하지 않습니다.");
-    }
-
-    const send = [];
-    const receive = [];
-
-    searchRecomsData.forEach((recom) => {
-        if (recom.senderId === userId) {
-            send.push(recom);
-        } else {
-            receive.push(recom);
-        }
-    });
+    const send = searchRecomsData.filter(r => r.senderId === userId);
+    const receive = searchRecomsData.filter(r => r.senderId !== userId);
 
     return {
         send: send.map(searchRecomsResponseDTO),
@@ -134,4 +120,18 @@ export const viewReplies = async (recomsId, type, userId) => {
     const data = await getCommentAndReply(recomsId);
     checkAuthByType(data, type, userId);
     return replyResponseDTO(data);
+};
+
+export const calendarRecomsSong = async (userId, year, month, status) => {
+    if (!["recommending", "recommended"].includes(status)) {
+        throw new QueryParamError("잘못된 추천 상태입니다. 'recommending' 또는 'recommended'만 가능합니다.");
+    }
+
+    if (!year || !month) {
+        throw new QueryParamError("year와 month 쿼리 파라미터가 누락되었습니다.");
+    }
+
+    const data = await getCalendarRecomsSong(userId, year, month, status);
+
+    return calendarRecomsResponseDTO(data, status);
 };

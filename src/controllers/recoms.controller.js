@@ -7,6 +7,7 @@ import {
     modifyLikeStatus,
     addRecoms,
     viewReplies,
+    calendarRecomsSong,
 } from "../services/recoms.service.js";
 import { searchSpotifyTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
@@ -199,7 +200,7 @@ export const handleSearchRecomSong = async (req, res, next) => {
     */
 
     try {
-        const searchRecomsData = await searchRecomsSong(req.user.userId, req.query.keyword);
+        const searchRecomsData = await searchRecomsSong(req.user.id, req.query.keyword);
         res.status(StatusCodes.OK).success(searchRecomsData);
     } catch (err) {
         next(err);
@@ -383,4 +384,14 @@ export const handleAIComment = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+export const handleCalendarRecomSong = async (req, res, next) => {
+
+    try {
+      const calendarRecomsData = await calendarRecomsSong(req.user.id, req.query.year, req.query.month, req.query.status);
+      res.status(StatusCodes.OK).success(calendarRecomsData);
+    } catch(err) {
+      next(err);
+    }  
 };
