@@ -48,6 +48,27 @@ export const receivedRecomsResponseDTO = (recomsData) => {
     };
 };
 
+export const searchRecomsResponseDTO = (recom, isReceived = false) => {
+    const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
+
+    const searchRecomsData = {
+        date: kstDate.toISOString().slice(0, 10),
+        comment: recom.comment,
+        title: recom.recomsSong.title,
+        artistName: recom.recomsSong.artistName,
+        imageUrl: recom.recomsSong.imgUrl || null,
+    };
+
+    if (isReceived) {
+        return {
+            senderNickname: recom.sender.nickname,
+            ...searchRecomsData,
+        };
+    }
+
+    return searchRecomsData;
+};
+
 export const getSongInfoResponseDTO = (songData) => {
     //console.log(songData);
     const artists = songData.artists.map((artist) => artist.name).join(", ");

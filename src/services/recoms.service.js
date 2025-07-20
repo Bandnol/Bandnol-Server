@@ -1,6 +1,7 @@
 import {
     sentRecomsResponseDTO,
     receivedRecomsResponseDTO,
+    searchRecomsResponseDTO,
     commentResponseDTO,
     likeStatusResponseDTO,
     userRecomsSongResponseDTO,
@@ -8,7 +9,6 @@ import {
     createdReplyResponseDTO,
 } from "../dtos/recoms.dto.js";
 import {
-    NotFoundKeywordError,
     QueryParamError,
     RequestBodyError,
     NoUserError,
@@ -46,13 +46,6 @@ export const receivedRecomsSong = async (recomsId, userId) => {
         throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
     }
     return receivedRecomsResponseDTO(data);
-};
-
-export const searchSong = async (userId, keyword) => {
-    if (!keyword) {
-        throw new NotFoundKeywordError("검색어를 입력하세요.");
-    }
-    return await findSongByKeyword(userId, keyword);
 };
 
 export const addRecoms = async (data, userId) => {
@@ -98,6 +91,21 @@ export const viewComment = async (recomsId, type, userId) => {
         throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
     }
     return commentResponseDTO(data);
+};
+
+export const searchRecomsSong = async (userId, keyword) => {
+    if (!keyword.trim()) {
+      throw new QueryParamError("검색어가 입력되지 않았습니다.");
+    }
+
+    const searchRecomsData = await findSongByKeyword(userId, keyword);
+    const send = searchRecomsData.filter(r => r.senderId === userId);
+    const receive = searchRecomsData.filter(r => r.senderId !== userId);
+
+    return {
+        send: send.map(searchRecomsResponseDTO),
+        receive: receive.map((item) => searchRecomsResponseDTO(item, true)), // true → isReceived
+    };
 };
 
 export const modifyLikeStatus = async (recomsId, userId, isLiked) => {
