@@ -329,6 +329,27 @@ export default {
                     }
                 }
             }
+        },
+        InvalidEmailTypeError: {
+            description: "이메일 형식이 잘못되었을 때",
+            content: {
+                "application/json": {
+                    schema:{
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: {type: "object", nullable: true},
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string" , example: "U1001"},
+                                    message: { type: "string", example: "올바르지 않은 이메일 형식입니다." }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
 };

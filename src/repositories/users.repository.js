@@ -22,3 +22,15 @@ export const modifyUser = async (userId, data) => {
 
   return updatedUser;
 }
+
+export const createInquiry = async (userName, userEmail, text) => {
+    console.log(userName,userEmail,text);
+    const newInquiry = await prisma.inquiry.create({
+        data: {
+            //name: userName
+            email: userEmail,
+            content: text
+        }
+    })
+    return newInquiry.id;
+}

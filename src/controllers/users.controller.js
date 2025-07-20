@@ -2,7 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import {
     checkOwnId,
     modifyUserInfo,
-} from "../services/users.service.js"
+} from "../services/users.service.js";
+import { sendEmail } from "../services/nodemailer.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
 export const handleCheckOwnId = async (req, res, next) => {
@@ -70,12 +71,55 @@ export const handleModifyUserInfo = async (req, res, next) => {
       $ref: "#/components/responses/NoModifyDataError"
     };
           
-  */
-  
-  const userId = req.user.id;
-  console.log(req.body)
-  const user = await modifyUserInfo(userId, userInfoRequestDTO({
-    ...req.body,
-  }));
-  res.status(StatusCodes.OK).success(user);
+    */
+   try{
+        const userId = req.user.id;
+        console.log(req.body)
+        const user = await modifyUserInfo(userId, userInfoRequestDTO({
+            ...req.body,
+        }));
+        res.status(StatusCodes.OK).success(user);
+    }catch(err){
+        next(err);
+    }
+}
+
+export const handleInquiry = async (req, res, next) => {
+    /*
+    #swagger.summary = '문의하기 API';
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              name: { type: "string", example: "임지은" },
+              email: { type: "string", example: "user@gmail.com" },
+              content: { type: "string", example: " ~ 이런 기능을 원해요 !!" },
+            },
+          }
+        }
+      }
+    };
+
+    #swagger.responses[200] = {
+      $ref: "#/components/responses/Success"
+    };
+     #swagger.responses[400] = {
+      $ref: "#/components/responses/InvalidEmailTypeError"
+    };
+    */
+   try{
+        const name = req.body.name;
+        const email = req.body.email;
+        const text = req.body.content;
+        console.log(req.body);
+
+        const inquiry = await sendEmail (name, email, text);
+        res.status(StatusCodes.OK).success({inquiry});
+   }catch(err){
+        next(err);
+   }
 }
