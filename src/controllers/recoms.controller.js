@@ -105,98 +105,26 @@ export const handleSearchRecomSong = async (req, res, next) => {
 
     /*
         #swagger.summary = '추천 기록 검색 API'
-        #swagger.security = [{ bearerAuth: [] }]
-        #swagger.parameters['keyword'] = {
-            in: 'query',
-            name: 'keyword',
-            required: true,
-            schema: { type: 'string', example: 'Blueming' },
-            description: '검색어(곡 제목 또는 아티스트명)'
-        }
+
+        #swagger.security = [{
+            bearerAuth: []
+        }]
 
         #swagger.responses[200] = {
-            description: '검색 성공 응답',
-            content: {
-                'application/json': {
-                    schema: {
-                        type: 'object',
-                        properties: {
-                            success: { type: 'boolean', example: true },
-                            data: {
-                                type: 'object',
-                                properties: {
-                                    send: {
-                                        type: 'array',
-                                        description: '내가 발신한 곡 리스트',
-                                        items: { $ref: '#/components/schemas/RecomsSongItem' }
-                                    },
-                                    receive: {
-                                        type: 'array',
-                                        description: '내가 수신한 곡 리스트',
-                                        items: {
-                                            allOf: [
-                                                { $ref: '#/components/schemas/RecomsSongItem' },
-                                                {
-                                                    type: 'object',
-                                                    properties: {
-                                                        senderNickname: { type: 'string', example: 'noshel' }
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }
-                            },
-                            error: { type: 'object', nullable: true, example: null }
-                        }
-                    }
-                }
-            }
-        }
+            $ref: "#/components/responses/Success"
+        };
 
         #swagger.responses[400] = {
-            description: '검색어 미입력',
-            content: {
-                'application/json': {
-                    schema: {
-                        type: 'object',
-                        properties: {
-                            success: { type: 'boolean', example: false },
-                            data: { type: 'string', nullable: true, example: null },
-                            error: {
-                                type: 'object',
-                                properties: {
-                                    code: { type: 'string', example: 'RS1300' },
-                                    message: { type: 'string', example: '검색어를 입력하세요.' }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            $ref: "#/components/responses/QueryParamError"
+        };
+
+        #swagger.responses[401] = {
+            $ref: "#/components/responses/TokenError"
+        };
 
         #swagger.responses[404] = {
-            description: '검색 결과 없음',
-            content: {
-                'application/json': {
-                    schema: {
-                        type: 'object',
-                        properties: {
-                            success: { type: 'boolean', example: false },
-                            data: { type: 'string', nullable: true, example: null },
-                            error: {
-                                type: 'object',
-                                properties: {
-                                    code: { type: 'string', example: 'RS1301' },
-                                    message: { type: 'string', example: '검색 결과가 없습니다.' }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            $ref: "#/components/responses/RecommendationNotFoundError"
+        };
     */
 
     try {
@@ -387,6 +315,30 @@ export const handleAIComment = async (req, res, next) => {
 };
 
 export const handleCalendarRecomSong = async (req, res, next) => {
+
+    /*
+        #swagger.summary = '추천 기록 캘린더 조회 API'
+
+        #swagger.security = [{
+            bearerAuth: []
+        }]
+
+        #swagger.responses[200] = {
+            $ref: "#/components/responses/Success"
+        };
+
+        #swagger.responses[400] = {
+            $ref: "#/components/responses/QueryParamError"
+        };
+
+        #swagger.responses[401] = {
+            $ref: "#/components/responses/TokenError"
+        };
+
+        #swagger.responses[404] = {
+            $ref: "#/components/responses/RecommendationNotFoundError"
+        };
+    */
 
     try {
       const calendarRecomsData = await calendarRecomsSong(req.user.id, req.query.year, req.query.month, req.query.status);
