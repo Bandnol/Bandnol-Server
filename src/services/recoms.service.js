@@ -13,7 +13,7 @@ import {
     QueryParamError,
     RequestBodyError,
     NoUserError,
-    DuplicateRecoms,
+    DuplicateRecomsError,
     NotFoundSongError,
     RecomsNotFoundOrAuthError,
 } from "../errors.js";
@@ -60,7 +60,7 @@ export const addRecoms = async (data, userId) => {
     // 오늘 추천한 적 있는지 확인
     const existUser = await getSenderToday(userId);
     if (existUser) {
-        throw new DuplicateRecoms("오늘은 이미 노래를 추천하셨습니다.");
+        throw new DuplicateRecomsError("오늘은 이미 노래를 추천하셨습니다.");
     }
 
     // recomsSong 테이블에 데이터 생성
@@ -73,12 +73,7 @@ export const addRecoms = async (data, userId) => {
         }
         recomsSong = await createRecomsSong(songData);
     }
-
-    //UserRecomsSong 테이블에 데이터 생성
-    if (!recomsSong) {
-        throw new RecomsSongNotFoundError("recomsSong 테이블에 데이터가 생성되지 않았습니다.");
-    }
-
+    
     const newUserSongData = await createUserRecomsSong(data, userId, recomsSong);
     return userRecomsSongResponseDTO(newUserSongData);
 };
@@ -165,7 +160,7 @@ export const sendReplies = async (recomsId, userId, content) => {
     } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
             if (err.code === "P2002" && err.meta?.target?.includes("user_recoms_song_id")) {
-                throw new DuplicateRecoms("이미 해당 추천곡에 대한 답장이 존재합니다.");
+                throw new DuplicateRecomsError("이미 해당 추천곡에 대한 답장이 존재합니다.");
             }
         }
         throw err;

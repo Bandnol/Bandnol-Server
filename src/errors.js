@@ -21,7 +21,7 @@ export class NoUserError extends Error {
 }
 
 // 도메인 : Recoms
-export class DuplicateRecoms extends Error {
+export class DuplicateRecomsError extends Error {
     errorCode = "R1200";
     statusCode = 409;
 
@@ -125,7 +125,7 @@ export class RequestBodyError extends Error {
 }
 
 export class NoModifyDataError extends Error {
-    errorCode = "1300";
+    errorCode = "E1300";
     statusCode = 400;
 
     constructor(reason, data) {
