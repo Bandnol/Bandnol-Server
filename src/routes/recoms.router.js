@@ -8,7 +8,8 @@ import {
     handleViewComments,
     handleModifyLikeStatus,
     handleViewReplies,
-    handleAIComment
+    handleAIComment,
+    handleSendReplies,
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -18,10 +19,11 @@ router.get("/search/song", handleAllTracks);
 router.get("/:recomsId/sent", authenticateAccessToken, handleSentRecomsSong);
 router.get("/:recomsId/received", authenticateAccessToken, handleReceivedRecomsSong);
 router.get("/search/record", authenticateAccessToken, searchRecomSong);
-router.post("/",authenticateAccessToken, handleAddRecoms);
+router.post("/", authenticateAccessToken, handleAddRecoms);
 router.get("/:recomsId/comments", authenticateAccessToken, handleViewComments);
 router.patch("/:recomsId/likes", authenticateAccessToken, handleModifyLikeStatus);
 router.get("/:recomsId/replies", authenticateAccessToken, handleViewReplies);
-router.post("/ai-comment",authenticateAccessToken, handleAIComment);
+router.post("/ai-comment", authenticateAccessToken, handleAIComment);
+router.post("/:recomsId/replies", authenticateAccessToken, handleSendReplies);
 
 export default router;

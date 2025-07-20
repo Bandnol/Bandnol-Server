@@ -102,28 +102,6 @@ export default {
                 },
             },
         },
-        UserMismatchError: {
-            description: "본인이 발신한 추천 곡이 아닙니다. 조회 권한이 없습니다.",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            success: { type: "boolean", example: false },
-                            data: { type: "object", nullable: true },
-                            error: {
-                                type: "object",
-                                properties: {
-                                    errorCode: { type: "string" },
-                                    reason: { type: "string" },
-                                    data: { type: "object" },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
         UnauthorizedError: {
             description: "Authorization이 제공되지 않았습니다.",
             content: {
@@ -238,111 +216,155 @@ export default {
             description: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요.",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
                                     errorCode: { type: "string" },
                                     reason: { type: "string" },
                                     data: { type: "object", nullable: true },
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         NoUserError: {
             description: "사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다.",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
                                     errorCode: { type: "string" },
                                     reason: { type: "string" },
                                     data: { type: "object", nullable: true },
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         DuplicateRecomsError: {
             description: "오늘은 이미 노래를 추천하셨습니다.",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
                                     errorCode: { type: "string" },
                                     reason: { type: "string" },
                                     data: { type: "object", nullable: true },
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         NotFoundSongError: {
             description: "트랙 ID가 존재하지 않습니다.",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
                                     errorCode: { type: "string" },
                                     reason: { type: "string" },
                                     data: { type: "object", nullable: true },
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         RecomsSongNotFoundError: {
             description: "트랙 ID가 존재하지 않습니다.",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
                                     errorCode: { type: "string" },
                                     reason: { type: "string" },
                                     data: { type: "object", nullable: true },
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        RecomsNotFoundOrAuthError: {
+            description: "추천 곡이 없거나 접근 권한이 없습니다.",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    errorCode: { type: "string" },
+                                    reason: { type: "string" },
+                                    data: { type: "object", nullable: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        DuplicateReplyError: {
+            description: "답장을 두 번 이상 보내려고 할 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    errorCode: { type: "string" },
+                                    reason: { type: "string" },
+                                    data: { type: "object", nullable: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         NoModifyDataError: {
             description: "수정할 데이터가 없습니다.",
@@ -367,4 +389,4 @@ export default {
             }
         }
     },
-}
+};

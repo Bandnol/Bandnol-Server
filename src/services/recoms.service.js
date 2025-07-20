@@ -5,6 +5,7 @@ import {
     likeStatusResponseDTO,
     userRecomsSongResponseDTO,
     replyResponseDTO,
+    createdReplyResponseDTO,
 } from "../dtos/recoms.dto.js";
 import {
     NotFoundKeywordError,
@@ -13,6 +14,7 @@ import {
     NoUserError,
     DuplicateRecoms,
     NotFoundSongError,
+    RecomsNotFoundOrAuthError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -24,21 +26,26 @@ import {
     getRecomsSong,
     createRecomsSong,
     createUserRecomsSong,
+    createReply,
 } from "../repositories/recoms.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo } from "./spotify.service.js";
-import { checkAuth, checkAuthByType } from "../utils/validate.js";
+import { Prisma } from "@prisma/client";
 
-export const sentRecomsSong = async (recomsId, userId, isLiked) => {
-    const recomsData = await getSentRecomsSong(recomsId, isLiked);
-    checkAuth(recomsData, userId, "sender");
-    return sentRecomsResponseDTO(recomsData);
+export const sentRecomsSong = async (recomsId, userId) => {
+    const data = await getSentRecomsSong(recomsId, userId);
+    if (!data) {
+        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+    }
+    return sentRecomsResponseDTO(data);
 };
 
 export const receivedRecomsSong = async (recomsId, userId) => {
-    const recomsData = await getReceivedRecomsSong(recomsId);
-    checkAuth(recomsData, userId, "receiver");
-    return receivedRecomsResponseDTO(recomsData);
+    const data = await getReceivedRecomsSong(recomsId, userId);
+    if (!data) {
+        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+    }
+    return receivedRecomsResponseDTO(data);
 };
 
 export const searchSong = async (userId, keyword) => {
@@ -85,29 +92,58 @@ export const viewComment = async (recomsId, type, userId) => {
     if (!["sent", "received"].includes(type)) {
         throw new QueryParamError("필수 쿼리 파라미터가 입력되지 않았거나 잘못된 쿼리 파라미터를 입력했습니다.");
     }
+    const data = await getCommentAndReply(recomsId, type, userId);
 
-    const data = await getCommentAndReply(recomsId);
-    checkAuthByType(data, type, userId);
-
+    if (!data) {
+        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+    }
     return commentResponseDTO(data);
 };
 
 export const modifyLikeStatus = async (recomsId, userId, isLiked) => {
-    if (![true, false, null].includes(isLiked)) {
-        throw new RequestBodyError("Request Body가 올바르지 않습니다.");
+    try {
+        if (![true, false, null].includes(isLiked)) {
+            throw new RequestBodyError("Request Body가 올바르지 않습니다.");
+        }
+        const data = await patchLikeStatus(recomsId, userId, isLiked);
+        return likeStatusResponseDTO(data);
+    } catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
+            throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+        }
+        throw err;
     }
-
-    const status = await patchLikeStatus(recomsId, isLiked);
-    checkAuth(status, userId, "receiverId");
-    return likeStatusResponseDTO(status);
 };
 
 export const viewReplies = async (recomsId, type, userId) => {
     if (!["sent", "received"].includes(type)) {
         throw new QueryParamError("필수 쿼리 파라미터가 입력되지 않았거나 잘못된 쿼리 파라미터를 입력했습니다.");
     }
+    const data = await getCommentAndReply(recomsId, type, userId);
 
-    const data = await getCommentAndReply(recomsId);
-    checkAuthByType(data, type, userId);
+    if (!data) {
+        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+    }
     return replyResponseDTO(data);
+};
+
+export const sendReplies = async (recomsId, userId, content) => {
+    try {
+        if (!content) {
+            throw new RequestBodyError("Request Body가 올바르지 않습니다.");
+        }
+        const data = await createReply(recomsId, userId, content);
+
+        if (!data) {
+            throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+        }
+        return createdReplyResponseDTO(data);
+    } catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            if (err.code === "P2002" && err.meta?.target?.includes("user_recoms_song_id")) {
+                throw new DuplicateRecoms("이미 해당 추천곡에 대한 답장이 존재합니다.");
+            }
+        }
+        throw err;
+    }
 };
