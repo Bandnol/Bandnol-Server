@@ -26,6 +26,7 @@ model Inquiry {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   content   String
+  name      String
 }
 
 model RecomsSong {
@@ -70,7 +71,7 @@ model UserRecomsSong {
   receiverId   String?      @map("receiver_id")
   createdAt    DateTime     @default(now()) @map("created_at")
   isAnoymous   Boolean      @default(false) @map("is_anoymous")
-  isLiked      Boolean?     @default(false) @map("is_liked")
+  isLiked      Boolean?     @map("is_liked")
   comment      String
   replies      RecomsReply?
   receiver     User?        @relation("UserReceivedRecom", fields: [receiverId], references: [id])
@@ -92,9 +93,10 @@ model User {
   inactiveStatus  Boolean           @default(false) @map("inactive_status")
   backgroundImg   String?           @map("background_img")
   ownId           String?           @unique @map("own_id")
-  recomsTime      String            @default("09:00") @map("recoms_time")
-  email           String?
-  name            String?
+  recomsTime      String            @default("0900") @map("recoms_time")
+  email           String
+  name            String
+  isDelivered     Boolean           @default(false) @map("is_delivered")
   fcmTokens       FcmToken[]
   receivedNotices Notification[]    @relation("NotificationReceiver")
   sentNotices     Notification[]    @relation("NotificationSender")
@@ -103,6 +105,7 @@ model User {
   likedArtist     UserLikedArtist[]
   receivedRecoms  UserRecomsSong[]  @relation("UserReceivedRecom")
   sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
+  @@index([isDelivered, recomsTime])
 }
 
 model FcmToken {
