@@ -31,6 +31,14 @@ export const modifyUserInfo = async (userId, data) => {
       updates[field] = value;
     }
   }
+  
+  // 시간 형식 검사: HH:mm
+  if (updates.recomsTime) {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(updates.recomsTime)) {
+      throw new InvalidRecomsTimeError("추천 시간은 HH:mm 형식이어야 합니다.");
+    }
+  }
 
   // 날짜 형식 검사: YYYY-MM-DD
   if (updates.birth) {
@@ -43,14 +51,6 @@ export const modifyUserInfo = async (userId, data) => {
       throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
     }
     updates.birth = parsedDate;
-  }
-
-  // 시간 형식 검사: HH:mm
-  if (updates.recomsTime) {
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if (!timeRegex.test(updates.recomsTime)) {
-      throw new InvalidRecomsTimeError("추천 시간은 HH:mm 형식이어야 합니다.");
-    }
   }
 
   const isModified = Object.keys(updates).length > 0;
