@@ -199,7 +199,7 @@ export const handleSearchRecomSong = async (req, res, next) => {
     */
 
     try {
-        const searchRecomsData = await searchRecomsSong(req.user.userId, req.query.keyword);
+        const searchRecomsData = await searchRecomsSong(req.user.id, req.query.keyword);
         res.status(StatusCodes.OK).success(searchRecomsData);
     } catch (err) {
         next(err);
