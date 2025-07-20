@@ -1,4 +1,15 @@
 // 도메인 : User
+export class InvalidDateTypeError extends Error {
+    errorCode = "U1000";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 export class NotSupportedSocialLoginError extends Error {
     errorCode = "U1300";
     statusCode = 401;
@@ -21,6 +32,17 @@ export class NoUserError extends Error {
 }
 
 // 도메인 : Recoms
+export class InvalidRecomsTimeError extends Error {
+    errorCode = "R1000";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 export class DuplicateRecoms extends Error {
     errorCode = "R1200";
     statusCode = 409;
@@ -125,8 +147,8 @@ export class RequestBodyError extends Error {
 }
 
 export class NoModifyDataError extends Error {
-    errorCode = "1300";
-    statusCode = 400;
+    errorCode = "E1300";
+    statusCode = 404;
 
     constructor(reason, data) {
         super(reason);

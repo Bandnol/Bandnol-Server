@@ -387,6 +387,27 @@ export default {
                     }
                 }
             }
+        },
+        InvalidTypeError: {
+            description: "날짜 또는 추천시간 형식이 잘못되었을 때",
+            content: {
+                "application/json": {
+                    schema:{
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: {type: "object", nullable: true},
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string" , example: "날짜 형식 오류 : U1000, 시간 형식 오류 : R1000"},
+                                    message: { type: "string", example: "날짜 또는 추천 시간 형식이 잘못되었습니다." }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
 };

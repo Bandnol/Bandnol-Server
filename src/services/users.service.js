@@ -1,4 +1,4 @@
-import { NoModifyDataError, NoUserError } from "../errors.js";
+import { NoModifyDataError, NoUserError, InvalidDateTypeError, InvalidRecomsTimeError } from "../errors.js";
 import {
     getUserById,
     getUserByOwnId,
@@ -16,7 +16,7 @@ export const checkOwnId = async (userOwnId) => {
 }
 
 export const modifyUserInfo = async (userId, data) => {
-     const allowedFields = ["nickname","ownId","gender","birth","recomsTime","bio"];
+  const allowedFields = ["nickname", "ownId", "gender", "birth", "recomsTime", "bio"];
 
   const user = await getUserById(userId);
   if (!user) {
@@ -32,18 +32,28 @@ export const modifyUserInfo = async (userId, data) => {
     }
   }
 
-  // 날짜 형식 변환
+  // 날짜 형식 검사: YYYY-MM-DD
   if (updates.birth) {
+    const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!birthRegex.test(updates.birth)) {
+      throw new InvalidDateTypeError("날짜 형식은 반드시 YYYY-MM-DD 형식이어야 합니다.");
+    }
     const parsedDate = new Date(updates.birth);
-    if (!isNaN(parsedDate.getTime())) {
-      updates.birth = parsedDate;
-    } else {
-      delete updates.birth;
+    if (isNaN(parsedDate.getTime())) {
+      throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
+    }
+    updates.birth = parsedDate;
+  }
+
+  // 시간 형식 검사: HH:mm
+  if (updates.recomsTime) {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(updates.recomsTime)) {
+      throw new InvalidRecomsTimeError("추천 시간은 HH:mm 형식이어야 합니다.");
     }
   }
-  console.log("updates:", updates);
 
-  const isModified = allowedFields.some(field => data[field] != undefined);
+  const isModified = Object.keys(updates).length > 0;
   if (!isModified) {
     throw new NoModifyDataError("수정할 데이터가 없습니다.");
   }
@@ -51,4 +61,4 @@ export const modifyUserInfo = async (userId, data) => {
   const updatedUser = await modifyUser(user.id, updates);
 
   return { userId: updatedUser.id };
-}
+};

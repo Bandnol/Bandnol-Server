@@ -61,10 +61,13 @@ export const handleModifyUserInfo = async (req, res, next) => {
       $ref: "#/components/responses/Success"
     };
     #swagger.responses[400] = {
-      $ref: "#/components/responses/NoModifyDataError"
+      $ref: "#/components/responses/InvalidTypeError"
     };
     #swagger.responses[401] = {
       $ref: "#/components/responses/TokenError"
+    };
+    #swagger.responses[404] = {
+      $ref: "#/components/responses/NoModifyDataError"
     };
           
   */
