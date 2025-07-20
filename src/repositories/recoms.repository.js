@@ -205,7 +205,7 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
     });
 
     return calendarsData;
-}
+};
 
 export const createReply = async (recomsId, userId, content) => {
     // 권한이 있는 유저인지 체크
@@ -226,4 +226,27 @@ export const createReply = async (recomsId, userId, content) => {
     });
 
     return created;
+};
+
+export const getListRecomsSong = async (userId) => {
+    const listData = await prisma.userRecomsSong.findMany({
+        where: {
+            OR: [{ senderId: userId }, { receiverId: userId }],
+        },
+        select: {
+            createdAt: true,
+            comment: true,
+            senderId: true,
+            receiverId: true,
+            recomsSong: {
+                select: {
+                    title: true,
+                    artistName: true,
+                    imgUrl: true,
+                },
+            },
+        },
+    });
+
+    return listData;
 };

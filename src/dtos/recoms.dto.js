@@ -150,3 +150,36 @@ export const createdReplyResponseDTO = (reply) => {
         content: reply.content,
     };
 };
+
+export const listRecomsResponseDTO = (data, userId) => {
+    const groupedByDate = {};
+
+    data.forEach((recom) => {
+        const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
+        const dateKey = kstDate.toISOString().slice(0, 10);
+
+        if (!groupedByDate[dateKey]) {
+            groupedByDate[dateKey] = {};
+        }
+
+        const dto = {
+            title: recom.recomsSong.title,
+            artistName: recom.recomsSong.artistName,
+            imageUrl: recom.recomsSong.imgUrl,
+            comment: recom.comment,
+        };
+
+        if (recom.senderId === userId) {
+            groupedByDate[dateKey].recommending = dto;
+        } else {
+            groupedByDate[dateKey].recommended = dto;
+        }
+    });
+
+    return Object.entries(groupedByDate)
+        .map(([date, value]) => ({
+            date,
+            ...value,
+        }))
+        .sort((a, b) => b.date.localeCompare(a.date));
+};
