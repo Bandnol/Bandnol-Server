@@ -1,8 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import {
-    checkOwnId,
-    modifyUserInfo,
-} from "../services/users.service.js"
+import { checkOwnId, modifyUserInfo, viewNotification } from "../services/users.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
 export const handleCheckOwnId = async (req, res, next) => {
@@ -24,12 +21,12 @@ export const handleCheckOwnId = async (req, res, next) => {
 
     try {
         const ownId = req.query.ownId;
-        const isPossibleOwnId = await checkOwnId (ownId);
-        res.status(StatusCodes.OK).success({ "isPossibleOwnId": isPossibleOwnId });
-    }catch(err){
+        const isPossibleOwnId = await checkOwnId(ownId);
+        res.status(StatusCodes.OK).success({ isPossibleOwnId: isPossibleOwnId });
+    } catch (err) {
         next(err);
     }
-}
+};
 
 export const handleModifyUserInfo = async (req, res, next) => {
     /*
@@ -71,11 +68,43 @@ export const handleModifyUserInfo = async (req, res, next) => {
     };
           
   */
-  
-  const userId = req.user.id;
-  console.log(req.body)
-  const user = await modifyUserInfo(userId, userInfoRequestDTO({
-    ...req.body,
-  }));
-  res.status(StatusCodes.OK).success(user);
-}
+
+    const userId = req.user.id;
+    console.log(req.body);
+    const user = await modifyUserInfo(
+        userId,
+        userInfoRequestDTO({
+            ...req.body,
+        })
+    );
+    res.status(StatusCodes.OK).success(user);
+};
+
+export const handleViewNotification = async (req, res, next) => {
+    /*
+    #swagger.summary = '알림 센터 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/CursorOrAuthError"
+    };
+    */
+
+    try {
+        const notification = await viewNotification(req.user.id, req.query.cursor);
+        res.status(StatusCodes.OK).success(notification);
+    } catch (err) {
+        next(err);
+    }
+};

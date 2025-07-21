@@ -31,6 +31,17 @@ export class NoUserError extends Error {
     }
 }
 
+export class CursorOrAuthError extends Error {
+    errorCode = "U1302";
+    statusCode = 404;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 // 도메인 : Recoms
 export class InvalidRecomsTimeError extends Error {
     errorCode = "R1000";
@@ -104,6 +115,18 @@ export class UnauthorizedError extends Error {
 export class TokenError extends Error {
     errorCode = "T1201";
     statusCode = 401;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+// 다른 사람의 토큰인 경우
+export class AuthTokenError extends Error {
+    errorCode = "T1202";
+    statusCode = 403;
 
     constructor(reason, data) {
         super(reason);

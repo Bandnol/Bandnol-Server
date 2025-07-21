@@ -52,7 +52,7 @@ export const getReceivedRecomsSong = async (recomsId, userId) => {
 };
 
 export const findSongByKeyword = async (userId, keyword) => {
-    const searchRecomsData =  await prisma.userRecomsSong.findMany({
+    const searchRecomsData = await prisma.userRecomsSong.findMany({
         where: {
             AND: [
                 {
@@ -68,12 +68,12 @@ export const findSongByKeyword = async (userId, keyword) => {
         },
         include: {
             recomsSong: true,
-            sender: { 
-                select: { 
-                    id: true, 
-                    nickname: true 
-                } 
-            }
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
         },
     });
 
@@ -183,7 +183,7 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
             gte: startDate,
             lt: endDate,
         },
-        ...(status === 'recommending' ? { senderId: userId } : { receiverId: userId }),
+        ...(status === "recommending" ? { senderId: userId } : { receiverId: userId }),
     };
 
     const calendarsData = await prisma.userRecomsSong.findMany({
@@ -205,7 +205,7 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
     });
 
     return calendarsData;
-}
+};
 
 export const createReply = async (recomsId, userId, content) => {
     // 권한이 있는 유저인지 체크
