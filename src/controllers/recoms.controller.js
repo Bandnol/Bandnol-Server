@@ -96,7 +96,6 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
 };
 
 export const handleSearchRecomSong = async (req, res, next) => {
-
     /*
         #swagger.summary = '추천 기록 검색 API'
 
@@ -329,7 +328,6 @@ export const handleAIComment = async (req, res, next) => {
 };
 
 export const handleCalendarRecomSong = async (req, res, next) => {
-
     /*
         #swagger.summary = '추천 기록 캘린더 조회 API'
 
@@ -355,11 +353,16 @@ export const handleCalendarRecomSong = async (req, res, next) => {
     */
 
     try {
-      const calendarRecomsData = await calendarRecomsSong(req.user.id, req.query.year, req.query.month, req.query.status);
-      res.status(StatusCodes.OK).success(calendarRecomsData);
-    } catch(err) {
-      next(err);
-    }  
+        const calendarRecomsData = await calendarRecomsSong(
+            req.user.id,
+            req.query.year,
+            req.query.month,
+            req.query.status
+        );
+        res.status(StatusCodes.OK).success(calendarRecomsData);
+    } catch (err) {
+        next(err);
+    }
 };
 
 export const handleSendReplies = async (req, res, next) => {

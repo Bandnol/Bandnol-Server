@@ -49,7 +49,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "R1301" },
-                                    message: { type: "string", example: "추천 곡 및 추천 기록이 없습니다." }
+                                    message: { type: "string", example: "추천 곡 및 추천 기록이 없습니다." },
                                 },
                             },
                         },
@@ -70,7 +70,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "R1300" },
-                                    message: { type: "string", example: "검색어를 입력하세요." }
+                                    message: { type: "string", example: "검색어를 입력하세요." },
                                 },
                             },
                         },
@@ -91,7 +91,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "T1200" },
-                                    message: { type: "string", example: "Authorization이 제공되지 않았습니다." }
+                                    message: { type: "string", example: "Authorization이 제공되지 않았습니다." },
                                 },
                             },
                         },
@@ -112,7 +112,11 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "T1201" },
-                                    message: { type: "string", example: "토큰을 확인해주세요. (만료된 토큰, 올바르지 않은 토큰, 유효하지 않은 토큰 등)" }
+                                    message: {
+                                        type: "string",
+                                        example:
+                                            "토큰을 확인해주세요. (만료된 토큰, 올바르지 않은 토큰, 유효하지 않은 토큰 등)",
+                                    },
                                 },
                             },
                         },
@@ -133,7 +137,10 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "U1300" },
-                                    message: { type: "string", example: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요." }
+                                    message: {
+                                        type: "string",
+                                        example: "소셜 로그인 실패했습니다. 인증 정보를 확인해주세요.",
+                                    },
                                 },
                             },
                         },
@@ -154,7 +161,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "E1000" },
-                                    message: { type: "string", example: "쿼리 파라미터가 올바르지 않습니다." }
+                                    message: { type: "string", example: "쿼리 파라미터가 올바르지 않습니다." },
                                 },
                             },
                         },
@@ -175,7 +182,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "E1001" },
-                                    message: { type: "string", example: "Request Body가 올바르지 않습니다." }
+                                    message: { type: "string", example: "Request Body가 올바르지 않습니다." },
                                 },
                             },
                         },
@@ -196,7 +203,10 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "U1301" },
-                                    message: { type: "string", example: "사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다." }
+                                    message: {
+                                        type: "string",
+                                        example: "사용자를 찾을 수 없습니다. 로그인 후 이용부탁드립니다.",
+                                    },
                                 },
                             },
                         },
@@ -217,7 +227,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "R1200" },
-                                    message: { type: "string", example: "오늘은 이미 노래를 추천하셨습니다." }
+                                    message: { type: "string", example: "오늘은 이미 노래를 추천하셨습니다." },
                                 },
                             },
                         },
@@ -238,7 +248,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "S1300" },
-                                    message: { type: "string", example: "트랙 ID가 존재하지 않습니다." }
+                                    message: { type: "string", example: "트랙 ID가 존재하지 않습니다." },
                                 },
                             },
                         },
@@ -259,7 +269,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "R1302" },
-                                    message: { type: "string", example: "추천 곡이 없거나 접근 권한이 없습니다." }
+                                    message: { type: "string", example: "추천 곡이 없거나 접근 권한이 없습니다." },
                                 },
                             },
                         },
@@ -280,7 +290,7 @@ export default {
                                 type: "object",
                                 properties: {
                                     code: { type: "string", example: "R1200" },
-                                    message: { type: "string", example: "이미 해당 추천곡에 대한 답장이 존재합니다." }
+                                    message: { type: "string", example: "이미 해당 추천곡에 대한 답장이 존재합니다." },
                                 },
                             },
                         },
@@ -292,32 +302,32 @@ export default {
             description: "수정할 데이터 없을 때",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
-                                     code: { type: "string", example: "E1300" },
-                                    message: { type: "string", example: "수정할 데이터가 없습니다." }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    code: { type: "string", example: "E1300" },
+                                    message: { type: "string", example: "수정할 데이터가 없습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         InvalidTypeError: {
             description: "날짜 또는 추천시간 형식이 잘못되었을 때",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
@@ -350,6 +360,27 @@ export default {
                     }
                 }
             }
-        }
+        },
+        CursorOrAuthError: {
+            description: "커서 형식이 올바르지 않거나 권한이 없을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "U1302" },
+                                    message: { type: "string", example: "커서가 잘못되었거나 접근 권한이 없습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
 };
