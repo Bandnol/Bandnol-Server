@@ -11,6 +11,7 @@ import {
     handleAIComment,
     handleCalendarRecomSong,
     handleSendReplies,
+    handleListRecomSong,
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -27,5 +28,6 @@ router.get("/:recomsId/replies", authenticateAccessToken, handleViewReplies);
 router.post("/ai-comment", authenticateAccessToken, handleAIComment);
 router.get("/calendars", authenticateAccessToken, handleCalendarRecomSong);
 router.post("/:recomsId/replies", authenticateAccessToken, handleSendReplies);
+router.get("/lists", authenticateAccessToken, handleListRecomSong);
 
 export default router;

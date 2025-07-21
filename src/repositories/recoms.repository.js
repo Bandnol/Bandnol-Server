@@ -227,3 +227,26 @@ export const createReply = async (recomsId, userId, content) => {
 
     return created;
 };
+
+export const getListRecomsSong = async (userId) => {
+    const listData = await prisma.userRecomsSong.findMany({
+        where: {
+            OR: [{ senderId: userId }, { receiverId: userId }],
+        },
+        select: {
+            createdAt: true,
+            comment: true,
+            senderId: true,
+            receiverId: true,
+            recomsSong: {
+                select: {
+                    title: true,
+                    artistName: true,
+                    imgUrl: true,
+                },
+            },
+        },
+    });
+
+    return listData;
+};

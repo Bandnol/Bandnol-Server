@@ -20,8 +20,20 @@ export const modifyUser = async (userId, data) => {
         data: data,
     });
 
-    return updatedUser;
-};
+  return updatedUser;
+}
+
+export const createInquiry = async (userName, userEmail, text) => {
+    console.log(userName,userEmail,text);
+    const newInquiry = await prisma.inquiry.create({
+        data: {
+            //name: userName
+            email: userEmail,
+            content: text
+        }
+    })
+    return newInquiry.id;
+}
 
 export const getNotification = async (userId, decoded, limit) => {
     const notification = await prisma.notification.findMany({

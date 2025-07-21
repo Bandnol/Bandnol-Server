@@ -10,6 +10,17 @@ export class InvalidDateTypeError extends Error {
     }
 }
 
+export class InvalidEmailTypeError extends Error {
+    errorCode = "U1001";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 export class NotSupportedSocialLoginError extends Error {
     errorCode = "U1300";
     statusCode = 401;

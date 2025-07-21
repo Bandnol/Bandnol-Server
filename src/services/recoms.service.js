@@ -8,6 +8,7 @@ import {
     replyResponseDTO,
     calendarRecomsResponseDTO,
     createdReplyResponseDTO,
+    listRecomsResponseDTO,
 } from "../dtos/recoms.dto.js";
 import {
     QueryParamError,
@@ -29,6 +30,7 @@ import {
     createUserRecomsSong,
     getCalendarRecomsSong,
     createReply,
+    getListRecomsSong,
 } from "../repositories/recoms.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo } from "./spotify.service.js";
@@ -165,4 +167,10 @@ export const sendReplies = async (recomsId, userId, content) => {
         }
         throw err;
     }
+};
+
+export const listRecomsSong = async (userId) => {
+    const data = await getListRecomsSong(userId);
+
+    return listRecomsResponseDTO(data, userId);
 };
