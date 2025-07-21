@@ -96,7 +96,6 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
 };
 
 export const handleSearchRecomSong = async (req, res, next) => {
-
     /*
         #swagger.summary = '추천 기록 검색 API'
 
@@ -329,7 +328,6 @@ export const handleAIComment = async (req, res, next) => {
 };
 
 export const handleCalendarRecomSong = async (req, res, next) => {
-
     /*
         #swagger.summary = '추천 기록 캘린더 조회 API'
 

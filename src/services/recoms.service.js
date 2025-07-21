@@ -75,7 +75,7 @@ export const addRecoms = async (data, userId) => {
         }
         recomsSong = await createRecomsSong(songData);
     }
-    
+
     const newUserSongData = await createUserRecomsSong(data, userId, recomsSong);
     return userRecomsSongResponseDTO(newUserSongData);
 };
@@ -94,12 +94,12 @@ export const viewComment = async (recomsId, type, userId) => {
 
 export const searchRecomsSong = async (userId, keyword) => {
     if (!keyword.trim()) {
-      throw new QueryParamError("검색어가 입력되지 않았습니다.");
+        throw new QueryParamError("검색어가 입력되지 않았습니다.");
     }
 
     const searchRecomsData = await findSongByKeyword(userId, keyword);
-    const send = searchRecomsData.filter(r => r.senderId === userId);
-    const receive = searchRecomsData.filter(r => r.senderId !== userId);
+    const send = searchRecomsData.filter((r) => r.senderId === userId);
+    const receive = searchRecomsData.filter((r) => r.senderId !== userId);
 
     return {
         send: send.map(searchRecomsResponseDTO),

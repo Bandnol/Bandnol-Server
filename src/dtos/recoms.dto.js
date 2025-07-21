@@ -127,7 +127,7 @@ export const replyResponseDTO = (reply) => {
 };
 
 export const calendarRecomsResponseDTO = (data, status) => {
-    return data.map(item => {
+    return data.map((item) => {
         const base = {
             date: item.createdAt.toISOString().slice(0, 10),
             title: item.recomsSong.title,
@@ -136,7 +136,7 @@ export const calendarRecomsResponseDTO = (data, status) => {
             comment: item.comment,
         };
 
-        if (status === 'recommended') {
+        if (status === "recommended") {
             base.senderNickname = item.sender.nickname;
         }
 
