@@ -3,7 +3,8 @@ import {
     NoUserError,
     InvalidDateTypeError,
     InvalidRecomsTimeError,
-    CursorOrAuthError,
+    CursorError,
+    AuthError,
 } from "../errors.js";
 import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
 import { notificationResponseDTO } from "../dtos/users.dto.js";
@@ -79,14 +80,18 @@ export const modifyUserInfo = async (userId, data) => {
 export const viewNotification = async (userId, cursor) => {
     let decoded = null;
     if (cursor) {
-        decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-        console.log(decoded);
+        try {
+            decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
+            console.log(decoded);
+        } catch (err) {
+            throw new CursorError("커서가 잘못되었습니다.");
+        }
     }
 
     const limit = 2;
     let data = await getNotification(userId, decoded, limit);
     if (!data) {
-        throw new CursorOrAuthError("커서가 잘못되었거나 접근 권한이 없습니다.");
+        throw new AuthError("접근 권한이 없습니다. 본인의 토큰이 아닙니다.");
     }
 
     let hasNext = false;

@@ -42,17 +42,6 @@ export class NoUserError extends Error {
     }
 }
 
-export class CursorOrAuthError extends Error {
-    errorCode = "U1302";
-    statusCode = 404;
-
-    constructor(reason, data) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
 // 도메인 : Recoms
 export class InvalidRecomsTimeError extends Error {
     errorCode = "R1000";
@@ -194,6 +183,28 @@ export class RequestBodyError extends Error {
 export class NoModifyDataError extends Error {
     errorCode = "E1300";
     statusCode = 404;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class CursorError extends Error {
+    errorCode = "E1002";
+    statusCode = 400;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class AuthError extends Error {
+    errorCode = "E1200";
+    statusCode = 403;
 
     constructor(reason, data) {
         super(reason);
