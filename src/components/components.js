@@ -1,5 +1,3 @@
-import { CursorOrAuthError } from "../errors.js";
-
 export default {
     responses: {
         Success: {
@@ -342,8 +340,8 @@ export default {
                 },
             },
         },
-        CursorOrAuthError: {
-            description: "커서 형식이 올바르지 않거나 권한이 없을 때",
+        CursorError: {
+            description: "커서 형식이 올바르지 않을 때",
             content: {
                 "application/json": {
                     schema: {
@@ -354,8 +352,32 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    code: { type: "string", example: "U1302" },
-                                    message: { type: "string", example: "커서가 잘못되었거나 접근 권한이 없습니다." },
+                                    code: { type: "string", example: "E1002" },
+                                    message: { type: "string", example: "커서가 잘못되었습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        AuthError: {
+            description: "권한이 없을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "E1200" },
+                                    message: {
+                                        type: "string",
+                                        example: "접근 권한이 없습니다. 본인의 토큰이 아닙니다.",
+                                    },
                                 },
                             },
                         },
@@ -367,22 +389,22 @@ export default {
             description: "이메일 형식이 잘못되었을 때",
             content: {
                 "application/json": {
-                    schema:{
+                    schema: {
                         type: "object",
                         properties: {
                             success: { type: "boolean", example: false },
-                            data: {type: "object", nullable: true},
+                            data: { type: "object", nullable: true },
                             error: {
                                 type: "object",
                                 properties: {
-                                    code: { type: "string" , example: "U1001"},
-                                    message: { type: "string", example: "올바르지 않은 이메일 형식입니다." }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    code: { type: "string", example: "U1001" },
+                                    message: { type: "string", example: "올바르지 않은 이메일 형식입니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         CursorOrAuthError: {
             description: "커서 형식이 올바르지 않거나 권한이 없을 때",

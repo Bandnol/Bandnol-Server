@@ -1,9 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import {
-    checkOwnId,
-    modifyUserInfo,
-    viewNotification
-} from "../services/users.service.js";
+import { checkOwnId, modifyUserInfo, viewNotification } from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
@@ -72,18 +68,21 @@ export const handleModifyUserInfo = async (req, res, next) => {
       $ref: "#/components/responses/NoModifyDataError"
     };
    */
-  
-   try{
+
+    try {
         const userId = req.user.id;
-        console.log(req.body)
-        const user = await modifyUserInfo(userId, userInfoRequestDTO({
-            ...req.body,
-        }));
+        console.log(req.body);
+        const user = await modifyUserInfo(
+            userId,
+            userInfoRequestDTO({
+                ...req.body,
+            })
+        );
         res.status(StatusCodes.OK).success(user);
-    }catch(err){
+    } catch (err) {
         next(err);
     }
-}
+};
 
 export const handleInquiry = async (req, res, next) => {
     /*
@@ -112,18 +111,18 @@ export const handleInquiry = async (req, res, next) => {
       $ref: "#/components/responses/InvalidEmailTypeError"
     };
     */
-   try{
+    try {
         const name = req.body.name;
         const email = req.body.email;
         const text = req.body.content;
         console.log(req.body);
 
-        const inquiry = await sendEmail (name, email, text);
-        res.status(StatusCodes.OK).success({inquiry});
-   }catch(err){
+        const inquiry = await sendEmail(name, email, text);
+        res.status(StatusCodes.OK).success({ inquiry });
+    } catch (err) {
         next(err);
-   }
-}
+    }
+};
 
 export const handleViewNotification = async (req, res, next) => {
     /*
@@ -137,12 +136,16 @@ export const handleViewNotification = async (req, res, next) => {
         $ref: "#/components/responses/Success"
     };
 
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/CursorError"
+    };
+
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.responses[404] = {
-        $ref: "#/components/responses/CursorOrAuthError"
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/AuthError"
     };
     */
 
