@@ -31,13 +31,15 @@ router.get(
     }
   */
     passport.authenticate("google", {
-        failureRedirect: "/api/v1/oauth2/login-fail/google",
+        failureRedirect: "/api/v1/oauth2/login/google",
         failureMessage: true,
     }),
     (req, res) => {
         const { token, user } = req.user;
-
-        res.json({ token, user });
+        res.success({
+            token,
+            user,
+        });
     }
 );
 router.get("/login/naver", 
@@ -65,13 +67,15 @@ router.get(
     }
     */
     passport.authenticate("naver", {
-        failureRedirect: "/api/v1/oauth2/login-fail/naver",
+        failureRedirect: "/api/v1/oauth2/login/naver",
         failureMessage: true,
     }),
     (req, res) => {
         const { token, user } = req.user;
-
-        res.json({ token, user });
+        res.success({
+            token,
+            user,
+        });
     }
 );
 router.get("/login/kakao", 
@@ -99,18 +103,16 @@ router.get(
     }
     */
     passport.authenticate("kakao", {
-        failureRedirect: "api/v1/oauth2/login-fail/kakao",
+        failureRedirect: "api/v1/oauth2/login/kakao",
         failureMessage: true,
     }),
     (req, res) => {
         const { token, user } = req.user;
-
-        res.json({ token, user });
+        res.success({
+            token,
+            user,
+        });
     }
 );
-
-router.get("/login-fail/google", (req, res) => {
-  res.status(401).json({ message: "Google 로그인에 실패했습니다. 다시 시도해주세요." });
-});
 
 export default router;
