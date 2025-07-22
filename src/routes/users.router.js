@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/check-ownId", authenticateAccessToken, handleCheckOwnId);
 router.patch("/me/profiles", authenticateAccessToken, handleModifyUserInfo);
+router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 router.post("/inquiry", handleInquiry);
 router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 

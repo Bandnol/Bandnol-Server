@@ -1,3 +1,5 @@
+import { CursorOrAuthError } from "../errors.js";
+
 export default {
     responses: {
         Success: {
@@ -331,14 +333,35 @@ export default {
                             error: {
                                 type: "object",
                                 properties: {
-                                    code: { type: "string" , example: "날짜 형식 오류 : U1000, 시간 형식 오류 : R1000"},
-                                    message: { type: "string", example: "날짜 또는 추천 시간 형식이 잘못되었습니다." }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    code: { type: "string", example: "날짜 형식 오류 : U1000, 시간 형식 오류 : R1000" },
+                                    message: { type: "string", example: "날짜 또는 추천 시간 형식이 잘못되었습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        CursorOrAuthError: {
+            description: "커서 형식이 올바르지 않거나 권한이 없을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "U1302" },
+                                    message: { type: "string", example: "커서가 잘못되었거나 접근 권한이 없습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
         InvalidEmailTypeError: {
             description: "이메일 형식이 잘못되었을 때",

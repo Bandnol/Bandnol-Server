@@ -71,8 +71,8 @@ export const handleModifyUserInfo = async (req, res, next) => {
     #swagger.responses[404] = {
       $ref: "#/components/responses/NoModifyDataError"
     };
-          
-    */
+   */
+  
    try{
         const userId = req.user.id;
         console.log(req.body)
