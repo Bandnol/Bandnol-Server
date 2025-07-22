@@ -11,13 +11,12 @@ model UserLikedArtist {
   id             String    @id @unique @default(uuid())
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
-  artistId       String    @map("artist_id")
   userId         String    @map("user_id")
-  artistName     String    @map("artist_name")
-  imgUrl         String    @map("img_url")
+  artistId       String    @map("artist_id")
   inactiveAt     DateTime? @map("inactive_at")
   inactiveStatus Boolean   @default(false) @map("inactive_status")
   user           User      @relation(fields: [userId], references: [id])
+  artist         Artist    @relation(fields: [artistId], references: [id])
 }
 
 model Inquiry {
@@ -36,6 +35,24 @@ model RecomsSong {
   imgUrl          String?          @map("img_url")
   previewUrl      String?          @map("preview_url")
   userRecomsSongs UserRecomsSong[]
+  sings           Sing[]            
+}
+
+model Sing {
+  id String @id @unique @default(uuid())
+  recomsSongId String @map("recoms_song_id")
+  artistId  String @map("artist_id")
+  
+  recomsSong RecomsSong @relation(fields: [recomsSongId], references: [id])
+  artist Artist @relation(fields: [artistId], references: [id])
+}
+
+model Artist {
+  id String @id @unique
+  name String @db.VarChar(100)
+  imgUrl String? @map("img_url")
+  userLikedArtist UserLikedArtist[]
+  sings Sing[]
 }
 
 model Notification {

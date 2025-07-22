@@ -104,10 +104,10 @@ export const getRecomsSong = async (recomsSongId) => {
 export const createRecomsSong = async (recomsSong) => {
     const created = await prisma.recomsSong.create({
         data: {
-            id: recomsSong.id,
+            id: recomsSong.id.toString(),
             title: recomsSong.title,
-            artistName: recomsSong.artistName,
-            imgUrl: recomsSong.imgUrl,
+            artistName: recomsSong.artist,
+            imgUrl: recomsSong.albumImg,
             previewUrl: recomsSong.previewUrl,
         },
     });

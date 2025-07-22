@@ -1,9 +1,3 @@
-export const searchTracksResponseDTO = (tracks) => {
-    return {
-        data: tracks,
-    };
-};
-
 export const sentRecomsResponseDTO = (recomsData) => {
     const kstDate = new Date(recomsData.createdAt.getTime() + 9 * 60 * 60 * 1000); // UTC+9 시간대
 
@@ -70,19 +64,19 @@ export const searchRecomsResponseDTO = (recom, isReceived = false) => {
 };
 
 export const getSongInfoResponseDTO = (songData) => {
-    //console.log(songData);
-    const artists = songData.artists.map((artist) => artist.name).join(", ");
-
+    console.log(songData)
     return {
-        id: songData.id,
-        title: songData.name,
-        artistName: artists,
-        imgUrl: songData.album.images?.[0]?.url || null,
-        previewUrl: songData.previewUrl || null,
+        id: songData.trackId,
+        title: songData.trackName,
+        artist: songData.artistName,
+        album: songData.collectionName,
+        albumImg: songData.artworkUrl100,
+        previewUrl: songData.previewUrl
     };
 };
 
-export const userRecomsSongResponseDTO = (userRecomsSongData) => {
+export const userRecomsSongResponseDTO = (userRecomsSongData, singData, artists) => {
+    
     return {
         id: userRecomsSongData.id,
         recomsSong: {

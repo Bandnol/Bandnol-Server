@@ -11,7 +11,7 @@ import {
     sendReplies,
     listRecomsSong,
 } from "../services/recoms.service.js";
-import { searchSpotifyTracks } from "../services/spotify.service.js";
+import { searchItunesTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
 import { genAIComment } from "../services/gemini.service.js";
 
@@ -30,7 +30,7 @@ export const handleAllTracks = async (req, res, next) => {
         const keyword = req.query.keyword;
         const cursor = typeof req.query.cursor === "string" ? parseInt(req.query.cursor) : 0;
 
-        const tracks = await searchSpotifyTracks(keyword, cursor);
+        const tracks = await searchItunesTracks(keyword, cursor);
         res.status(StatusCodes.OK).success(tracks);
     } catch (err) {
         next(err);
@@ -275,8 +275,8 @@ export const handleAddRecoms = async (req, res, next) => {
 
     try {
         const userId = req.user.id;
-        const recomsSong = await addRecoms(req.body, userId);
         console.log(req.body);
+        const recomsSong = await addRecoms(req.body, userId);
         res.status(StatusCodes.OK).success(recomsSong);
     } catch (err) {
         next(err);

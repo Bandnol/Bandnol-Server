@@ -17,6 +17,7 @@ import {
     DuplicateRecomsError,
     NotFoundSongError,
     RecomsNotFoundOrAuthError,
+    DuplicateSingError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -32,8 +33,9 @@ import {
     createReply,
     getListRecomsSong,
 } from "../repositories/recoms.repository.js";
+import { createArtist, createSing, getSing, getArtistById } from "../repositories/artists.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
-import { getSongInfo } from "./spotify.service.js";
+import { getSongInfo, getArtistInfo } from "./spotify.service.js";
 import { Prisma } from "@prisma/client";
 
 export const sentRecomsSong = async (recomsId, userId) => {
@@ -68,16 +70,37 @@ export const addRecoms = async (data, userId) => {
     // recomsSong 테이블에 데이터 생성
     let recomsSong = await getRecomsSong(data.id);
     if (!recomsSong) {
-        const songData = await getSongInfo(data.id);
+        const songData = await getSongInfo(parseInt(data.id));
         console.log(songData);
-        if (!songData) {
+        if (!songData) {    
             throw new NotFoundSongError("트랙 ID가 존재하지 않습니다.");
         }
         recomsSong = await createRecomsSong(songData);
     }
-    
+
+    //아티스트 테이블에 아티스트 생성
+    const artists = []
+    const artistNames = recomsSong.artistName.split("&").map(name => name.trim());
+    for (const artistName of artistNames){
+        const artistData = await getArtistInfo(artistName);
+        const existArtist = await getArtistById(artistData.id);
+        if(!existArtist){
+            await createArtist(artistData);
+        }
+        artists.push(artistData);
+    }
+    console.log(artists);
+
+    for(const artist of artists){
+        let singData = await getSing(recomsSong.id, artist.id);
+        if(!singData){
+            singData = await createSing(recomsSong.id,artist.id);
+        }
+    }
+
     const newUserSongData = await createUserRecomsSong(data, userId, recomsSong);
-    return userRecomsSongResponseDTO(newUserSongData);
+
+    return userRecomsSongResponseDTO(newUserSongData, artists, singData);
 };
 
 export const viewComment = async (recomsId, type, userId) => {

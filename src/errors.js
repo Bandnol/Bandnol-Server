@@ -65,6 +65,17 @@ export class DuplicateRecomsError extends Error {
     }
 }
 
+export class DuplicateSingError extends Error {
+    errorCode = "R1201";
+    statusCode = 409;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 export class NotFoundKeywordError extends Error {
     errorCode = "R1300";
     statusCode = 404;
