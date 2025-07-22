@@ -188,20 +188,30 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
 
     const calendarsData = await prisma.userRecomsSong.findMany({
         where: whereClause,
-        include: {
-            recomsSong: {
-                select: {
-                    title: true,
-                    artistName: true,
-                    imgUrl: true,
+        select: {
+                id: true,
+                createdAt: true, 
+                comment: true,
+                sender: {
+                    select: {
+                        id: true,
+                        nickname: true
+                    },
                 },
-            },
-            sender: {
-                select: {
-                    nickname: true,
+                receiver: {
+                    select: {
+                        id: true,
+                        nickname: true
+                    }
                 },
-            },
-        },
+                recomsSong: {
+                    select: {
+                        title: true,
+                        artistName: true,
+                        imgUrl: true,
+                    }
+                }
+            }
     });
 
     return calendarsData;

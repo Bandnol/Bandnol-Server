@@ -168,7 +168,7 @@ export const calendarRecomsSong = async (userId, year, month, status) => {
 
     const data = await getCalendarRecomsSong(userId, year, month, status);
 
-    return calendarRecomsResponseDTO(data, status);
+    return calendarRecomsResponseDTO(data);
 };
 
 export const sendReplies = async (recomsId, userId, content) => {
