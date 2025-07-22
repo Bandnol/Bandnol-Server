@@ -15,7 +15,6 @@ model UserLikedArtist {
   userId         String    @map("user_id")
   inactiveAt     DateTime? @map("inactive_at")
   inactiveStatus Boolean   @default(false) @map("inactive_status")
-  artist         Artist    @relation(fields: [artistId], references: [id])
   user           User      @relation(fields: [userId], references: [id])
   artist         Artist    @relation(fields: [artistId], references: [id])
 }
