@@ -109,6 +109,17 @@ export class RecomsNotFoundOrAuthError extends Error {
     }
 }
 
+export class NotSendRecomsError extends Error {
+    errorCode = "R1303";
+    statusCode = 422;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 // 도메인 : Token
 // 인증 정보가 제공되어 있지 않은 경우
 export class UnauthorizedError extends Error {
@@ -205,6 +216,17 @@ export class CursorError extends Error {
 export class AuthError extends Error {
     errorCode = "E1200";
     statusCode = 403;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class SchedulerError extends Error {
+    errorCode = "E1301";
+    statusCode = 500;
 
     constructor(reason, data) {
         super(reason);

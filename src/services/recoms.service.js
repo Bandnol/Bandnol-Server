@@ -18,6 +18,9 @@ import {
     NotFoundSongError,
     RecomsNotFoundOrAuthError,
     DuplicateSingError,
+    NotSendRecomsError,
+    RecommendationNotFoundError,
+    NoModifyDataError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -32,11 +35,15 @@ import {
     getCalendarRecomsSong,
     createReply,
     getListRecomsSong,
+    updateReceiver,
+    createUserRecomsSongByAI,
+    updateIsDeliveredToTrue,
 } from "../repositories/recoms.repository.js";
 import { createArtist, createSing, getSing, getArtistById } from "../repositories/artists.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
-import { getSongInfo, getArtistInfo } from "./spotify.service.js";
+import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./spotify.service.js";
 import { Prisma } from "@prisma/client";
+import { genAIAutoRecoms } from "./gemini.service.js";
 
 export const sentRecomsSong = async (recomsId, userId) => {
     const data = await getSentRecomsSong(recomsId, userId);
@@ -72,29 +79,29 @@ export const addRecoms = async (data, userId) => {
     if (!recomsSong) {
         const songData = await getSongInfo(parseInt(data.id));
         console.log(songData);
-        if (!songData) {    
+        if (!songData) {
             throw new NotFoundSongError("트랙 ID가 존재하지 않습니다.");
         }
         recomsSong = await createRecomsSong(songData);
     }
 
     //아티스트 테이블에 아티스트 생성
-    const artists = []
-    const artistNames = recomsSong.artistName.split("&").map(name => name.trim());
-    for (const artistName of artistNames){
+    const artists = [];
+    const artistNames = recomsSong.artistName.split("&").map((name) => name.trim());
+    for (const artistName of artistNames) {
         const artistData = await getArtistInfo(artistName);
         const existArtist = await getArtistById(artistData.id);
-        if(!existArtist){
+        if (!existArtist) {
             await createArtist(artistData);
         }
         artists.push(artistData);
     }
     console.log(artists);
 
-    for(const artist of artists){
+    for (const artist of artists) {
         let singData = await getSing(recomsSong.id, artist.id);
-        if(!singData){
-            singData = await createSing(recomsSong.id,artist.id);
+        if (!singData) {
+            singData = await createSing(recomsSong.id, artist.id);
         }
     }
 
@@ -196,4 +203,58 @@ export const listRecomsSong = async (userId) => {
     const data = await getListRecomsSong(userId);
 
     return listRecomsResponseDTO(data, userId);
+};
+
+export const sendUserRecoms = async (recomsId, userId) => {
+    let update = await updateReceiver(recomsId, userId);
+    if (!update) {
+        throw new RecommendationNotFoundError("userRecomsSong 테이블에 데이터가 생성되지 않았습니다.");
+    }
+    console.log(update);
+
+    // isDelivered true로 변경
+    const isDelivered = await updateIsDeliveredToTrue(userId);
+    if (!isDelivered) {
+        throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
+    }
+    console.log(isDelivered);
+};
+
+export const sendAIRecoms = async (userId) => {
+    // 보낼 추천 곡이 없는 경우 - AI 생성
+    const result = await genAIAutoRecoms();
+    console.log(result);
+
+    // iTunes에서 곡 정보 받아오기 (DTO로 가공됨)
+    const songData = await getSongInfoBySearch(result.artist);
+    console.log("songData: ", songData);
+    if (!songData.id) {
+        throw new NotFoundSongError("트랙이 존재하지 않습니다.");
+    }
+
+    // recomsSong에 중복 데이터가 있는지 확인 -> artist만으로는 중복 데이터를 확인할 수 없어서 부득이하게 곡 정보를 가져온 후 검사를 하게 됨
+    let recomsSong = await getRecomsSong(songData.id);
+
+    // recomsSong 테이블에 데이터 생성
+    if (!recomsSong) {
+        recomsSong = await createRecomsSong(songData);
+        if (!recomsSong) {
+            throw new RecommendationNotFoundError("recomsSong 테이블에 데이터가 생성되지 않았습니다.");
+        }
+        console.log("ai가 recomsSong에 생성한 데이터: ", recomsSong);
+    }
+
+    // UserRecomsSong 테이블에 데이터 생성
+    let newUserSongData = await createUserRecomsSongByAI(userId, result.comment || songData.comment, recomsSong);
+    if (!newUserSongData) {
+        throw new RecommendationNotFoundError("userRecomsSong 테이블에 데이터가 생성되지 않았습니다.");
+    }
+    console.log("ai가 userRecomsSong에 생성한 데이터: ", newUserSongData);
+
+    // isDelivered true로 변경
+    const isDelivered = await updateIsDeliveredToTrue(userId);
+    if (!isDelivered) {
+        throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
+    }
+    console.log(isDelivered);
 };
