@@ -1,5 +1,10 @@
 import { sendAIRecoms, sendUserRecoms } from "../services/recoms.service.js";
-import { getRecomsWithNoReceiver, getUserList, getSenderToday } from "../repositories/recoms.repository.js";
+import {
+    getRecomsWithNoReceiver,
+    getUserList,
+    getSenderToday,
+    updateIsDeliveredToFalse,
+} from "../repositories/recoms.repository.js";
 import cron from "node-cron";
 import { SchedulerError } from "../errors.js";
 
@@ -64,7 +69,7 @@ export const resetIsDeliveredScheduler = async () => {
         "0 0 * * *",
         async () => {
             try {
-                const updated = await updateIsDelivered();
+                const updated = await updateIsDeliveredToFalse();
                 console.log("업데이트 된 행의 개수: ", updated);
                 console.log(new Date());
             } catch (err) {
