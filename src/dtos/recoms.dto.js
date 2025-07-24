@@ -64,19 +64,17 @@ export const searchRecomsResponseDTO = (recom, isReceived = false) => {
 };
 
 export const getSongInfoResponseDTO = (songData) => {
-    console.log(songData)
     return {
-        id: songData.trackId,
+        id: songData.trackId.toString(),
         title: songData.trackName,
         artist: songData.artistName,
         album: songData.collectionName,
         albumImg: songData.artworkUrl100,
-        previewUrl: songData.previewUrl
+        previewUrl: songData.previewUrl,
     };
 };
 
 export const userRecomsSongResponseDTO = (userRecomsSongData, singData, artists) => {
-    
     return {
         id: userRecomsSongData.id,
         recomsSong: {

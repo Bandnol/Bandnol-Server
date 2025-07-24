@@ -10,6 +10,7 @@ import passport from "passport";
 import { prisma } from "./configs/db.config.js";
 import { googleStrategy, naverStrategy, kakaoStrategy } from "./configs/auth.config.js";
 import components from "./components/components.js";
+import { resetIsDeliveredScheduler, songScheduler } from "./cron/scheduler.js";
 
 dotenv.config();
 
@@ -135,6 +136,9 @@ app.use((err, req, res, next) => {
         data: err.data || null,
     });
 });
+
+songScheduler();
+resetIsDeliveredScheduler();
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
