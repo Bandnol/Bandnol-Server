@@ -95,7 +95,16 @@ app.get("/openapi.json", async (req, res, next) => {
             title: "Bandnol",
             description: "Bandnol 프로젝트의 API 명세입니다.",
         },
-        host: "localhost:3000",
+        servers: [
+            {
+            url: "http://localhost:3000",
+            description: "로컬 서버",
+            },
+            {
+            url: "https://bandnol.app",
+            description: "배포 서버",
+            },
+        ],
         components: {
             ...components,
             securitySchemes: {
