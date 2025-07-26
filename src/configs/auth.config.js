@@ -14,9 +14,10 @@ export const googleStrategy = new GoogleStrategy(
     {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/v1/oauth2/callback/google",
+        callbackURL: "https://bandnol.app/api/v1/oauth2/callback/google",
         scope: ["email", "profile"],
         state: true,
+        
     },
     (accessToken, refreshToken, profile, cb) => {
         return socialVerify(profile, SocialType.GOOGLE)
@@ -29,7 +30,7 @@ export const naverStrategy = new NaverStrategy(
     {
         clientID: process.env.NAVER_CLIENT_ID,
         clientSecret: process.env.NAVER_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/v1/oauth2/callback/naver",
+        callbackURL: "https://bandnol.app/api/v1/oauth2/callback/naver",
         scope: ["name", "email", "gender", "birthyear", "birthday"],
         state: true,
     },
@@ -43,7 +44,7 @@ export const naverStrategy = new NaverStrategy(
 export const kakaoStrategy = new KakaoStrategy(
     {
         clientID: process.env.KAKAO_TEST_API_KEY,
-        callbackURL: "http://localhost:3000/api/v1/oauth2/callback/kakao",
+        callbackURL: "https://bandnol.app/api/v1/oauth2/callback/kakao",
         scope: ["account_email", "name"],
         state: true,
     },
