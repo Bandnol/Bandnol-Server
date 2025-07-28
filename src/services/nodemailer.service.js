@@ -16,7 +16,6 @@ const transporter = nodemailer.createTransport({
 export const sendEmail = async (userName, userEmail, text) => {
   const recepients = [userEmail, process.env.ADMIN_USER_EMAIL];
   
-  console.log("📩 이메일 검사 대상:", userEmail, typeof userEmail);
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(userEmail)) {
     throw new InvalidEmailTypeError("올바르지 않은 이메일 형식입니다.");

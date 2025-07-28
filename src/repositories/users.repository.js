@@ -24,7 +24,6 @@ export const modifyUser = async (userId, data) => {
 }
 
 export const createInquiry = async (userName, userEmail, text) => {
-    console.log(userName,userEmail,text);
     const newInquiry = await prisma.inquiry.create({
         data: {
             name: userName,
@@ -33,4 +32,28 @@ export const createInquiry = async (userName, userEmail, text) => {
         }
     })
     return newInquiry.id;
+}
+
+export const findOrCreateUser = async( userName, userEmail, type ) => {
+    let user = await prisma.user.findFirst({ where: { email: userEmail } });
+
+    if (!user) {
+        user = await prisma.user.create({
+            data: {
+                name: userName,
+                email: userEmail,
+                socialType: type,
+            },
+        });
+    } else {
+        user = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                name: userName,
+                email: userEmail,
+                socialType: type,
+            },
+        });
+    }
+    return user;
 }
