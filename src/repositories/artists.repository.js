@@ -38,54 +38,6 @@ export const createSing = async (songId, artistId) => {
     });
 };
 
-// export const getArtistsByPopularity = async (decoded, limit) => {
-//     const [artists, artistInfo] = await prisma.$transaction(async (tx) => {
-//         // const grouped = await tx.userLikedArtist.groupBy({
-//         //     take: limit + 1,
-//         //     skip: decoded ? 1 : 0,
-//         //     ...(decoded && { cursor: { artistId: decoded.artistId } }),
-//         //     by: ["artistId"],
-//         //     _count: {
-//         //         artistId: true,
-//         //     },
-//         //     orderBy: [{ _count: { artistId: "desc" } }, { artistId: "asc" }],
-//         // });
-
-//         const groupByOptions = {
-//             take: limit + 1,
-//             skip: decoded ? 1 : 0,
-//             by: ["artistId"],
-//             _count: {
-//                 artistId: true,
-//             },
-//             orderBy: [{ _count: { artistId: "desc" } }, { artistId: "asc" }],
-//         };
-
-//         if (decoded?.artistId) {
-//             groupByOptions.cursor = { artistId: decoded.artistId };
-//         }
-
-//         const grouped = await tx.userLikedArtist.groupBy(groupByOptions);
-
-//         const artistIds = grouped.map((a) => a.artistId);
-
-//         const info = await tx.artist.findMany({
-//             where: {
-//                 id: {
-//                     in: artistIds,
-//                 },
-//             },
-//         });
-
-//         return [grouped, info];
-//     });
-
-//     console.log(artists);
-//     console.log(artistInfo);
-
-//     return artistInfo;
-// };
-
 export const getArtistsByPopularity = async (decoded, limit) => {
     let result;
     if (decoded) {
