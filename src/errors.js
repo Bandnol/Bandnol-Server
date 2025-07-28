@@ -42,6 +42,17 @@ export class NoUserError extends Error {
     }
 }
 
+export class AuthorizationCodeError extends Error {
+    errorCode = "U1302";
+    statusCode = 401;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 // 도메인 : Recoms
 export class InvalidRecomsTimeError extends Error {
     errorCode = "R1000";

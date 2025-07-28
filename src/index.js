@@ -8,14 +8,9 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
-import { googleStrategy, naverStrategy, kakaoStrategy } from "./configs/auth.config.js";
 import components from "./components/components.js";
 
 dotenv.config();
-
-passport.use(googleStrategy);
-passport.use(naverStrategy);
-passport.use(kakaoStrategy);
 
 // Session의 정보를 가져올 때 사용하는 함수들
 passport.serializeUser((user, done) => done(null, user));
