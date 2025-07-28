@@ -3,6 +3,7 @@ import { generateToken } from "../utils/token.js";
 import { getKakaoToken, getKakaoUser } from "../configs/auth.config.js"
 import { findOrCreateUser } from "../repositories/users.repository.js"
 import pkg from '@prisma/client';
+import { StatusCodes } from "http-status-codes";
 const { SocialType, Gender } = pkg;
 
 export const handleKakaoLogin = async (req, res, next) => {
@@ -23,7 +24,8 @@ export const handleKakaoLogin = async (req, res, next) => {
     const user = await findOrCreateUser(name, email, SocialType.KAKAO);
 
     const token = generateToken({id: user.id});
-    res.json({ token, user });
+
+    res.status(StatusCodes.OK).success({token, user});
    } catch (err) {
     console.error("Kakao 로그인 실패", err);
     res.status(500).json({ message: "Kakao 로그인 실패" });

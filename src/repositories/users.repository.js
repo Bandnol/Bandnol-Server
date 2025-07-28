@@ -55,5 +55,5 @@ export const findOrCreateUser = async( userName, userEmail, type ) => {
             },
         });
     }
-    return user;
+    return { id: user.id, name: user.name, email: user.email, socialType: user.socialType};
 }
