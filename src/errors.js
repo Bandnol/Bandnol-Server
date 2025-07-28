@@ -120,6 +120,18 @@ export class NotSendRecomsError extends Error {
     }
 }
 
+// 도메인 : Artists
+export class NotFoundArtistsError extends Error {
+    errorCode = "A1300";
+    statusCode = 404;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 // 도메인 : Token
 // 인증 정보가 제공되어 있지 않은 경우
 export class UnauthorizedError extends Error {
@@ -160,6 +172,16 @@ export class AuthTokenError extends Error {
 // 도메인 : Spotify
 export class NotFoundSongError extends Error {
     errorCode = "S1300";
+    statusCode = 400;
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class NotFoundArtistsSpotifyError extends Error {
+    errorCode = "S1301";
     statusCode = 400;
     constructor(reason, data) {
         super(reason);

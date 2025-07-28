@@ -1,3 +1,5 @@
+import { NotFoundArtistsError } from "../errors.js";
+
 export default {
     responses: {
         Success: {
@@ -420,6 +422,27 @@ export default {
                                 properties: {
                                     code: { type: "string", example: "U1302" },
                                     message: { type: "string", example: "커서가 잘못되었거나 접근 권한이 없습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        NotFoundArtistsError: {
+            description: "아티스트를 불러오지 못했을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "A1300" },
+                                    message: { type: "string", example: "아티스트를 불러오지 못했습니다." },
                                 },
                             },
                         },
