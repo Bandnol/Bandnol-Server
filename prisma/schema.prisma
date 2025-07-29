@@ -11,8 +11,8 @@ model UserLikedArtist {
   id             String    @id @unique @default(uuid())
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
-  userId         String    @map("user_id")
   artistId       String    @map("artist_id")
+  userId         String    @map("user_id")
   inactiveAt     DateTime? @map("inactive_at")
   inactiveStatus Boolean   @default(false) @map("inactive_status")
   user           User      @relation(fields: [userId], references: [id])
@@ -34,25 +34,24 @@ model RecomsSong {
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
   previewUrl      String?          @map("preview_url")
+  sings           Sing[]
   userRecomsSongs UserRecomsSong[]
-  sings           Sing[]            
 }
 
 model Sing {
-  id String @id @unique @default(uuid())
-  recomsSongId String @map("recoms_song_id")
-  artistId  String @map("artist_id")
-  
-  recomsSong RecomsSong @relation(fields: [recomsSongId], references: [id])
-  artist Artist @relation(fields: [artistId], references: [id])
+  id           String     @id @unique @default(uuid())
+  recomsSongId String     @map("recoms_song_id")
+  artistId     String     @map("artist_id")
+  artist       Artist     @relation(fields: [artistId], references: [id])
+  recomsSong   RecomsSong @relation(fields: [recomsSongId], references: [id])
 }
 
 model Artist {
-  id String @id @unique
-  name String @db.VarChar(100)
-  imgUrl String? @map("img_url")
+  id              String            @id @unique
+  name            String            @db.VarChar(100)
+  imgUrl          String?           @map("img_url")
+  sings           Sing[]
   userLikedArtist UserLikedArtist[]
-  sings Sing[]
 }
 
 model Notification {

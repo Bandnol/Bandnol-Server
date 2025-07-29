@@ -64,19 +64,17 @@ export const searchRecomsResponseDTO = (recom, isReceived = false) => {
 };
 
 export const getSongInfoResponseDTO = (songData) => {
-    console.log(songData)
     return {
-        id: songData.trackId,
+        id: songData.trackId.toString(),
         title: songData.trackName,
         artist: songData.artistName,
         album: songData.collectionName,
         albumImg: songData.artworkUrl100,
-        previewUrl: songData.previewUrl
+        previewUrl: songData.previewUrl,
     };
 };
 
 export const userRecomsSongResponseDTO = (userRecomsSongData, singData, artists) => {
-    
     return {
         id: userRecomsSongData.id,
         recomsSong: {
@@ -120,21 +118,21 @@ export const replyResponseDTO = (reply) => {
     };
 };
 
-export const calendarRecomsResponseDTO = (data, status) => {
-    return data.map(item => {
-        const base = {
-            date: item.createdAt.toISOString().slice(0, 10),
-            title: item.recomsSong.title,
-            artistName: item.recomsSong.artistName,
-            imageUrl: item.recomsSong.imgUrl,
-            comment: item.comment,
+export const calendarRecomsResponseDTO = (data) => {
+
+    return data.map(recom => {
+        const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
+        
+        return {
+            id: recom.id,
+            date: kstDate.toISOString().slice(0, 10),
+            title: recom.recomsSong.title,
+            artistName: recom.recomsSong.artistName,
+            imageUrl: recom.recomsSong.imgUrl,
+            comment: recom.comment,
+            senderNickname: recom.sender.nickname,
+            receiverNickname: recom.receiver.nickname,
         };
-
-        if (status === 'recommended') {
-            base.senderNickname = item.sender.nickname;
-        }
-
-        return base;
     });
 };
 

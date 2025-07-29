@@ -1,8 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import {
-    checkOwnId,
-    modifyUserInfo,
-} from "../services/users.service.js";
+import { checkOwnId, modifyUserInfo, viewNotification } from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
@@ -25,12 +22,12 @@ export const handleCheckOwnId = async (req, res, next) => {
 
     try {
         const ownId = req.query.ownId;
-        const isPossibleOwnId = await checkOwnId (ownId);
-        res.status(StatusCodes.OK).success({ "isPossibleOwnId": isPossibleOwnId });
-    }catch(err){
+        const isPossibleOwnId = await checkOwnId(ownId);
+        res.status(StatusCodes.OK).success({ isPossibleOwnId: isPossibleOwnId });
+    } catch (err) {
         next(err);
     }
-}
+};
 
 export const handleModifyUserInfo = async (req, res, next) => {
     /*
@@ -70,19 +67,22 @@ export const handleModifyUserInfo = async (req, res, next) => {
     #swagger.responses[404] = {
       $ref: "#/components/responses/NoModifyDataError"
     };
-          
-    */
-   try{
+   */
+
+    try {
         const userId = req.user.id;
-        console.log(req.body)
-        const user = await modifyUserInfo(userId, userInfoRequestDTO({
-            ...req.body,
-        }));
+        console.log(req.body);
+        const user = await modifyUserInfo(
+            userId,
+            userInfoRequestDTO({
+                ...req.body,
+            })
+        );
         res.status(StatusCodes.OK).success(user);
-    }catch(err){
+    } catch (err) {
         next(err);
     }
-}
+};
 
 export const handleInquiry = async (req, res, next) => {
     /*
@@ -111,15 +111,48 @@ export const handleInquiry = async (req, res, next) => {
       $ref: "#/components/responses/InvalidEmailTypeError"
     };
     */
-   try{
+    try {
         const name = req.body.name;
         const email = req.body.email;
         const text = req.body.content;
         console.log(req.body);
 
-        const inquiry = await sendEmail (name, email, text);
-        res.status(StatusCodes.OK).success({inquiry});
-   }catch(err){
+        const inquiry = await sendEmail(name, email, text);
+        res.status(StatusCodes.OK).success({ inquiry });
+    } catch (err) {
         next(err);
-   }
-}
+    }
+};
+
+export const handleViewNotification = async (req, res, next) => {
+    /*
+    #swagger.summary = '알림 센터 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/CursorError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[403] = {
+        $ref: "#/components/responses/AuthError"
+    };
+    */
+
+    try {
+        const notification = await viewNotification(req.user.id, req.query.cursor);
+        res.status(StatusCodes.OK).success(notification);
+    } catch (err) {
+        next(err);
+    }
+};

@@ -52,7 +52,7 @@ export const getReceivedRecomsSong = async (recomsId, userId) => {
 };
 
 export const findSongByKeyword = async (userId, keyword) => {
-    const searchRecomsData =  await prisma.userRecomsSong.findMany({
+    const searchRecomsData = await prisma.userRecomsSong.findMany({
         where: {
             AND: [
                 {
@@ -68,12 +68,12 @@ export const findSongByKeyword = async (userId, keyword) => {
         },
         include: {
             recomsSong: true,
-            sender: { 
-                select: { 
-                    id: true, 
-                    nickname: true 
-                } 
-            }
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
         },
     });
 
@@ -95,16 +95,14 @@ export const getSenderToday = async (userId) => {
 
 export const getRecomsSong = async (recomsSongId) => {
     return await prisma.recomsSong.findUnique({
-        where: {
-            id: recomsSongId,
-        },
+        where: { id: recomsSongId },
     });
 };
 
 export const createRecomsSong = async (recomsSong) => {
     const created = await prisma.recomsSong.create({
         data: {
-            id: recomsSong.id.toString(),
+            id: recomsSong.id,
             title: recomsSong.title,
             artistName: recomsSong.artist,
             imgUrl: recomsSong.albumImg,
@@ -183,25 +181,35 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
             gte: startDate,
             lt: endDate,
         },
-        ...(status === 'recommending' ? { senderId: userId } : { receiverId: userId }),
+        ...(status === "recommending" ? { senderId: userId } : { receiverId: userId }),
     };
 
     const calendarsData = await prisma.userRecomsSong.findMany({
         where: whereClause,
-        include: {
-            recomsSong: {
-                select: {
-                    title: true,
-                    artistName: true,
-                    imgUrl: true,
+        select: {
+                id: true,
+                createdAt: true, 
+                comment: true,
+                sender: {
+                    select: {
+                        id: true,
+                        nickname: true
+                    },
                 },
-            },
-            sender: {
-                select: {
-                    nickname: true,
+                receiver: {
+                    select: {
+                        id: true,
+                        nickname: true
+                    }
                 },
-            },
-        },
+                recomsSong: {
+                    select: {
+                        title: true,
+                        artistName: true,
+                        imgUrl: true,
+                    }
+                }
+            }
     });
 
     return calendarsData;
@@ -228,6 +236,80 @@ export const createReply = async (recomsId, userId, content) => {
     return created;
 };
 
+export const getUserList = async () => {
+    let now = new Date();
+    let hour = now.getHours();
+    let min = now.getMinutes();
+
+    if (hour < 10) {
+        hour = "0" + hour.toString();
+    } else {
+        hour = hour.toString();
+    }
+
+    if (min < 10) {
+        min = "0" + min.toString();
+    } else {
+        min = min.toString();
+    }
+    let time = hour + min;
+
+    const userList = await prisma.user.findMany({
+        where: {
+            isDelivered: false,
+            recomsTime: {
+                lt: time,
+            },
+            inactiveStatus: false,
+        },
+        select: {
+            id: true,
+        },
+    });
+    return userList;
+};
+
+export const getRecomsWithNoReceiver = async () => {
+    const recomsList = await prisma.userRecomsSong.findMany({
+        where: { receiverId: null },
+        select: {
+            id: true,
+            senderId: true,
+        },
+    });
+    return recomsList;
+};
+
+export const updateReceiver = async (recomsId, userId) => {
+    const receiverUpdate = await prisma.userRecomsSong.update({
+        where: { id: recomsId, NOT: { senderId: userId } },
+        data: {
+            receiverId: userId,
+        },
+    });
+
+    return receiverUpdate;
+};
+
+export const createUserRecomsSongByAI = async (receiverId, comment, recomsSong) => {
+    const created = await prisma.userRecomsSong.create({
+        data: {
+            sender: {
+                connect: { id: "AI" },
+            },
+            receiver: {
+                connect: { id: receiverId },
+            },
+            recomsSong: {
+                connect: { id: recomsSong.id },
+            },
+            isAnoymous: true,
+            comment: comment,
+        },
+    });
+    return created;
+};
+
 export const getListRecomsSong = async (userId) => {
     const listData = await prisma.userRecomsSong.findMany({
         where: {
@@ -249,4 +331,25 @@ export const getListRecomsSong = async (userId) => {
     });
 
     return listData;
+};
+
+export const updateIsDeliveredToTrue = async (userId) => {
+    const modified = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            isDelivered: true,
+        },
+    });
+
+    return modified;
+};
+
+export const updateIsDeliveredToFalse = async () => {
+    const updated = await prisma.user.updateMany({
+        where: { NOT: { id: "AI" } },
+        data: {
+            isDelivered: false,
+        },
+    });
+    return updated;
 };
