@@ -10,6 +10,7 @@ import {
     calendarRecomsSong,
     sendReplies,
     listRecomsSong,
+    shareRecomsSong
 } from "../services/recoms.service.js";
 import { searchItunesTracks } from "../services/spotify.service.js";
 import { NotFoundKeywordError } from "../errors.js";
@@ -426,6 +427,35 @@ export const handleListRecomSong = async (req, res, next) => {
     try {
       const listRecomsData = await listRecomsSong(req.user.id);
       res.status(StatusCodes.OK).success(listRecomsData);
+    } catch(err) {
+      next(err);
+    }  
+};
+
+export const handleShareRecomSong = async (req, res, next) => {
+    /*
+        #swagger.summary = '추천 기록 공유 API'
+
+        #swagger.security = [{
+            bearerAuth: []
+        }]
+
+        #swagger.responses[200] = {
+            $ref: "#/components/responses/Success"
+        };
+
+        #swagger.responses[401] = {
+            $ref: "#/components/responses/TokenError" 
+        };
+
+        #swagger.responses[404] = {
+            $ref: "#/components/responses/RecommendationNotFoundError"
+        };
+    */
+
+    try {
+      const shareRecomsData = await shareRecomsSong(req.user.id, req.params.recomsId, req.query.type);
+      res.status(StatusCodes.OK).success(shareRecomsData);
     } catch(err) {
       next(err);
     }  

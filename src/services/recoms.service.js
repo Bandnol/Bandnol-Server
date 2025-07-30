@@ -37,6 +37,7 @@ import { createArtist, createSing, getSing, getArtistById } from "../repositorie
 import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo, getArtistInfo } from "./spotify.service.js";
 import { Prisma } from "@prisma/client";
+import { createVerticalImage } from "../utils/image.js";
 
 export const sentRecomsSong = async (recomsId, userId) => {
     const data = await getSentRecomsSong(recomsId, userId);
@@ -196,4 +197,34 @@ export const listRecomsSong = async (userId) => {
     const data = await getListRecomsSong(userId);
 
     return listRecomsResponseDTO(data, userId);
+};
+
+export const shareRecomsSong = async (userId, recomsId, type) => {
+    if (!["instagram", "X", "link"].includes(type)) {
+        throw new QueryParamError("잘못된 추천 상태입니다. 'instagram', 'X', 'link' 중 하나만 가능합니다.");
+    }
+
+    if (!type) {
+        throw new QueryParamError("type 쿼리 파라미터가 누락되었습니다.");
+    }
+
+    const record = await getRecomsSong(recomsId);  
+
+    if (type === "instagram") {
+        await createVerticalImage({
+            width: 268,
+            height: 391,
+            coverUrl: record.imgUrl,
+            title: record.title,
+            artist: record.artistName,
+            comment: record.userRecomsSongs[0].comment,
+            sender: record.userRecomsSongs[0].sender.nickname,
+            receiver: record.userRecomsSongs[0].receiver.nickname,
+            recomsId
+        });     
+    }
+    
+    const shareUrl = `https://cdn.yoursite.com/shares/${recomsId}.png`;
+
+    return shareUrl;
 };

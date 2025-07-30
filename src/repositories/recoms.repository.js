@@ -98,6 +98,19 @@ export const getRecomsSong = async (recomsSongId) => {
         where: {
             id: recomsSongId,
         },
+        include: {
+            userRecomsSongs: { 
+                select: { 
+                    comment: true,
+                    sender: {
+                        select: { nickname: true }
+                    },
+                    receiver: {
+                        select: { nickname: true }
+                    }
+                }   
+            }
+        }
     });
 };
 

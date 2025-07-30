@@ -12,6 +12,7 @@ import {
     handleCalendarRecomSong,
     handleSendReplies,
     handleListRecomSong,
+    handleShareRecomSong
 } from "../controllers/recoms.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -29,5 +30,6 @@ router.post("/ai-comment", authenticateAccessToken, handleAIComment);
 router.get("/calendars", authenticateAccessToken, handleCalendarRecomSong);
 router.post("/:recomsId/replies", authenticateAccessToken, handleSendReplies);
 router.get("/lists", authenticateAccessToken, handleListRecomSong);
+router.get("/:recomsId/share", authenticateAccessToken, handleShareRecomSong);
 
 export default router;
