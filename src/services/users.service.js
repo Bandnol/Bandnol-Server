@@ -7,7 +7,7 @@ import {
     AuthError,
 } from "../errors.js";
 import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
-import { notificationResponseDTO } from "../dtos/users.dto.js";
+import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 
 export const checkOwnId = async (userOwnId) => {
     const userData = await getUserByOwnId(userOwnId);
@@ -108,4 +108,13 @@ export const viewNotification = async (userId, cursor) => {
     }
 
     return notificationResponseDTO(data, hasNext, nextCursor);
+};
+
+export const viewMyPage = async (userId) => {
+    const user = await getUserById(userId);
+        if (!user) {
+        throw new NoUserError("존재하지 않는 사용자 ID입니다.");
+    }
+    
+    return getMyPageResponseDTO(user);
 };

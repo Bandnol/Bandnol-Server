@@ -18,3 +18,13 @@ export const notificationResponseDTO = (data, hasNext, nextCursor) => {
         nextCursor,
     };
 };
+
+export const getMyPageResponseDTO = (data) => {
+    return {
+        nickname: data.nickname,
+        ownId: data.ownId,
+        photo: data.photo,
+        backgroundImg: data.backgroundImg,
+        bio: data.bio
+    };
+};

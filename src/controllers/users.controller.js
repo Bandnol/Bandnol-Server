@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { checkOwnId, modifyUserInfo, viewNotification } from "../services/users.service.js";
+import { checkOwnId, modifyUserInfo, viewNotification, viewMyPage } from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
@@ -152,6 +152,31 @@ export const handleViewNotification = async (req, res, next) => {
     try {
         const notification = await viewNotification(req.user.id, req.query.cursor);
         res.status(StatusCodes.OK).success(notification);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleViewMyPage = async (req, res, next) => {
+    /*
+    #swagger.summary = '마이페이지 조회 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+    */
+
+    try {
+        const mypage = await viewMyPage(req.user.id);
+        res.status(StatusCodes.OK).success(mypage);
     } catch (err) {
         next(err);
     }
