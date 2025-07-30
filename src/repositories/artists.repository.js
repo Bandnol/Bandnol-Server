@@ -80,3 +80,33 @@ export const getArtistsByPopularity = async (decoded, limit) => {
 
     return result;
 };
+
+export const createLikedArtist = async (body, userId) => {
+    const created = await prisma.userLikedArtist.create({
+        data: {
+            user: {
+                connect: {
+                    id: userId,
+                },
+            },
+            artist: {
+                connectOrCreate: {
+                    where: { id: body.id },
+                    create: {
+                        id: body.id,
+                        name: body.name,
+                        imgUrl: body.imgUrl,
+                    },
+                },
+            },
+        },
+    });
+    return created;
+};
+
+export const getUserlikedArtist = async (artistId, userId) => {
+    const liked = await prisma.userLikedArtist.findFirst({
+        where: { artistId: artistId, userId: userId },
+    });
+    return liked;
+};

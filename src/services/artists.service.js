@@ -1,7 +1,13 @@
-import { QueryParamError, CursorError, NotFoundArtistsError } from "../errors.js";
-import { getArtistsByPopularity } from "../repositories/artists.repository.js";
+import {
+    QueryParamError,
+    CursorError,
+    NotFoundArtistsError,
+    RequestBodyError,
+    DuplicateLikedArtistError,
+} from "../errors.js";
+import { getArtistsByPopularity, createLikedArtist, getUserlikedArtist } from "../repositories/artists.repository.js";
 import { getArtistsRandomly } from "./spotify.service.js";
-import { artistsResponseDTO, recomsArtistsResponseDTO } from "../dtos/artists.dto.js";
+import { artistsResponseDTO, recomsArtistsResponseDTO, likedArtistsResponseDTO } from "../dtos/artists.dto.js";
 
 export const viewRecomArtists = async (sort, cursor) => {
     // 커서 오류를 잡기 위한 디코딩
@@ -45,4 +51,21 @@ export const viewRecomArtists = async (sort, cursor) => {
         const spotifyData = await getArtistsRandomly();
         return recomsArtistsResponseDTO(spotifyData);
     }
+};
+
+export const postLikedArtists = async (body, userId) => {
+    if (
+        typeof body !== "object" ||
+        typeof body.id !== "string" ||
+        typeof body.name !== "string" ||
+        typeof body.imgUrl !== "string"
+    ) {
+        throw new RequestBodyError("잘못된 request body 형식입니다.");
+    }
+    const likedArtist = await getUserlikedArtist(body.id, userId);
+    if (likedArtist) {
+        throw new DuplicateLikedArtistError("이미 즐겨찾기 되어 있는 아티스트입니다.");
+    }
+    const created = await createLikedArtist(body, userId);
+    return likedArtistsResponseDTO(created);
 };

@@ -1,8 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { viewRecomArtists } from "../services/artists.service.js";
-import { searchItunesTracks } from "../services/spotify.service.js";
-import { NotFoundKeywordError } from "../errors.js";
-import { genAIComment } from "../services/gemini.service.js";
+import { viewRecomArtists, postLikedArtists } from "../services/artists.service.js";
 
 export const handleViewRecomArtists = async (req, res, next) => {
     /*
@@ -41,6 +38,54 @@ export const handleViewRecomArtists = async (req, res, next) => {
     try {
         const list = await viewRecomArtists(req.query.sort, req.query.cursor);
         res.status(StatusCodes.OK).success(list);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handlePostLikedArtists = async (req, res, next) => {
+    /*
+    #swagger.summary = '아티스트 즐겨찾기 하기';
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.requestBody = {
+        required: true,
+        content: {
+            "application/json": {
+                schema: {
+                    type: "object",
+                    properties: {
+                        id: { type: "string" },
+                        name: { type: "string" },
+                        imgUrl: { type: "string" },
+                    }
+                }
+            }
+        }
+    }
+    
+    #swagger.responses[200] = {
+      $ref: "#/components/responses/Success"
+    };
+    
+    #swagger.responses[400] = {
+      $ref: "#/components/responses/RequestBodyError"
+    };
+
+    #swagger.responses[401] = {
+      $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[409] = {
+      $ref: "#/components/responses/DuplicateLikedArtistError"
+    };
+  */
+    try {
+        const liked = await postLikedArtists(req.body, req.user.id);
+        res.status(StatusCodes.OK).success(liked);
     } catch (err) {
         next(err);
     }

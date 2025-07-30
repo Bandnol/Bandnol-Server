@@ -450,5 +450,26 @@ export default {
                 },
             },
         },
+        DuplicateLikedArtistError: {
+            description: "아티스트를 중복으로 즐겨찾기 했을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "A1200" },
+                                    message: { type: "string", example: "이미 즐겨찾기 되어 있는 아티스트입니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
 };
