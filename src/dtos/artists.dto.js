@@ -21,3 +21,13 @@ export const recomsArtistsResponseDTO = (data) => {
 
     return newData;
 };
+
+export const likedArtistsResponseDTO = (data) => {
+    return {
+        id: data.id,
+        artistId: data.artistId,
+        userId: data.userId,
+        inactiveStatus: data.inactiveStatus,
+        inactiveAt: data.inactiveAt,
+    };
+};

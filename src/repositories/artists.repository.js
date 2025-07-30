@@ -80,3 +80,69 @@ export const getArtistsByPopularity = async (decoded, limit) => {
 
     return result;
 };
+
+export const createLikedArtist = async (body, userId) => {
+    const created = await prisma.userLikedArtist.create({
+        data: {
+            user: {
+                connect: {
+                    id: userId,
+                },
+            },
+            artist: {
+                connectOrCreate: {
+                    where: { id: body.id },
+                    create: {
+                        id: body.id,
+                        name: body.name,
+                        imgUrl: body.imgUrl,
+                    },
+                },
+            },
+        },
+    });
+    return created;
+};
+
+export const getUserlikedArtist = async (artistId, userId) => {
+    const liked = await prisma.userLikedArtist.findFirst({
+        where: { artistId: artistId, userId: userId },
+    });
+    return liked;
+};
+
+export const updateInactiveStatusToFalse = async (id) => {
+    const updated = await prisma.userLikedArtist.update({
+        where: { id: id },
+        data: {
+            inactiveStatus: false,
+        },
+    });
+    return updated;
+};
+
+export const updateInactiveStatusToTrue = async (id) => {
+    const updated = await prisma.userLikedArtist.update({
+        where: { id: id },
+        data: {
+            inactiveStatus: true,
+            inactiveAt: new Date(),
+        },
+    });
+    return updated;
+};
+
+export const deleteUserLikedArtists = async () => {
+    let compareDate = new Date();
+    compareDate.setDate(compareDate.getDate() - 7);
+
+    const deleted = await prisma.userLikedArtist.deleteMany({
+        where: {
+            inactiveStatus: true,
+            inactiveAt: {
+                lt: compareDate,
+            },
+        },
+    });
+    return deleted;
+};

@@ -5,6 +5,7 @@ import {
     getSenderToday,
     updateIsDeliveredToFalse,
 } from "../repositories/recoms.repository.js";
+import { deleteUserLikedArtists } from "../repositories/artists.repository.js";
 import cron from "node-cron";
 import { SchedulerError } from "../errors.js";
 
@@ -77,6 +78,26 @@ export const resetIsDeliveredScheduler = async () => {
                 throw new SchedulerError(
                     "resetIsDeliveredScheduler - isDelivered 초기화 과정에서 에러가 발생했습니다."
                 );
+            }
+        },
+        {
+            timezone: "Asia/Seoul",
+        }
+    );
+};
+
+export const deleteUserLikedArtistScheduler = async () => {
+    // 자정마다 비활성화된지 7일이 지난 userLikedArtist 데이터를 삭제
+    cron.schedule(
+        "0 0 * * *",
+        async () => {
+            try {
+                const deleted = await deleteUserLikedArtists();
+                console.log("삭제된 행의 개수: ", deleted);
+                console.log(new Date());
+            } catch (err) {
+                console.error(`deleteUserLikedArtistScheduler error: ${err}`);
+                throw new SchedulerError("deleteUserLikedArtistScheduler - 데이터 삭제 과정에서 에러가 발생했습니다.");
             }
         },
         {
