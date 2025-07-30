@@ -131,3 +131,18 @@ export const updateInactiveStatusToTrue = async (id) => {
     });
     return updated;
 };
+
+export const deleteUserLikedArtists = async () => {
+    let compareDate = new Date();
+    compareDate.setDate(compareDate.getDate() - 7);
+
+    const deleted = await prisma.userLikedArtist.deleteMany({
+        where: {
+            inactiveStatus: true,
+            inactiveAt: {
+                lt: compareDate,
+            },
+        },
+    });
+    return deleted;
+};

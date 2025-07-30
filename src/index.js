@@ -9,7 +9,7 @@ import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
 import components from "./components/components.js";
-import { resetIsDeliveredScheduler, songScheduler } from "./cron/scheduler.js";
+import { resetIsDeliveredScheduler, songScheduler, deleteUserLikedArtistScheduler } from "./cron/scheduler.js";
 
 dotenv.config();
 
@@ -93,12 +93,12 @@ app.get("/openapi.json", async (req, res, next) => {
         },
         servers: [
             {
-            url: "http://localhost:3000",
-            description: "로컬 서버",
+                url: "http://localhost:3000",
+                description: "로컬 서버",
             },
             {
-            url: "https://bandnol.app",
-            description: "배포 서버",
+                url: "https://bandnol.app",
+                description: "배포 서버",
             },
         ],
         components: {
@@ -143,6 +143,7 @@ app.use((err, req, res, next) => {
 
 songScheduler();
 resetIsDeliveredScheduler();
+deleteUserLikedArtistScheduler();
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
