@@ -27,7 +27,7 @@ export const viewRecomArtists = async (sort, cursor) => {
 
     if (sort === "popularity") {
         // 인기순으로 아티스트 목록 조회 - 즐겨찾기 횟수 순서
-        const limit = 2;
+        const limit = 20;
         let data = await getArtistsByPopularity(decoded, limit);
 
         if (!data) {

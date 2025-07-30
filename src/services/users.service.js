@@ -88,7 +88,7 @@ export const viewNotification = async (userId, cursor) => {
         }
     }
 
-    const limit = 2;
+    const limit = 20;
     let data = await getNotification(userId, decoded, limit);
     if (!data) {
         throw new AuthError("접근 권한이 없습니다. 본인의 토큰이 아닙니다.");
