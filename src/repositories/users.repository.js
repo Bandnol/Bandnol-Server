@@ -67,7 +67,6 @@ export const getNotification = async (userId, decoded, limit) => {
         where: { receiverId: userId },
         select: {
             id: true,
-            content: true,
             createdAt: true,
             type: true,
             isConfirmed: true,
