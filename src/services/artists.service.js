@@ -1,15 +1,10 @@
-import {
-    QueryParamError,
-    CursorError,
-    NotFoundArtistsError,
-    RequestBodyError,
-    DuplicateLikedArtistError,
-} from "../errors.js";
+import { QueryParamError, CursorError, NotFoundArtistsError, RequestBodyError } from "../errors.js";
 import {
     getArtistsByPopularity,
     createLikedArtist,
     getUserlikedArtist,
     updateInactiveStatusToFalse,
+    updateInactiveStatusToTrue,
 } from "../repositories/artists.repository.js";
 import { getArtistsRandomly } from "./spotify.service.js";
 import { artistsResponseDTO, recomsArtistsResponseDTO, likedArtistsResponseDTO } from "../dtos/artists.dto.js";
@@ -67,15 +62,16 @@ export const postLikedArtists = async (body, userId) => {
     ) {
         throw new RequestBodyError("잘못된 request body 형식입니다.");
     }
-    let created;
+    let updated;
     const likedArtist = await getUserlikedArtist(body.id, userId);
     if (likedArtist) {
-        if (!likedArtist.inactiveStatus) {
-            throw new DuplicateLikedArtistError("이미 즐겨찾기 되어 있는 아티스트입니다.");
+        if (likedArtist.inactiveStatus) {
+            updated = await updateInactiveStatusToFalse(likedArtist.id);
+        } else {
+            updated = await updateInactiveStatusToTrue(likedArtist.id);
         }
-        created = await updateInactiveStatusToFalse(likedArtist.id);
     } else {
-        created = await createLikedArtist(body, userId);
+        updated = await createLikedArtist(body, userId);
     }
-    return likedArtistsResponseDTO(created);
+    return likedArtistsResponseDTO(updated);
 };

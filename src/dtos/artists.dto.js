@@ -27,5 +27,7 @@ export const likedArtistsResponseDTO = (data) => {
         id: data.id,
         artistId: data.artistId,
         userId: data.userId,
+        inactiveStatus: data.inactiveStatus,
+        inactiveAt: data.inactiveAt,
     };
 };

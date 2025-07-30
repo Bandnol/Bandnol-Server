@@ -78,10 +78,6 @@ export const handlePostLikedArtists = async (req, res, next) => {
     #swagger.responses[401] = {
       $ref: "#/components/responses/TokenError"
     };
-
-    #swagger.responses[409] = {
-      $ref: "#/components/responses/DuplicateLikedArtistError"
-    };
   */
     try {
         const liked = await postLikedArtists(req.body, req.user.id);

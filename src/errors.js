@@ -143,17 +143,6 @@ export class NotFoundArtistsError extends Error {
     }
 }
 
-export class DuplicateLikedArtistError extends Error {
-    errorCode = "A1200";
-    statusCode = 409;
-
-    constructor(reason, data) {
-        super(reason);
-        this.reason = reason;
-        this.data = data;
-    }
-}
-
 // 도메인 : Token
 // 인증 정보가 제공되어 있지 않은 경우
 export class UnauthorizedError extends Error {
