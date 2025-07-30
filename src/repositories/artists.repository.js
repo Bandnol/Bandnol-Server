@@ -110,3 +110,13 @@ export const getUserlikedArtist = async (artistId, userId) => {
     });
     return liked;
 };
+
+export const updateInactiveStatusToFalse = async (id) => {
+    const updated = await prisma.userLikedArtist.update({
+        where: { id: id },
+        data: {
+            inactiveStatus: false,
+        },
+    });
+    return updated;
+};
