@@ -1,35 +1,21 @@
-import dotenv from "dotenv";
-import pkg from '@prisma/client';
-const { SocialType, Gender } = pkg;
-import axios from "axios";
+import jwt from "jsonwebtoken";
+import jwksClient from "jwks-rsa"; 
 
-dotenv.config();
-
-export const getKakaoToken = async (code) => {
-  const response = await axios.post(
-    "https://kauth.kakao.com/oauth/token",
-    new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: process.env.KAKAO_TEST_API_KEY,
-      redirect_uri: `${process.env.API_URL}/api/v1/oauth2/callback/kakao`,
-      code,
-    }),
-    {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    }
-  );
-
-  return response.data.access_token;
-};
-
-export const getKakaoUser = async (accessToken) => {
-  const response = await axios.get("https://kapi.kakao.com/v2/user/me", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
-    },
+export const getKakaoUser = async (idToken) => {
+  const client = jwksClient({
+    jwksUri: "https://kauth.kakao.com/.well-known/jwks.json"
   });
-  console.log(response.data);
 
-  return response.data;
+  const decodedHeader = jwt.decode(idToken, { complete: true });
+  const kid = decodedHeader.header.kid;
+
+  const key = await client.getSigningKey(kid);
+  const publicKey = key.getPublicKey();
+
+  const payload = jwt.verify(idToken, publicKey, {
+    audience: process.env.KAKAO_NATIVE_APP_KEY,
+    issuer: "https://kauth.kakao.com",
+  });
+
+  return payload; 
 };
