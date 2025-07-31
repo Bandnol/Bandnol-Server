@@ -172,9 +172,8 @@ export const patchLikeStatus = async (recomsId, userId, isLiked) => {
 };
 
 export const getCalendarRecomsSong = async (userId, year, month, status) => {
-    const startDate = new Date(`${year}-${month}-01`);
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
+    const startDate = new Date(Date.UTC(year, month - 1, 1, -9)); 
+    const endDate = new Date(Date.UTC(year, month, 1, -9));       
 
     const whereClause = {
         createdAt: {
