@@ -15,6 +15,6 @@ router.patch("/me/profiles", authenticateAccessToken, handleModifyUserInfo);
 router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 router.post("/inquiry", handleInquiry);
 router.get("/me/notification", authenticateAccessToken, handleViewNotification);
-router.get("/me", authenticateAccessToken, handleViewMyPage);
+router.get("/:ownId", authenticateAccessToken, handleViewMyPage);
 
 export default router;

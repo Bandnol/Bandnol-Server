@@ -5,6 +5,7 @@ import {
     InvalidRecomsTimeError,
     CursorError,
     AuthError,
+    NotFoundOwnIdError,
 } from "../errors.js";
 import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
@@ -110,11 +111,19 @@ export const viewNotification = async (userId, cursor) => {
     return notificationResponseDTO(data, hasNext, nextCursor);
 };
 
-export const viewMyPage = async (userId) => {
+export const viewMyPage = async (userId, ownId) => {
     const user = await getUserById(userId);
-        if (!user) {
-        throw new NoUserError("존재하지 않는 사용자 ID입니다.");
+    const other = await getUserByOwnId(ownId);  
+
+    if (!other) 
+    {
+        throw new NotFoundOwnIdError("존재하지 않는 사용자입니다.")
     }
-    
-    return getMyPageResponseDTO(user);
+
+    if (user.ownId === other.ownId) {
+        return getMyPageResponseDTO(user);
+    }
+    else {  
+        return getMyPageResponseDTO(other);
+    }
 };
