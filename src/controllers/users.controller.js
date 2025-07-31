@@ -175,7 +175,7 @@ export const handleViewMyPage = async (req, res, next) => {
     */
 
     try {
-        const mypage = await viewMyPage(req.user.id);
+        const mypage = await viewMyPage(req.user.id, req.params.ownId);
         res.status(StatusCodes.OK).success(mypage);
     } catch (err) {
         next(err);

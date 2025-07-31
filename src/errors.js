@@ -53,6 +53,17 @@ export class AuthorizationCodeError extends Error {
     }
 }
 
+export class NotFoundOwnIdError extends Error {
+     errorCode = "U1303";
+    statusCode = 404;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 // 도메인 : Recoms
 export class InvalidRecomsTimeError extends Error {
     errorCode = "R1000";
