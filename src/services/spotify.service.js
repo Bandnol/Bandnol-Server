@@ -191,9 +191,9 @@ export async function getArtistsRandomly() {
             });
 
             //console.log(playlist.data);
-            console.log(playlist.data.playlists.items);
-
-            if (playlist.data.playlists.items[0].tracks.total >= trackLimit) {
+            //console.log(playlist.data.playlists.items);
+            const items = playlist.data.playlists.items;
+            if (items.length > 0 && items[0].tracks.total >= trackLimit) {
                 isOverLimit = false;
             }
         }

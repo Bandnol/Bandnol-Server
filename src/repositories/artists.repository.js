@@ -43,41 +43,41 @@ export const getArtistsByPopularity = async (decoded, limit) => {
     if (decoded) {
         result = await prisma.$queryRaw`
         SELECT a.*,
-            CONCAT(LPAD(likes.count::text, 10, '0'), LPAD(a.id, 30, '0')) AS cursor
+            CONCAT(LPAD(COALESCE(likes.count, 0)::text, 10, '0'), LPAD(a.id, 30, '0')) AS cursor
         FROM "Artist" AS a
-        JOIN (
+        LEFT JOIN (
             SELECT artist_id, COUNT(*) AS count
             FROM "UserLikedArtist"
             GROUP BY artist_id
         ) AS likes ON a.id = likes.artist_id
-        WHERE CONCAT(LPAD(likes.count::text, 10, '0'), LPAD(a.id, 30, '0')) <=
+        WHERE CONCAT(LPAD(COALESCE(likes.count, 0)::text, 10, '0'), LPAD(a.id, 30, '0')) <=
             (
-                SELECT CONCAT(LPAD(like_count_sub.count::text, 10, '0'), LPAD(like_count_sub.artist_id, 30, '0'))
+                SELECT CONCAT(LPAD(COALESCE(sub.count, 0)::text, 10, '0'), LPAD(sub.artist_id, 30, '0'))
                 FROM (
-                    SELECT artist_id, COUNT(*) AS count
-                    FROM "UserLikedArtist"
-                    GROUP BY artist_id
-                ) AS like_count_sub
-                WHERE like_count_sub.artist_id = ${decoded.artistId}
+                    SELECT a.id AS artist_id, COUNT(ula.*) AS count
+                    FROM "Artist" a
+                    LEFT JOIN "UserLikedArtist" ula ON a.id = ula.artist_id
+                    GROUP BY a.id
+                ) AS sub
+                WHERE sub.artist_id = ${decoded.artistId}
             )
-        ORDER BY likes.count DESC, a.id DESC
+        ORDER BY COALESCE(likes.count, 0) DESC, a.id DESC
         LIMIT ${limit + 1};
-    `;
+        `;
     } else {
         result = await prisma.$queryRaw`
         SELECT a.*,
-            CONCAT(LPAD(u.count::text, 10, '0'), LPAD(a.id, 30, '0')) AS cursor
+            CONCAT(LPAD(COALESCE(likes.count, 0)::text, 10, '0'), LPAD(a.id, 30, '0')) AS cursor
         FROM "Artist" AS a
-        JOIN (
-            SELECT artist_id, COUNT(*) AS count 
+        LEFT JOIN (
+            SELECT artist_id, COUNT(*) AS count
             FROM "UserLikedArtist"
             GROUP BY artist_id
-        ) AS u ON a.id = u.artist_id
-        ORDER BY u.count DESC, a.id DESC
+        ) AS likes ON a.id = likes.artist_id
+        ORDER BY COALESCE(likes.count, 0) DESC, a.id DESC
         LIMIT ${limit + 1};
-    `;
+        `;
     }
-
     return result;
 };
 

@@ -16,7 +16,7 @@ export const recomsArtistsResponseDTO = (data) => {
     const newData = data.map((d) => ({
         id: d.id,
         name: d.name,
-        imgUrl: d.images[0].url,
+        imgUrl: d.images?.[0]?.url || null,
     }));
 
     return newData;
