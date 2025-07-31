@@ -44,10 +44,10 @@ export const getArtistsByPopularity = async (decoded, limit) => {
         result = await prisma.$queryRaw`
         SELECT a.*,
             CONCAT(LPAD(COALESCE(likes.count, 0)::text, 10, '0'), LPAD(a.id, 30, '0')) AS cursor
-        FROM "Artist" AS a
+        FROM artist AS a
         LEFT JOIN (
             SELECT artist_id, COUNT(*) AS count
-            FROM "UserLikedArtist"
+            FROM user_liked_artist
             GROUP BY artist_id
         ) AS likes ON a.id = likes.artist_id
         WHERE CONCAT(LPAD(COALESCE(likes.count, 0)::text, 10, '0'), LPAD(a.id, 30, '0')) <=
@@ -55,8 +55,8 @@ export const getArtistsByPopularity = async (decoded, limit) => {
                 SELECT CONCAT(LPAD(COALESCE(sub.count, 0)::text, 10, '0'), LPAD(sub.artist_id, 30, '0'))
                 FROM (
                     SELECT a.id AS artist_id, COUNT(ula.*) AS count
-                    FROM "Artist" a
-                    LEFT JOIN "UserLikedArtist" ula ON a.id = ula.artist_id
+                    FROM artist a
+                    LEFT JOIN user_liked_artist ula ON a.id = ula.artist_id
                     GROUP BY a.id
                 ) AS sub
                 WHERE sub.artist_id = ${decoded.artistId}
@@ -68,10 +68,10 @@ export const getArtistsByPopularity = async (decoded, limit) => {
         result = await prisma.$queryRaw`
         SELECT a.*,
             CONCAT(LPAD(COALESCE(likes.count, 0)::text, 10, '0'), LPAD(a.id, 30, '0')) AS cursor
-        FROM "Artist" AS a
+        FROM artist AS a
         LEFT JOIN (
             SELECT artist_id, COUNT(*) AS count
-            FROM "UserLikedArtist"
+            FROM user_liked_artist
             GROUP BY artist_id
         ) AS likes ON a.id = likes.artist_id
         ORDER BY COALESCE(likes.count, 0) DESC, a.id DESC
