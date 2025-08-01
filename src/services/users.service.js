@@ -94,7 +94,6 @@ export const viewNotification = async (userId, cursor) => {
     if (!data) {
         throw new AuthError("접근 권한이 없습니다. 본인의 토큰이 아닙니다.");
     }
-
     let hasNext = false;
     let nextCursor = null;
     if (data.length > limit) {
@@ -113,17 +112,15 @@ export const viewNotification = async (userId, cursor) => {
 
 export const viewMyPage = async (userId, ownId) => {
     const user = await getUserById(userId);
-    const other = await getUserByOwnId(ownId);  
+    const other = await getUserByOwnId(ownId);
 
-    if (!other) 
-    {
-        throw new NotFoundOwnIdError("존재하지 않는 사용자입니다.")
+    if (!other) {
+        throw new NotFoundOwnIdError("존재하지 않는 사용자입니다.");
     }
 
     if (user.ownId === other.ownId) {
         return getMyPageResponseDTO(user);
-    }
-    else {  
+    } else {
         return getMyPageResponseDTO(other);
     }
 };

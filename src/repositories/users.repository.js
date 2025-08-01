@@ -77,6 +77,7 @@ export const getNotification = async (userId, decoded, limit) => {
                     nickname: true,
                 },
             },
+            content: true,
         },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
