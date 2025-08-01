@@ -6,7 +6,7 @@ import {
     updateInactiveStatusToFalse,
     updateInactiveStatusToTrue,
 } from "../repositories/artists.repository.js";
-import { getArtistsRandomly } from "./spotify.service.js";
+import { getArtistsRandomly } from "./musicAPI.service.js";
 import { artistsResponseDTO, recomsArtistsResponseDTO, likedArtistsResponseDTO } from "../dtos/artists.dto.js";
 
 export const viewRecomArtists = async (sort, cursor) => {
