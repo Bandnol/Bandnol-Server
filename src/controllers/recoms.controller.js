@@ -11,19 +11,15 @@ import {
     sendReplies,
     listRecomsSong,
 } from "../services/recoms.service.js";
-import { searchItunesTracks } from "../services/spotify.service.js";
+import { searchItunesTracks } from "../services/musicAPI.service.js";
 import { NotFoundKeywordError } from "../errors.js";
 import { genAIComment } from "../services/gemini.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
     /*
-    #swagger.summary = 'Spotify API 이용하여 추천할 노래 검색하기';
+    #swagger.summary = 'iTunes API 이용하여 추천할 노래 검색하기';
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
-    };
-
-    #swagger.responses[401] = {
-      $ref: "#/components/responses/TokenError"
     };
   */
     try {

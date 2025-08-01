@@ -40,7 +40,7 @@ import {
 } from "../repositories/recoms.repository.js";
 import { createArtist, createSing, getSing, getArtistById } from "../repositories/artists.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
-import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./spotify.service.js";
+import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./musicAPI.service.js";
 import { Prisma } from "@prisma/client";
 import { genAIAutoRecoms } from "./gemini.service.js";
 
