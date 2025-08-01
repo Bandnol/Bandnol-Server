@@ -98,8 +98,9 @@ export const addRecoms = async (data, userId) => {
     }
     console.log(artists);
 
+    let singData = null;
     for (const artist of artists) {
-        let singData = await getSing(recomsSong.id, artist.id);
+        singData = await getSing(recomsSong.id, artist.id);
         if (!singData) {
             singData = await createSing(recomsSong.id, artist.id);
         }
