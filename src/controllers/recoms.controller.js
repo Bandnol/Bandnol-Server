@@ -52,14 +52,10 @@ export const handleSentRecomsSong = async (req, res, next) => {
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
-
-    #swagger.responses[404] = {
-        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
-    };
     */
 
     try {
-        const recomsData = await sentRecomsSong(req.params.recomsId, req.user.id);
+        const recomsData = await sentRecomsSong(req.user.id);
         res.status(StatusCodes.OK).success(recomsData);
     } catch (err) {
         next(err);
@@ -81,14 +77,10 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
-
-    #swagger.responses[404] = {
-        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
-    };
     */
 
     try {
-        const recomsData = await receivedRecomsSong(req.params.recomsId, req.user.id);
+        const recomsData = await receivedRecomsSong(req.user.id);
         res.status(StatusCodes.OK).success(recomsData);
     } catch (err) {
         next(err);
