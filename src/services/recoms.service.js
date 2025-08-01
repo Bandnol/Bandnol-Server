@@ -44,18 +44,18 @@ import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./spotify.servi
 import { Prisma } from "@prisma/client";
 import { genAIAutoRecoms } from "./gemini.service.js";
 
-export const sentRecomsSong = async (recomsId, userId) => {
-    const data = await getSentRecomsSong(recomsId, userId);
+export const sentRecomsSong = async (userId) => {
+    const data = await getSentRecomsSong(userId);
     if (!data) {
-        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+        return [];
     }
     return sentRecomsResponseDTO(data);
 };
 
-export const receivedRecomsSong = async (recomsId, userId) => {
-    const data = await getReceivedRecomsSong(recomsId, userId);
+export const receivedRecomsSong = async (userId) => {
+    const data = await getReceivedRecomsSong(userId);
     if (!data) {
-        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+        return [];
     }
     return receivedRecomsResponseDTO(data);
 };
