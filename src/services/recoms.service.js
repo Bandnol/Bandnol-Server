@@ -17,10 +17,9 @@ import {
     DuplicateRecomsError,
     NotFoundSongError,
     RecomsNotFoundOrAuthError,
-    DuplicateSingError,
-    NotSendRecomsError,
     RecommendationNotFoundError,
     NoModifyDataError,
+    NoReplyError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -157,9 +156,11 @@ export const viewReplies = async (recomsId, type, userId) => {
         throw new QueryParamError("필수 쿼리 파라미터가 입력되지 않았거나 잘못된 쿼리 파라미터를 입력했습니다.");
     }
     const data = await getCommentAndReply(recomsId, type, userId);
-
     if (!data) {
         throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+    }
+    if (!data.replies) {
+        throw new NoReplyError("답장이 없습니다.");
     }
     return replyResponseDTO(data);
 };
