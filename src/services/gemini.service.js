@@ -35,6 +35,7 @@ export const genAIComment = async (data, userId) => {
 
 export const genAIAutoRecoms = async () => {
     const prompt = `국내 인디 밴드 하나를 추천해줘(한글 이름만 반환, 특수기호 제외).
+    자꾸 새소년만 추천하지 말고 다른 아티스트들도 추천해줬으면 좋겠어.
     그리고 이 그룹의 노래를 왜 추천하는지 친근하게 한 줄 이내로 코멘트를 작성해줘.
     밴드 이름과 코멘트는 '/' 기호로 분리해줘`;
 
@@ -46,7 +47,6 @@ export const genAIAutoRecoms = async () => {
         let [artist, comment] = text.split("/");
         artist = artist.trim();
         comment = comment.trim();
-        //console.log(`trackId: ${trackId}\n comment: ${comment}`);
         return { artist, comment };
     } catch (err) {
         console.error("Gemini API 요청 실패:", err.response?.data || err.message);
