@@ -73,6 +73,7 @@ model Notification {
   link        String?
   senderId    String?    @map("sender_id")
   type        NoticeType
+  content     String?
   receiver    User       @relation("NotificationReceiver", fields: [receiverId], references: [id])
   sender      User?      @relation("NotificationSender", fields: [senderId], references: [id])
 

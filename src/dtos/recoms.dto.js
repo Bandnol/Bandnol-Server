@@ -12,10 +12,10 @@ export const sentRecomsResponseDTO = (recomsData) => {
             previewUrl: recomsData.recomsSong.previewUrl,
         },
         receiver: {
-            id: recomsData.receiver.id,
-            nickname: recomsData.receiver.nickname,
+            id: recomsData.receiver?.id || null,
+            nickname: recomsData.receiver?.nickname || null,
         },
-        replyId: recomsData.replies ? recomsData.replies.id : null,
+        replyId: recomsData.replies?.id || null,
     };
 };
 
@@ -119,10 +119,9 @@ export const replyResponseDTO = (reply) => {
 };
 
 export const calendarRecomsResponseDTO = (data) => {
-
-    return data.map(recom => {
+    return data.map((recom) => {
         const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
-        
+
         return {
             id: recom.id,
             date: kstDate.toISOString().slice(0, 10),
