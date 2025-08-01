@@ -215,7 +215,7 @@ export const handleViewReplies = async (req, res, next) => {
     };
 
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+        $ref: "#/components/responses/NoReplyError"
     };
     */
 
@@ -424,9 +424,9 @@ export const handleListRecomSong = async (req, res, next) => {
     */
 
     try {
-      const listRecomsData = await listRecomsSong(req.user.id);
-      res.status(StatusCodes.OK).success(listRecomsData);
-    } catch(err) {
-      next(err);
-    }  
+        const listRecomsData = await listRecomsSong(req.user.id);
+        res.status(StatusCodes.OK).success(listRecomsData);
+    } catch (err) {
+        next(err);
+    }
 };

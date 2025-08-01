@@ -54,7 +54,7 @@ export class AuthorizationCodeError extends Error {
 }
 
 export class NotFoundOwnIdError extends Error {
-     errorCode = "U1303";
+    errorCode = "U1303";
     statusCode = 404;
 
     constructor(reason, data) {
@@ -134,6 +134,17 @@ export class RecomsNotFoundOrAuthError extends Error {
 export class NotSendRecomsError extends Error {
     errorCode = "R1303";
     statusCode = 422;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class NoReplyError extends Error {
+    errorCode = "R1304";
+    statusCode = 404;
 
     constructor(reason, data) {
         super(reason);

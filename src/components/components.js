@@ -1,4 +1,4 @@
-import { NotFoundArtistsError } from "../errors.js";
+import { NoReplyError, NotFoundArtistsError } from "../errors.js";
 
 export default {
     responses: {
@@ -443,6 +443,27 @@ export default {
                                 properties: {
                                     code: { type: "string", example: "A1300" },
                                     message: { type: "string", example: "아티스트를 불러오지 못했습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        NoReplyError: {
+            description: "답장이 없을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "R1304" },
+                                    message: { type: "string", example: "답장이 없습니다." },
                                 },
                             },
                         },
