@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { 
-    handleCheckOwnId, 
-    handleModifyUserInfo, 
-    handleInquiry, 
-    handleViewNotification, 
-    handleViewMyPage 
+import {
+    handleCheckOwnId,
+    handleModifyUserInfo,
+    handleInquiry,
+    handleViewNotification,
+    handleViewMyPage,
+    handleSaveFcmToken,
 } from "../controllers/users.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -16,5 +17,6 @@ router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 router.post("/inquiry", handleInquiry);
 router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 router.get("/:ownId", authenticateAccessToken, handleViewMyPage);
+router.post("/fcm-token", authenticateAccessToken, handleSaveFcmToken);
 
 export default router;

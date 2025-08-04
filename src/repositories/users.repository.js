@@ -89,11 +89,19 @@ export const updateUserRefreshToken = async (userId, refreshToken) => {
         where: { id: userId },
         data: { refreshToken },
     });
-  
-}
+};
 
 export const findUserByToken = async (id) => {
-    return await prisma.user.findUnique({ 
-        where: { id: id } 
+    return await prisma.user.findUnique({
+        where: { id: id },
     });
-}
+};
+
+export const createFcmToken = async (userId, token) => {
+    return await prisma.fcmToken.create({
+        data: {
+            fcmToken: token,
+            userId: userId,
+        },
+    });
+};

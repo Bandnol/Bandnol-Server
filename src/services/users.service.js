@@ -6,8 +6,15 @@ import {
     CursorError,
     AuthError,
     NotFoundOwnIdError,
+    RequestBodyError,
 } from "../errors.js";
-import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
+import {
+    getUserById,
+    getUserByOwnId,
+    modifyUser,
+    getNotification,
+    createFcmToken,
+} from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 
 export const checkOwnId = async (userOwnId) => {
@@ -123,4 +130,12 @@ export const viewMyPage = async (userId, ownId) => {
     } else {
         return getMyPageResponseDTO(other);
     }
+};
+
+export const saveFcmToken = async (userId, token) => {
+    if (!token) {
+        throw new RequestBodyError("잘못된 Request body 형식입니다.");
+    }
+    const created = await createFcmToken(userId, token);
+    return created;
 };
