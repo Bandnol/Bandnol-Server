@@ -24,11 +24,6 @@ export async function searchItunesTracks(keyword, cursor = 15) {
         return result;
     } catch (err) {
         console.error("iTunes 트랙 검색 실패:", err.response?.data || err.message);
-
-        if (err.response && err.response.status === 400) {
-            throw new NotFoundKeywordError("검색어가 없거나 잘못된 요청입니다.");
-        }
-
         throw new Error("iTunes 트랙 검색 중 알 수 없는 오류가 발생했습니다.");
     }
 }
@@ -191,9 +186,9 @@ export async function getArtistsRandomly() {
             });
 
             //console.log(playlist.data);
-            console.log(playlist.data.playlists.items);
-
-            if (playlist.data.playlists.items[0].tracks.total >= trackLimit) {
+            //console.log(playlist.data.playlists.items);
+            const items = playlist.data.playlists.items;
+            if (items.length > 0 && items[0].tracks.total >= trackLimit) {
                 isOverLimit = false;
             }
         }

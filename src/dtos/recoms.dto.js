@@ -12,10 +12,10 @@ export const sentRecomsResponseDTO = (recomsData) => {
             previewUrl: recomsData.recomsSong.previewUrl,
         },
         receiver: {
-            id: recomsData.receiver.id,
-            nickname: recomsData.receiver.nickname,
+            id: recomsData.receiver?.id || null,
+            nickname: recomsData.receiver?.nickname || null,
         },
-        replyId: recomsData.replies ? recomsData.replies.id : null,
+        replyId: recomsData.replies?.id || null,
     };
 };
 
@@ -64,12 +64,14 @@ export const searchRecomsResponseDTO = (recom, isReceived = false) => {
 };
 
 export const getSongInfoResponseDTO = (songData) => {
+    const highResAlbumImg = songData.artworkUrl100.replace(/\/[0-9]+x[0-9]+bb\.jpg$/, "/1000x1000bb.jpg");
+
     return {
         id: songData.trackId.toString(),
         title: songData.trackName,
         artist: songData.artistName,
         album: songData.collectionName,
-        albumImg: songData.artworkUrl100,
+        albumImg: highResAlbumImg,
         previewUrl: songData.previewUrl,
     };
 };
@@ -119,10 +121,9 @@ export const replyResponseDTO = (reply) => {
 };
 
 export const calendarRecomsResponseDTO = (data) => {
-
-    return data.map(recom => {
+    return data.map((recom) => {
         const kstDate = new Date(recom.createdAt.getTime() + 9 * 60 * 60 * 1000);
-        
+
         return {
             id: recom.id,
             date: kstDate.toISOString().slice(0, 10),

@@ -2,9 +2,15 @@ import { prisma } from "../configs/db.config.js";
 import { startOfDay, endOfDay } from "date-fns";
 
 // 발신한 추천 곡 반환
-export const getSentRecomsSong = async (recomsId, userId) => {
-    const recomsData = await prisma.userRecomsSong.findUnique({
-        where: { id: recomsId, senderId: userId },
+export const getSentRecomsSong = async (userId) => {
+    const recomsData = await prisma.userRecomsSong.findFirst({
+        where: {
+            senderId: userId,
+            createdAt: {
+                gte: startOfDay(new Date()),
+                lt: endOfDay(new Date()),
+            },
+        },
         select: {
             id: true,
             createdAt: true,
@@ -26,9 +32,15 @@ export const getSentRecomsSong = async (recomsId, userId) => {
 };
 
 // 수신한 추천 곡 반환
-export const getReceivedRecomsSong = async (recomsId, userId) => {
-    const recomsData = await prisma.userRecomsSong.findUnique({
-        where: { id: recomsId, receiverId: userId },
+export const getReceivedRecomsSong = async (userId) => {
+    const recomsData = await prisma.userRecomsSong.findFirst({
+        where: {
+            receiverId: userId,
+            createdAt: {
+                gte: startOfDay(new Date()),
+                lt: endOfDay(new Date()),
+            },
+        },
         select: {
             id: true,
             createdAt: true,
@@ -172,9 +184,8 @@ export const patchLikeStatus = async (recomsId, userId, isLiked) => {
 };
 
 export const getCalendarRecomsSong = async (userId, year, month, status) => {
-    const startDate = new Date(`${year}-${month}-01`);
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
+    const startDate = new Date(Date.UTC(year, month - 1, 1, -9));
+    const endDate = new Date(Date.UTC(year, month, 1, -9));
 
     const whereClause = {
         createdAt: {
@@ -187,29 +198,29 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
     const calendarsData = await prisma.userRecomsSong.findMany({
         where: whereClause,
         select: {
-                id: true,
-                createdAt: true, 
-                comment: true,
-                sender: {
-                    select: {
-                        id: true,
-                        nickname: true
-                    },
+            id: true,
+            createdAt: true,
+            comment: true,
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
                 },
-                receiver: {
-                    select: {
-                        id: true,
-                        nickname: true
-                    }
+            },
+            receiver: {
+                select: {
+                    id: true,
+                    nickname: true,
                 },
-                recomsSong: {
-                    select: {
-                        title: true,
-                        artistName: true,
-                        imgUrl: true,
-                    }
-                }
-            }
+            },
+            recomsSong: {
+                select: {
+                    title: true,
+                    artistName: true,
+                    imgUrl: true,
+                },
+            },
+        },
     });
 
     return calendarsData;

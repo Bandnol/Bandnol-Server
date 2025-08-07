@@ -15,8 +15,10 @@ model UserLikedArtist {
   userId         String    @map("user_id")
   inactiveAt     DateTime? @map("inactive_at")
   inactiveStatus Boolean   @default(false) @map("inactive_status")
-  user           User      @relation(fields: [userId], references: [id])
   artist         Artist    @relation(fields: [artistId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
+
+  @@map("user_liked_artist")
 }
 
 model Inquiry {
@@ -26,6 +28,8 @@ model Inquiry {
   updatedAt DateTime @updatedAt @map("updated_at")
   content   String
   name      String
+
+  @@map("inquiry")
 }
 
 model RecomsSong {
@@ -36,6 +40,8 @@ model RecomsSong {
   previewUrl      String?          @map("preview_url")
   sings           Sing[]
   userRecomsSongs UserRecomsSong[]
+
+  @@map("recoms_song")
 }
 
 model Sing {
@@ -44,6 +50,8 @@ model Sing {
   artistId     String     @map("artist_id")
   artist       Artist     @relation(fields: [artistId], references: [id])
   recomsSong   RecomsSong @relation(fields: [recomsSongId], references: [id])
+
+  @@map("sing")
 }
 
 model Artist {
@@ -52,21 +60,24 @@ model Artist {
   imgUrl          String?           @map("img_url")
   sings           Sing[]
   userLikedArtist UserLikedArtist[]
+
+  @@map("artist")
 }
 
 model Notification {
   id          String     @id @unique @default(uuid())
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
-  referenceId String     @map("reference_id")
   receiverId  String     @map("receiver_id")
-  content     String
   isConfirmed Boolean    @default(false) @map("is_confirmed")
   link        String?
   senderId    String?    @map("sender_id")
   type        NoticeType
+  content     String?
   receiver    User       @relation("NotificationReceiver", fields: [receiverId], references: [id])
   sender      User?      @relation("NotificationSender", fields: [senderId], references: [id])
+
+  @@map("notification")
 }
 
 model RecomsReply {
@@ -78,6 +89,8 @@ model RecomsReply {
   responderId      String         @map("responder_id")
   responder        User           @relation(fields: [responderId], references: [id])
   userRecomsSong   UserRecomsSong @relation(fields: [userRecomsSongId], references: [id])
+
+  @@map("recoms_reply")
 }
 
 model UserRecomsSong {
@@ -93,6 +106,8 @@ model UserRecomsSong {
   receiver     User?        @relation("UserReceivedRecom", fields: [receiverId], references: [id])
   recomsSong   RecomsSong   @relation(fields: [recomsSongId], references: [id])
   sender       User         @relation("UserSentRecom", fields: [senderId], references: [id])
+
+  @@map("user_recoms_song")
 }
 
 model User {
@@ -113,6 +128,7 @@ model User {
   email           String
   name            String
   isDelivered     Boolean           @default(false) @map("is_delivered")
+  refreshToken    String?           @map("refresh_token")
   fcmTokens       FcmToken[]
   receivedNotices Notification[]    @relation("NotificationReceiver")
   sentNotices     Notification[]    @relation("NotificationSender")
@@ -123,6 +139,7 @@ model User {
   sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
 
   @@index([isDelivered, recomsTime])
+  @@map("user")
 }
 
 model FcmToken {
@@ -131,6 +148,8 @@ model FcmToken {
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id])
+
+  @@map("fcm_token")
 }
 
 model Session {
@@ -151,17 +170,23 @@ model NotificationType {
   notRecoms      Boolean @default(true) @map("not_recoms")
   announcement   Boolean @default(true)
   user           User    @relation(fields: [userId], references: [id])
+
+  @@map("notification_type")
 }
 
 enum Gender {
   MAN
   WOMAN
+
+  @@map("gender")
 }
 
 enum SocialType {
   NAVER
   KAKAO
   GOOGLE
+
+  @@map("social_type")
 }
 
 enum NoticeType {
@@ -170,4 +195,6 @@ enum NoticeType {
   COMMENT_ARRIVED
   NOT_RECOMS
   ANNOUNCEMENT
+
+  @@map("notice_type")
 }

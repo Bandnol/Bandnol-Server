@@ -6,7 +6,7 @@ import {
     updateInactiveStatusToFalse,
     updateInactiveStatusToTrue,
 } from "../repositories/artists.repository.js";
-import { getArtistsRandomly } from "./spotify.service.js";
+import { getArtistsRandomly } from "./musicAPI.service.js";
 import { artistsResponseDTO, recomsArtistsResponseDTO, likedArtistsResponseDTO } from "../dtos/artists.dto.js";
 
 export const viewRecomArtists = async (sort, cursor) => {
@@ -15,7 +15,7 @@ export const viewRecomArtists = async (sort, cursor) => {
     if (cursor) {
         try {
             decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-            console.log("decoded: ", decoded);
+            //console.log("decoded: ", decoded);
         } catch (err) {
             throw new CursorError("커서가 잘못되었습니다.");
         }

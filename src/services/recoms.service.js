@@ -17,10 +17,9 @@ import {
     DuplicateRecomsError,
     NotFoundSongError,
     RecomsNotFoundOrAuthError,
-    DuplicateSingError,
-    NotSendRecomsError,
     RecommendationNotFoundError,
     NoModifyDataError,
+    NoReplyError,
 } from "../errors.js";
 import {
     getSentRecomsSong,
@@ -41,22 +40,22 @@ import {
 } from "../repositories/recoms.repository.js";
 import { createArtist, createSing, getSing, getArtistById } from "../repositories/artists.repository.js";
 import { getUserById } from "../repositories/users.repository.js";
-import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./spotify.service.js";
+import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./musicAPI.service.js";
 import { Prisma } from "@prisma/client";
 import { genAIAutoRecoms } from "./gemini.service.js";
 
-export const sentRecomsSong = async (recomsId, userId) => {
-    const data = await getSentRecomsSong(recomsId, userId);
+export const sentRecomsSong = async (userId) => {
+    const data = await getSentRecomsSong(userId);
     if (!data) {
-        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+        return [];
     }
     return sentRecomsResponseDTO(data);
 };
 
-export const receivedRecomsSong = async (recomsId, userId) => {
-    const data = await getReceivedRecomsSong(recomsId, userId);
+export const receivedRecomsSong = async (userId) => {
+    const data = await getReceivedRecomsSong(userId);
     if (!data) {
-        throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+        return [];
     }
     return receivedRecomsResponseDTO(data);
 };
@@ -98,8 +97,9 @@ export const addRecoms = async (data, userId) => {
     }
     console.log(artists);
 
+    let singData = null;
     for (const artist of artists) {
-        let singData = await getSing(recomsSong.id, artist.id);
+        singData = await getSing(recomsSong.id, artist.id);
         if (!singData) {
             singData = await createSing(recomsSong.id, artist.id);
         }
@@ -157,9 +157,11 @@ export const viewReplies = async (recomsId, type, userId) => {
         throw new QueryParamError("필수 쿼리 파라미터가 입력되지 않았거나 잘못된 쿼리 파라미터를 입력했습니다.");
     }
     const data = await getCommentAndReply(recomsId, type, userId);
-
     if (!data) {
         throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
+    }
+    if (!data.replies) {
+        throw new NoReplyError("답장이 없습니다.");
     }
     return replyResponseDTO(data);
 };

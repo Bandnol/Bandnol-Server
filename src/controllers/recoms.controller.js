@@ -11,19 +11,15 @@ import {
     sendReplies,
     listRecomsSong,
 } from "../services/recoms.service.js";
-import { searchItunesTracks } from "../services/spotify.service.js";
+import { searchItunesTracks } from "../services/musicAPI.service.js";
 import { NotFoundKeywordError } from "../errors.js";
 import { genAIComment } from "../services/gemini.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
     /*
-    #swagger.summary = 'Spotify API 이용하여 추천할 노래 검색하기';
+    #swagger.summary = 'iTunes API 이용하여 추천할 노래 검색하기';
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
-    };
-
-    #swagger.responses[401] = {
-      $ref: "#/components/responses/TokenError"
     };
   */
     try {
@@ -52,14 +48,10 @@ export const handleSentRecomsSong = async (req, res, next) => {
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
-
-    #swagger.responses[404] = {
-        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
-    };
     */
 
     try {
-        const recomsData = await sentRecomsSong(req.params.recomsId, req.user.id);
+        const recomsData = await sentRecomsSong(req.user.id);
         res.status(StatusCodes.OK).success(recomsData);
     } catch (err) {
         next(err);
@@ -81,14 +73,10 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
-
-    #swagger.responses[404] = {
-        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
-    };
     */
 
     try {
-        const recomsData = await receivedRecomsSong(req.params.recomsId, req.user.id);
+        const recomsData = await receivedRecomsSong(req.user.id);
         res.status(StatusCodes.OK).success(recomsData);
     } catch (err) {
         next(err);
@@ -215,7 +203,7 @@ export const handleViewReplies = async (req, res, next) => {
     };
 
     #swagger.responses[404] = {
-        $ref: "#/components/responses/RecomsNotFoundOrAuthError"
+        $ref: "#/components/responses/NoReplyError"
     };
     */
 
@@ -424,9 +412,9 @@ export const handleListRecomSong = async (req, res, next) => {
     */
 
     try {
-      const listRecomsData = await listRecomsSong(req.user.id);
-      res.status(StatusCodes.OK).success(listRecomsData);
-    } catch(err) {
-      next(err);
-    }  
+        const listRecomsData = await listRecomsSong(req.user.id);
+        res.status(StatusCodes.OK).success(listRecomsData);
+    } catch (err) {
+        next(err);
+    }
 };

@@ -77,8 +77,23 @@ export const getNotification = async (userId, decoded, limit) => {
                     nickname: true,
                 },
             },
+            content: true,
         },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
     return notification;
 };
+
+export const updateUserRefreshToken = async (userId, refreshToken) => {
+    return await prisma.user.update({
+        where: { id: userId },
+        data: { refreshToken },
+    });
+  
+}
+
+export const findUserByToken = async (id) => {
+    return await prisma.user.findUnique({ 
+        where: { id: id } 
+    });
+}
