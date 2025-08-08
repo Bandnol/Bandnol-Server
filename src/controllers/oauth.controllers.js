@@ -85,3 +85,34 @@ export const handleRefreshAccessToken = async (req, res) => {
     res.status(500).json({ code: 500, message: `AccessToken 재발급 실패 ${err}` });
   }
 };
+
+export const handleKakaoLogout = async (req, res, next) => {
+   /*
+    #swagger.summary = '카카오톡 소셜 로그아웃 API';
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+   */
+
+  try {
+    const { accessToken } = req.body;
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+    const user = await findUserByToken(decoded.id);
+    if(!user){
+      throw new TokenError("유효하지 않은 토큰입니다!");
+    }
+    
+    await redisClient.del(`accessToken:user:${user.id}`);
+    await redisClient.del(`refreshToken:user:${user.id}`);
+
+    res.status(200).json({ message: "로그아웃 성공 !" });
+
+  } catch (err) {
+    res.status(500).json({ code: 500, message: `AccessToken 삭제 실패 ${err}` });
+  }
+}
