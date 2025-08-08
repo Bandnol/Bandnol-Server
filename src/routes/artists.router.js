@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/recommended", handleViewRecomArtists);
 router.post("/liked", authenticateAccessToken, handlePostLikedArtists);
-router.get("/:artistName", authenticateAccessToken, handleViewArtists);
+router.get("/:artistId", authenticateAccessToken, handleViewArtists);
 
 export default router;

@@ -87,8 +87,8 @@ export const postLikedArtists = async (body, userId) => {
     return likedArtistsResponseDTO(updated);
 };
 
-export const viewArtistsChannel = async (userId, artistName) => {
-    const artistsChannel = await getArtistsChannel(userId, artistName);
-    
+export const viewArtistsChannel = async (userId, artistId) => {
+    const artistsChannel = await getArtistsChannel(userId, artistId);
+
     return channelResponseDTO(artistsChannel);
 };

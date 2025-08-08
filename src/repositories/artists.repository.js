@@ -148,10 +148,10 @@ export const deleteUserLikedArtists = async () => {
     return deleted;
 };
 
-export const getArtistsChannel = async (userId, artistName) => {
+export const getArtistsChannel = async (userId, artistId) => {
     const artist = await prisma.artist.findFirst({
         where: {
-            name: artistName
+            id: artistId
         },
         select: {
             id: true,

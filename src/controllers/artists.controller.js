@@ -108,7 +108,7 @@ export const handleViewArtists = async (req, res, next) => {
     };
   */
     try {
-        const channel = await viewArtistsChannel(req.user.id, req.params.artistName);
+        const channel = await viewArtistsChannel(req.user.id, req.params.artistId);
         res.status(StatusCodes.OK).success(channel);
     } catch (err) {
         next(err);
