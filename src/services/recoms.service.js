@@ -43,6 +43,7 @@ import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./musicAPI.service.js";
 import { Prisma } from "@prisma/client";
 import { genAIAutoRecoms } from "./gemini.service.js";
+import redisClient from "../utils/redis.js";
 
 export const sentRecomsSong = async (userId) => {
     const data = await getSentRecomsSong(userId);
@@ -106,6 +107,12 @@ export const addRecoms = async (data, userId) => {
     }
 
     const newUserSongData = await createUserRecomsSong(data, userId, recomsSong);
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setHours(24, 0, 0, 0);  // 오늘 자정(내일 0시)으로 설정
+
+    const expireAt = tomorrow.getTime(); 
+    await redisClient.set(`userRecomsSongData:user:${userId}`, JSON.stringify(data) , { PXAT: expireAt });
 
     return userRecomsSongResponseDTO(newUserSongData, artists, singData);
 };
