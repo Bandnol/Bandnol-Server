@@ -80,7 +80,7 @@ export const handleRefreshAccessToken = async (req, res) => {
 
     await redisClient.set(`accessToken:user:${user.id}`, newAccessToken , { EX: 7 * 24 * 60 * 60 });
 
-    res.status(200).json({ token: newAccessToken });
+    res.status(StatusCodes.OK).success({ token: newAccessToken });
   } catch (err) {
     res.status(500).json({ code: 500, message: `AccessToken 재발급 실패 ${err}` });
   }
@@ -110,7 +110,7 @@ export const handleKakaoLogout = async (req, res, next) => {
     await redisClient.del(`accessToken:user:${user.id}`);
     await redisClient.del(`refreshToken:user:${user.id}`);
 
-    res.status(200).json({ message: "로그아웃 성공 !" });
+   res.status(StatusCodes.OK).success({ message: "로그아웃 성공!" });
 
   } catch (err) {
     res.status(500).json({ code: 500, message: `AccessToken 삭제 실패 ${err}` });
