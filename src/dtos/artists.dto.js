@@ -39,8 +39,8 @@ export const channelResponseDTO = (data) => {
         isLiked: data.isLiked,
         likedCount: data.likedCount,
         recommends: {
-            sent: data.recommends.sent,
-            received: data.recommends.received
+            sentCnt: data.recommends.sentCnt,
+            receivedCnt: data.recommends.receivedCnt
         }
     };
 };

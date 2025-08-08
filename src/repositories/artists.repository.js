@@ -215,8 +215,8 @@ export const getArtistsChannel = async (userId, artistName) => {
         isLiked,
         likedCount,
         recommends: {
-            sent: sentCount,
-            received: receivedCount
+            sentCnt: sentCount,
+            receivedCnt: receivedCount
         }
     };
 };
