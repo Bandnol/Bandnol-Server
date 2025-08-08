@@ -1,13 +1,24 @@
-import { QueryParamError, CursorError, NotFoundArtistsError, RequestBodyError } from "../errors.js";
+import { 
+    QueryParamError, 
+    CursorError, 
+    NotFoundArtistsError, 
+    RequestBodyError,
+} from "../errors.js";
 import {
     getArtistsByPopularity,
     createLikedArtist,
     getUserlikedArtist,
     updateInactiveStatusToFalse,
     updateInactiveStatusToTrue,
+    getArtistsChannel,
 } from "../repositories/artists.repository.js";
 import { getArtistsRandomly } from "./musicAPI.service.js";
-import { artistsResponseDTO, recomsArtistsResponseDTO, likedArtistsResponseDTO } from "../dtos/artists.dto.js";
+import { 
+    artistsResponseDTO, 
+    recomsArtistsResponseDTO, 
+    likedArtistsResponseDTO,
+    channelResponseDTO 
+} from "../dtos/artists.dto.js";
 
 export const viewRecomArtists = async (sort, cursor) => {
     // 커서 오류를 잡기 위한 디코딩
@@ -74,4 +85,10 @@ export const postLikedArtists = async (body, userId) => {
         updated = await createLikedArtist(body, userId);
     }
     return likedArtistsResponseDTO(updated);
+};
+
+export const viewArtistsChannel = async (userId, artistName) => {
+    const artistsChannel = await getArtistsChannel(userId, artistName);
+    
+    return channelResponseDTO(artistsChannel);
 };
