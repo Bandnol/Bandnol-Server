@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GENERATIVE_AI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro-latest" });
+const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash-latest" });
 
 export const genAIComment = async (data, userId) => {
     const user = await getUserById(userId);
