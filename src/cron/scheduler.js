@@ -29,7 +29,6 @@ export const songScheduler = async () => {
 
                 // 노래를 보내지 않았을 경우
                 if (!isSent) {
-                    //console.log("노래를 추천하지 않았습니다: ", user.id);
                     continue;
                 }
 
@@ -37,6 +36,10 @@ export const songScheduler = async () => {
                 if (recoms) {
                     // 보낼 추천 곡이 있는 경우 - 추천 곡 리스트에서 곡을 반환
                     await sendUserRecoms(recoms.id, user);
+                    const idx = recomsList.findIndex((r) => r.id === recoms.id);
+                    if (idx !== -1) {
+                        recomsList.splice(idx, 1);
+                    }
                     //console.log("receiver 등록 완료!");
                 } else {
                     // 보낼 추천 곡이 없는 경우 - AI 생성
@@ -65,7 +68,7 @@ export const resetIsDeliveredScheduler = async () => {
 
                 if (userIds.length > 0) {
                     for (const id of userIds) {
-                        const result = await redisClient.sAdd("user:isDeliveredFalse", id);
+                        await redisClient.sAdd("user:isDeliveredFalse", id);
                     }
                 }
             } catch (err) {

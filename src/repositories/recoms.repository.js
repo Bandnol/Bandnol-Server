@@ -321,7 +321,7 @@ export const updateIsDeliveredToFalse = async () => {
 
         const userIds = users.map((u) => u.id);
 
-        await tx.user.updateMany({
+        const updatedCount = await tx.user.updateMany({
             where: { id: { in: userIds } },
             data: { isDelivered: false },
         });
