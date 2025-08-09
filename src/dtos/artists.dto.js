@@ -31,3 +31,16 @@ export const likedArtistsResponseDTO = (data) => {
         inactiveAt: data.inactiveAt,
     };
 };
+
+export const channelResponseDTO = (data) => {
+    return {
+        id: data.id,
+        imgUrl: data.imgUrl,
+        isLiked: data.isLiked,
+        likedCount: data.likedCount,
+        recommends: {
+            sentCnt: data.recommends.sentCnt,
+            receivedCnt: data.recommends.receivedCnt
+        }
+    };
+};

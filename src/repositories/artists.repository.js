@@ -1,4 +1,5 @@
 import { prisma } from "../configs/db.config.js";
+import { NotFoundArtistsError } from "../errors.js";
 
 export const createArtist = async (artistData) => {
     const created = await prisma.artist.create({
@@ -145,4 +146,77 @@ export const deleteUserLikedArtists = async () => {
         },
     });
     return deleted;
+};
+
+export const getArtistsChannel = async (userId, artistId) => {
+    const artist = await prisma.artist.findFirst({
+        where: {
+            id: artistId
+        },
+        select: {
+            id: true,
+            imgUrl: true
+        }
+    });
+
+    if(!artist) {
+        throw new NotFoundArtistsError("해당 아티스트가 없습니다.");
+    }
+    
+    const likedRow = await prisma.userLikedArtist.findFirst({
+        where: {
+            artistId: artist.id,
+            userId
+        },
+        select: {
+            inactiveStatus: true
+        }
+    });
+
+    const isLiked = likedRow?.inactiveStatus === false;
+
+    const likedCount = await prisma.userLikedArtist.count({
+        where: {
+            artistId: artist.id,
+            inactiveStatus: false
+        }
+    });
+
+    const [sentCount, receivedCount] = await Promise.all([
+        prisma.userRecomsSong.count({
+            where: {
+                recomsSong: {
+                    sings: {
+                        some: {
+                            artistId: artist.id
+                        }
+                    }
+                }
+            },
+        }),
+        prisma.userRecomsSong.count({
+            where: {
+                recomsSong: {
+                    sings: {
+                        some: {
+                            artistId: artist.id
+                        }
+                    }
+                },
+                receiverId: { 
+                    not: null 
+                }     
+            },
+        }),
+    ]);
+
+    return {
+        imgUrl: artist.imgUrl ?? null,
+        isLiked,
+        likedCount,
+        recommends: {
+            sentCnt: sentCount,
+            receivedCnt: receivedCount
+        }
+    };
 };
