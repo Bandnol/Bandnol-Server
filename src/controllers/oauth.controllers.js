@@ -2,11 +2,11 @@ import { AuthTokenError, TokenError } from "../errors.js";
 import { generateRefreshToken, generateToken } from "../utils/token.js";
 import { getKakaoUser } from "../configs/auth.config.js"
 import { findOrCreateUser, findUserByToken } from "../repositories/users.repository.js"
-import { updateUserRefreshToken } from "../repositories/users.repository.js";
 import pkg from '@prisma/client';
 import { StatusCodes } from "http-status-codes";
 const { SocialType } = pkg;
 import jwt from 'jsonwebtoken';
+import redisClient from "../utils/redis.js";
 
 
 export const handleKakaoLogin = async (req, res, next) => {
@@ -37,7 +37,9 @@ export const handleKakaoLogin = async (req, res, next) => {
     const token = generateToken({id: user.id});
     const refreshToken = generateRefreshToken({id : user.id})
 
-    await updateUserRefreshToken(user.id, refreshToken);
+
+    await redisClient.set(`accessToken:user:${user.id}`, token , { EX: 7 * 24 * 60 * 60 });
+    await redisClient.set(`refreshToken:user:${user.id}`, refreshToken, { EX: 30 * 24 * 60 * 60 } )
 
     res.status(StatusCodes.OK).success({token,refreshToken, user});
    } catch (err) {
@@ -75,8 +77,42 @@ export const handleRefreshAccessToken = async (req, res) => {
     }
 
     const newAccessToken = generateToken({ id: user.id });
-    res.status(200).json({ token: newAccessToken });
+
+    await redisClient.set(`accessToken:user:${user.id}`, newAccessToken , { EX: 7 * 24 * 60 * 60 });
+
+    res.status(StatusCodes.OK).success({ token: newAccessToken });
   } catch (err) {
     res.status(500).json({ code: 500, message: `AccessToken 재발급 실패 ${err}` });
   }
 };
+
+export const handleKakaoLogout = async (req, res, next) => {
+   /*
+    #swagger.summary = '카카오톡 소셜 로그아웃 API';
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+   */
+
+  try {
+    const { accessToken } = req.body;
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+    const user = await findUserByToken(decoded.id);
+    if(!user){
+      throw new TokenError("유효하지 않은 토큰입니다!");
+    }
+    
+    await redisClient.del(`accessToken:user:${user.id}`);
+    await redisClient.del(`refreshToken:user:${user.id}`);
+
+   res.status(StatusCodes.OK).success({ message: "로그아웃 성공!" });
+
+  } catch (err) {
+    res.status(500).json({ code: 500, message: `AccessToken 삭제 실패 ${err}` });
+  }
+}
