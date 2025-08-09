@@ -44,3 +44,14 @@ export const channelResponseDTO = (data) => {
         }
     };
 };
+
+export const likedArtistsListResponseDTO = (data) => {
+    return {
+        artists: data.map((a) => ({
+            id: a.id,
+            name: a.name,
+            imgUrl: a.imgUrl,
+            isliked: true
+        }))
+    };
+};

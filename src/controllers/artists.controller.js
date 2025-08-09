@@ -1,5 +1,10 @@
 import { StatusCodes } from "http-status-codes";
-import { viewRecomArtists, postLikedArtists, viewArtistsChannel } from "../services/artists.service.js";
+import { 
+  viewRecomArtists, 
+  postLikedArtists, 
+  viewArtistsChannel,
+  viewLikedArtists 
+} from "../services/artists.service.js";
 
 export const handleViewRecomArtists = async (req, res, next) => {
     /*
@@ -110,6 +115,30 @@ export const handleViewArtists = async (req, res, next) => {
     try {
         const channel = await viewArtistsChannel(req.user.id, req.params.artistId);
         res.status(StatusCodes.OK).success(channel);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleViewListLikedArtists = async (req, res, next) => {
+    /*
+    #swagger.summary = '즐겨찾기한 아티스트 목록 조회하기';
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+    
+    #swagger.responses[200] = {
+      $ref: "#/components/responses/Success"
+    };
+    
+    #swagger.responses[401] = {
+      $ref: "#/components/responses/TokenError"
+    };
+  */
+    try {
+        const liked = await viewLikedArtists(req.user.id);
+        res.status(StatusCodes.OK).success(liked);
     } catch (err) {
         next(err);
     }
