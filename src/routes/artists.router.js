@@ -1,10 +1,17 @@
 import { Router } from "express";
-import { handleViewRecomArtists, handlePostLikedArtists } from "../controllers/artists.controller.js";
+import { 
+    handleViewRecomArtists, 
+    handlePostLikedArtists, 
+    handleViewArtists,
+    handleViewListLikedArtists 
+} from "../controllers/artists.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
 const router = Router();
 
 router.get("/recommended", handleViewRecomArtists);
 router.post("/liked", authenticateAccessToken, handlePostLikedArtists);
+router.get("/:artistId", authenticateAccessToken, handleViewArtists);
+router.get("/liked/list", authenticateAccessToken, handleViewListLikedArtists);
 
 export default router;

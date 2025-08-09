@@ -31,3 +31,27 @@ export const likedArtistsResponseDTO = (data) => {
         inactiveAt: data.inactiveAt,
     };
 };
+
+export const channelResponseDTO = (data) => {
+    return {
+        id: data.id,
+        imgUrl: data.imgUrl,
+        isLiked: data.isLiked,
+        likedCount: data.likedCount,
+        recommends: {
+            sentCnt: data.recommends.sentCnt,
+            receivedCnt: data.recommends.receivedCnt
+        }
+    };
+};
+
+export const likedArtistsListResponseDTO = (data) => {
+    return {
+        artists: data.map((a) => ({
+            id: a.id,
+            name: a.name,
+            imgUrl: a.imgUrl,
+            isliked: true
+        }))
+    };
+};

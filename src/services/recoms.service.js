@@ -43,6 +43,7 @@ import { getUserById } from "../repositories/users.repository.js";
 import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./musicAPI.service.js";
 import { Prisma } from "@prisma/client";
 import { genAIAutoRecoms } from "./gemini.service.js";
+import redisClient from "../utils/redis.js";
 
 export const sentRecomsSong = async (userId) => {
     const data = await getSentRecomsSong(userId);
@@ -106,6 +107,12 @@ export const addRecoms = async (data, userId) => {
     }
 
     const newUserSongData = await createUserRecomsSong(data, userId, recomsSong);
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setHours(24, 0, 0, 0); // 오늘 자정(내일 0시)으로 설정
+
+    const expireAt = tomorrow.getTime();
+    await redisClient.set(`userRecomsSongData:user:${userId}`, JSON.stringify(newUserSongData), { PXAT: expireAt });
 
     return userRecomsSongResponseDTO(newUserSongData, artists, singData);
 };
@@ -208,6 +215,7 @@ export const listRecomsSong = async (userId) => {
 };
 
 export const sendUserRecoms = async (recomsId, userId) => {
+    await redisClient.del(`userRecomsSongData:user:${userId}`);
     let update = await updateReceiver(recomsId, userId);
     if (!update) {
         throw new RecommendationNotFoundError("userRecomsSong 테이블에 데이터가 생성되지 않았습니다.");
@@ -215,6 +223,7 @@ export const sendUserRecoms = async (recomsId, userId) => {
     console.log(update);
 
     // isDelivered true로 변경
+    await redisClient.sRem("user:isDeliveredFalse", userId); // redis set에서 데이터 제거
     const isDelivered = await updateIsDeliveredToTrue(userId);
     if (!isDelivered) {
         throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
@@ -254,6 +263,7 @@ export const sendAIRecoms = async (userId) => {
     console.log("ai가 userRecomsSong에 생성한 데이터: ", newUserSongData);
 
     // isDelivered true로 변경
+    await redisClient.sRem("user:isDeliveredFalse", userId); // redis set에서 데이터 제거
     const isDelivered = await updateIsDeliveredToTrue(userId);
     if (!isDelivered) {
         throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
