@@ -102,6 +102,8 @@ model UserRecomsSong {
   isAnoymous   Boolean      @default(false) @map("is_anoymous")
   isLiked      Boolean?     @map("is_liked")
   comment      String
+  isRead       Boolean      @default(false) @map("is_read")
+  updatedAt    DateTime?    @updatedAt @map("updated_at")
   replies      RecomsReply?
   receiver     User?        @relation("UserReceivedRecom", fields: [receiverId], references: [id])
   recomsSong   RecomsSong   @relation(fields: [recomsSongId], references: [id])
@@ -119,7 +121,7 @@ model User {
   photo           String?
   bio             String?
   createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
+  updatedAt       DateTime?         @updatedAt @map("updated_at")
   inactiveAt      DateTime?         @map("inactive_at")
   inactiveStatus  Boolean           @default(false) @map("inactive_status")
   backgroundImg   String?           @map("background_img")
@@ -128,8 +130,7 @@ model User {
   email           String
   name            String
   isDelivered     Boolean           @default(false) @map("is_delivered")
-  refreshToken    String?           @map("refresh_token")
-  fcmTokens       FcmToken[]
+  expoPushTokens  ExpoPushToken[]
   receivedNotices Notification[]    @relation("NotificationReceiver")
   sentNotices     Notification[]    @relation("NotificationSender")
   notifications   NotificationType?
@@ -142,14 +143,14 @@ model User {
   @@map("user")
 }
 
-model FcmToken {
+model ExpoPushToken {
   id        String   @id @unique @default(uuid())
-  fcmToken  String   @map("fcm_token") @db.VarChar(512)
+  token     String
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id])
 
-  @@map("fcm_token")
+  @@map("expo_push_token")
 }
 
 model Session {
