@@ -247,50 +247,6 @@ export const createReply = async (recomsId, userId, content) => {
     return created;
 };
 
-export const getUserList = async () => {
-    let now = new Date();
-    let hour = now.getHours();
-    let min = now.getMinutes();
-
-    if (hour < 10) {
-        hour = "0" + hour.toString();
-    } else {
-        hour = hour.toString();
-    }
-
-    if (min < 10) {
-        min = "0" + min.toString();
-    } else {
-        min = min.toString();
-    }
-    let time = hour + min;
-
-    const userList = await prisma.user.findMany({
-        where: {
-            isDelivered: false,
-            recomsTime: {
-                lt: time,
-            },
-            inactiveStatus: false,
-        },
-        select: {
-            id: true,
-        },
-    });
-    return userList;
-};
-
-export const getRecomsWithNoReceiver = async () => {
-    const recomsList = await prisma.userRecomsSong.findMany({
-        where: { receiverId: null },
-        select: {
-            id: true,
-            senderId: true,
-        },
-    });
-    return recomsList;
-};
-
 export const updateReceiver = async (recomsId, userId) => {
     const receiverUpdate = await prisma.userRecomsSong.update({
         where: { id: recomsId, NOT: { senderId: userId } },
@@ -356,11 +312,22 @@ export const updateIsDeliveredToTrue = async (userId) => {
 };
 
 export const updateIsDeliveredToFalse = async () => {
-    const updated = await prisma.user.updateMany({
-        where: { NOT: { id: "AI" } },
-        data: {
-            isDelivered: false,
-        },
+    // userId를 가져오기 위해 findMany() 추가
+    const result = await prisma.$transaction(async (tx) => {
+        const users = await tx.user.findMany({
+            where: { inactiveStatus: false, NOT: { id: "AI" } },
+            select: { id: true },
+        });
+
+        const userIds = users.map((u) => u.id);
+
+        const updatedCount = await tx.user.updateMany({
+            where: { id: { in: userIds } },
+            data: { isDelivered: false },
+        });
+
+        return userIds;
     });
-    return updated;
+
+    return result;
 };

@@ -220,3 +220,57 @@ export const getArtistsChannel = async (userId, artistId) => {
         }
     };
 };
+
+export const getMyLikedArtists = async (userId, limit = 6) => {
+    const myLikes = await prisma.userLikedArtist.findMany({
+        where: { 
+            userId, 
+            inactiveStatus: false 
+        },
+        select: { 
+            artistId: true 
+        },
+    });
+    const artistIds = myLikes.map((x) => x.artistId);
+    if (artistIds.length === 0) return [];
+
+    const ranked = await prisma.userLikedArtist.groupBy({
+        by: ["artistId"],
+        where: { 
+            artistId: { 
+                in: artistIds 
+            }, 
+            inactiveStatus: false 
+        },
+        _count: { 
+            artistId: true 
+        },
+        orderBy: { 
+            _count: { 
+                artistId: "desc" 
+            } 
+        },
+        take: limit,
+    });
+    const topIdsInOrder = ranked.map((r) => r.artistId);
+    
+    const artists = await prisma.artist.findMany({
+        where: { 
+            id: { 
+                in: topIdsInOrder 
+            } 
+        },
+        select: { 
+            id: true, 
+            name: true, 
+            imgUrl: true 
+        },
+    });
+    const byId = new Map(artists.map((a) => [a.id, a]));
+
+    return topIdsInOrder.map((id) => ({
+        id,
+        name: byId.get(id)?.name ?? "",
+        imgUrl: byId.get(id)?.imgUrl ?? null,
+    }));
+}
