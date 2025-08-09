@@ -11,13 +11,15 @@ import {
     updateInactiveStatusToFalse,
     updateInactiveStatusToTrue,
     getArtistsChannel,
+    getMyLikedArtists
 } from "../repositories/artists.repository.js";
 import { getArtistsRandomly } from "./musicAPI.service.js";
 import { 
     artistsResponseDTO, 
     recomsArtistsResponseDTO, 
     likedArtistsResponseDTO,
-    channelResponseDTO 
+    channelResponseDTO,
+    likedArtistsListResponseDTO
 } from "../dtos/artists.dto.js";
 
 export const viewRecomArtists = async (sort, cursor) => {
@@ -91,4 +93,10 @@ export const viewArtistsChannel = async (userId, artistId) => {
     const artistsChannel = await getArtistsChannel(userId, artistId);
 
     return channelResponseDTO(artistsChannel);
+};
+
+export const viewLikedArtists = async (userId) => {
+    const likedArtists = await getMyLikedArtists(userId);
+
+    return likedArtistsListResponseDTO(likedArtists);
 };
