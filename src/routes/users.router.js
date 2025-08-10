@@ -5,6 +5,7 @@ import {
     handleInquiry,
     handleViewNotification,
     handleViewMyPage,
+    handleSaveExpoToken,
 } from "../controllers/users.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -15,6 +16,6 @@ router.patch("/me/profiles", authenticateAccessToken, handleModifyUserInfo);
 router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 router.post("/inquiry", handleInquiry);
 router.get("/:ownId", authenticateAccessToken, handleViewMyPage);
-router.post("/fcm-token", authenticateAccessToken, handleSaveFcmToken);
+router.post("/expo-token", authenticateAccessToken, handleSaveExpoToken);
 
 export default router;

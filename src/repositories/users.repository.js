@@ -90,11 +90,62 @@ export const findUserByToken = async (id) => {
     });
 };
 
-export const createFcmToken = async (userId, token) => {
-    return await prisma.fcmToken.create({
+export const createExpoToken = async (userId, token) => {
+    return await prisma.expoPushToken.create({
         data: {
-            fcmToken: token,
+            token: token,
             userId: userId,
         },
     });
+};
+
+export const getExpoTokens = async (userIds) => {
+    const ids = Array.isArray(userIds) ? userIds : [userIds];
+
+    const rows = await prisma.expoPushToken.findMany({
+        where: { userId: { in: ids } },
+    });
+
+    if (!Array.isArray(userIds)) return rows[0] || null;
+    return rows;
+};
+
+export const createAllowedNotifications = async (userId) => {
+    const result = await prisma.$transaction(async (tx) => {
+        const user = await tx.notificationType.findFirst({ where: { userId: userId } });
+
+        let data = {};
+        if (!user) {
+            data = await tx.notificationType.create({
+                data: {
+                    userId: userId,
+                },
+            });
+        }
+        return data;
+    });
+    return result;
+};
+
+export const getAllowedNotifications = async (userIds) => {
+    const ids = Array.isArray(userIds) ? userIds : [userIds];
+
+    const rows = await prisma.notificationType.findMany({
+        where: { userId: { in: ids } },
+    });
+
+    if (!Array.isArray(userIds)) return rows[0] || null;
+    return rows;
+};
+
+export const createNotifications = async (receiverId, senderId, type, link) => {
+    const result = await prisma.notification.create({
+        data: {
+            receiverId: receiverId,
+            senderId: senderId,
+            type: type,
+            link: link,
+        },
+    });
+    return result;
 };

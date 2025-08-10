@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { checkOwnId, modifyUserInfo, viewNotification, viewMyPage, saveFcmToken } from "../services/users.service.js";
+import { checkOwnId, modifyUserInfo, viewNotification, viewMyPage, saveExpoToken } from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
@@ -182,7 +182,7 @@ export const handleViewMyPage = async (req, res, next) => {
     }
 };
 
-export const handleSaveFcmToken = async (req, res, next) => {
+export const handleSaveExpoToken = async (req, res, next) => {
     /*
     #swagger.summary = 'FCM 토큰 저장 API'
 
@@ -204,7 +204,7 @@ export const handleSaveFcmToken = async (req, res, next) => {
     */
 
     try {
-        const token = await saveFcmToken(req.user.id, req.body.token);
+        const token = await saveExpoToken(req.user.id, req.body.token);
         res.status(StatusCodes.OK).success(token);
     } catch (err) {
         next(err);

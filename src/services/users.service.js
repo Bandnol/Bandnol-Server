@@ -13,7 +13,7 @@ import {
     getUserByOwnId,
     modifyUser,
     getNotification,
-    createFcmToken,
+    createExpoToken,
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 
@@ -132,10 +132,10 @@ export const viewMyPage = async (userId, ownId) => {
     }
 };
 
-export const saveFcmToken = async (userId, token) => {
+export const saveExpoToken = async (userId, token) => {
     if (!token) {
         throw new RequestBodyError("잘못된 Request body 형식입니다.");
     }
-    const created = await createFcmToken(userId, token);
+    const created = await createExpoToken(userId, token);
     return created;
 };

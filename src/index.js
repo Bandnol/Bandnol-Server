@@ -9,7 +9,12 @@ import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
 import components from "./components/components.js";
-import { resetIsDeliveredScheduler, songScheduler, deleteUserLikedArtistScheduler } from "./cron/scheduler.js";
+import {
+    resetIsDeliveredScheduler,
+    songScheduler,
+    deleteUserLikedArtistScheduler,
+    notReadScheduler,
+} from "./cron/scheduler.js";
 
 dotenv.config();
 
@@ -144,6 +149,7 @@ app.use((err, req, res, next) => {
 songScheduler();
 resetIsDeliveredScheduler();
 deleteUserLikedArtistScheduler();
+notReadScheduler();
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
