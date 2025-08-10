@@ -55,6 +55,9 @@ jobs:
                       --env-file /opt/app/.env.prod \
                       -p 3000:3000 \
                       ${{ secrets.DOCKER_USERNAME }}/bandnol-server
+                      sudo docker image prune -af
+                      sudo docker container prune -f
+                      sudo docker network prune -f
                   EOF
 
             - name: Apply prisma migrations
