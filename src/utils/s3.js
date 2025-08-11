@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import path from "path";
 import crypto from "crypto";
 
@@ -32,4 +32,26 @@ export function makeUserImageKey({ userId, role, originalName }) {
   const y = new Date().getFullYear();
   const m = String(new Date().getMonth() + 1).padStart(2, "0");
   return `users/${userId}/${role}/${y}/${m}/${Date.now()}_${hash}${ext}`;
+}
+
+export function extractS3KeyFromUrl(url) {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    // https://bandnol-bucket.s3.ap-northeast-2.amazonaws.com/<key>
+    if (u.hostname.startsWith(`${process.env.S3_BUCKET}.s3`)) {
+      return u.pathname.replace(/^\/+/, '');
+    }
+    // https://s3.ap-northeast-2.amazonaws.com/bandnol-bucket/<key>
+    const parts = u.pathname.split('/').filter(Boolean);
+    if (u.hostname.includes('amazonaws.com') && parts[0] === process.env.S3_BUCKET) {
+      return parts.slice(1).join('/');
+    }
+  } catch {}
+  return null;
+}
+
+export async function deleteFromS3ByKey(key) {
+  if (!key) return;
+  await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }));
 }

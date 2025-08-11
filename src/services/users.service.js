@@ -9,6 +9,7 @@ import {
 } from "../errors.js";
 import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
+import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
 
 export const checkOwnId = async (userOwnId) => {
     const userData = await getUserByOwnId(userOwnId);
@@ -175,7 +176,49 @@ export const modifyMypage = async (userId, data) => {
         throw new NoModifyDataError("수정할 데이터가 없습니다.");
     }
 
-    const updatedUser = await modifyUser(user.id, updates);
+    const deleteKeys = [];
 
-    return updatedUser;
+    for (const key of deleteKeys) {
+        try {
+            await deleteFromS3ByKey(key);
+        } catch (e) {
+            console.error('[S3:delete failed]', { key, msg: e?.message, code: e?.Code || e?.name, http: e?.$metadata?.httpStatusCode });
+        }
+    }
+
+    if ("photo" in updates) {
+        const oldKey = extractS3KeyFromUrl(user.photo);
+
+        if (updates.photo === null && oldKey) deleteKeys.push(oldKey);
+
+        if (typeof updates.photo === "string" && updates.photo !== user.photo && oldKey) {
+            deleteKeys.push(oldKey);
+        }
+    }
+
+    if ("backgroundImg" in updates) {
+        const oldKey = extractS3KeyFromUrl(user.backgroundImg);
+
+        if (updates.backgroundImg === null && oldKey) deleteKeys.push(oldKey);
+        if (typeof updates.backgroundImg === "string" && updates.backgroundImg !== user.backgroundImg && oldKey) {
+            deleteKeys.push(oldKey);
+        }
+    }
+
+    const updated = await modifyUser(user.id, updates);
+
+    for (const key of deleteKeys) {
+        try {
+            await deleteFromS3ByKey(key);
+        } catch (e) {
+            console.error("[S3:delete failed]", {
+            key,
+            msg: e?.message,
+            code: e?.Code || e?.name,
+            http: e?.$metadata?.httpStatusCode,
+            });
+        }
+    }
+
+    return updated;
 };

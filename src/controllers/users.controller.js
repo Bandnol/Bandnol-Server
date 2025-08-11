@@ -237,19 +237,21 @@ export const handleModifyMypage = async (req, res, next) => {
         const userId = req.user.id;
         const files = req.files || {};
         const fileUrls = {};
+        const removePhoto = req.body.removePhoto;
+        const removeBackgroundImg = req.body.removeBackgroundImg;
         console.log(req.body);
-        if (files.photo?.[0]) {
-          const f = files.photo[0];
-          const contentType = f.mimetype || mime.lookup(f.originalname) || "image/jpeg";
-          const key = makeUserImageKey({ userId, role: "photo", originalName: f.originalname });
-          fileUrls.photoUrl = await uploadBufferToS3({ buffer: f.buffer, contentType, key });
+        if (!removePhoto && files.photo?.[0]) {
+          const photoFile = files.photo[0];
+          const contentType = photoFile.mimetype || mime.lookup(photoFile.originalname) || "image/jpeg";
+          const key = makeUserImageKey({ userId, role: "photo", originalName: photoFile.originalname });
+          fileUrls.photoUrl = await uploadBufferToS3({ buffer: photoFile.buffer, contentType, key });
         }
 
-        if (files.backgroundImg?.[0]) {
-          const f = files.backgroundImg[0];
-          const contentType = f.mimetype || mime.lookup(f.originalname) || "image/jpeg";
-          const key = makeUserImageKey({ userId, role: "background", originalName: f.originalname });
-          fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: f.buffer, contentType, key });
+        if (!removeBackgroundImg && files.backgroundImg?.[0]) {
+          const backkgroundfile = files.backgroundImg[0];
+          const contentType = backkgroundfile.mimetype || mime.lookup(backkgroundfile.originalname) || "image/jpeg";
+          const key = makeUserImageKey({ userId, role: "background", originalName: backkgroundfile.originalname });
+          fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backkgroundfile.buffer, contentType, key });
         }
 
         const dto = myPageModifyRequestDTO(req.body, fileUrls);
