@@ -89,3 +89,13 @@ export const findUserByToken = async (id) => {
         where: { id: id } 
     });
 }
+
+export const modifyUserStatus = async (id, status) => {
+    return await prisma.user.update({
+        where: {id: id},
+        data: {
+            inactiveStatus: status,
+            inactiveAt: status ? new Date() : null // "YYYY-MM-DD"
+        }
+    })
+}

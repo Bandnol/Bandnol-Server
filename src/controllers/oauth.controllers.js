@@ -1,12 +1,13 @@
-import { AuthTokenError, TokenError } from "../errors.js";
+import { AlreadyInactiveError, AuthTokenError, NoUserError, TokenError } from "../errors.js";
 import { generateRefreshToken, generateToken } from "../utils/token.js";
 import { getKakaoUser } from "../configs/auth.config.js"
-import { findOrCreateUser, findUserByToken } from "../repositories/users.repository.js"
+import { findOrCreateUser, findUserByToken, modifyUserStatus, getUserById } from "../repositories/users.repository.js"
 import pkg from '@prisma/client';
 import { StatusCodes } from "http-status-codes";
 const { SocialType } = pkg;
 import jwt from 'jsonwebtoken';
 import redisClient from "../utils/redis.js";
+import { withdrawResponseDTO } from "../dtos/users.dto.js";
 
 
 export const handleKakaoLogin = async (req, res, next) => {
@@ -113,6 +114,55 @@ export const handleKakaoLogout = async (req, res, next) => {
    res.status(StatusCodes.OK).success({ message: "로그아웃 성공!" });
 
   } catch (err) {
-    res.status(500).json({ code: 500, message: `AccessToken 삭제 실패 ${err}` });
+    res.status(500).json({ code: 500, message: `로그아웃 실패 ${err}` });
+  }
+}
+
+export const handleWithdraw = async (req, res, next) => {
+  /*
+    #swagger.summary = '카카오톡 회원탈퇴 API';
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.response[404] = {
+        $ref: "#/components/responses/NoUserError"
+    };
+
+    #swagger.response[409] = {
+        $ref: "#/components/responses/AlreadyInactiveError"
+    };
+   */
+
+  try {
+    const { accessToken } = req.body;
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+    const user = await findUserByToken(decoded.id);
+    if(!user){
+      throw new TokenError("유효하지 않은 토큰입니다.");
+    }
+    
+    await redisClient.del(`accessToken:user:${user.id}`);
+    await redisClient.del(`refreshToken:user:${user.id}`);
+
+    const existUser = await getUserById(user.id);
+    if(!existUser){
+      throw new NoUserError("존재하지 않는 사용자 ID입니다.");
+    }
+
+    if(existUser.inactiveStatus == true){
+      throw new AlreadyInactiveError("이미 비활성화 상태인 사용자입니다.")
+    }
+    const data = await modifyUserStatus(user.id, true);
+
+   res.status(StatusCodes.OK).success(withdrawResponseDTO(data));
+
+  } catch (err) {
+    next(err);
   }
 }
