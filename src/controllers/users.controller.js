@@ -1,7 +1,19 @@
 import { StatusCodes } from "http-status-codes";
-import { checkOwnId, modifyUserInfo, viewNotification, viewMyPage } from "../services/users.service.js";
+import { 
+  checkOwnId, 
+  modifyUserInfo, 
+  viewNotification, 
+  viewMyPage, 
+  modifyMypage 
+} from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
-import { userInfoRequestDTO } from "../dtos/users.dto.js";
+import { 
+  userInfoRequestDTO, 
+  myPageModifyRequestDTO, 
+  getMyPageResponseDTO 
+} from "../dtos/users.dto.js";
+import { uploadBufferToS3, makeUserImageKey } from "../utils/s3.js";
+import mime from "mime-types";
 
 export const handleCheckOwnId = async (req, res, next) => {
     /*
@@ -179,5 +191,72 @@ export const handleViewMyPage = async (req, res, next) => {
         res.status(StatusCodes.OK).success(mypage);
     } catch (err) {
         next(err);
+    }
+};
+
+export const handleModifyMypage = async (req, res, next) => {
+    /*
+    #swagger.summary = '마이페이지 수정 API';
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              nickname: { type: "string", example: "징니" },
+              bio: { type: "string", example: "안뇽하세용 ~ 징니에요 ~ " },
+              photo: { type: ["string", "null"], example: "https://cdn.example.com/u/123/photo.jpg", nullable: true },
+              backgroundImg: { type: ["string", "null"], example: null, nullable: true }
+            },
+            additionalProperties: false
+          }
+        }
+      }
+    };
+    #swagger.responses[200] = {
+      $ref: "#/components/responses/Success"
+    };
+    #swagger.responses[400] = {
+      $ref: "#/components/responses/InvalidTypeError"
+    };
+    #swagger.responses[401] = {
+      $ref: "#/components/responses/TokenError"
+    };
+    #swagger.responses[404] = {
+      $ref: "#/components/responses/NoModifyDataError"
+    };
+   */
+
+    try {
+        const userId = req.user.id;
+        const files = req.files || {};
+        const fileUrls = {};
+        console.log(req.body);
+        if (files.photo?.[0]) {
+          const f = files.photo[0];
+          const contentType = f.mimetype || mime.lookup(f.originalname) || "image/jpeg";
+          const key = makeUserImageKey({ userId, role: "photo", originalName: f.originalname });
+          fileUrls.photoUrl = await uploadBufferToS3({ buffer: f.buffer, contentType, key });
+        }
+
+        if (files.backgroundImg?.[0]) {
+          const f = files.backgroundImg[0];
+          const contentType = f.mimetype || mime.lookup(f.originalname) || "image/jpeg";
+          const key = makeUserImageKey({ userId, role: "background", originalName: f.originalname });
+          fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: f.buffer, contentType, key });
+        }
+
+        const dto = myPageModifyRequestDTO(req.body, fileUrls);
+
+        const updated = await modifyMypage(userId, dto);
+        res.status(StatusCodes.OK).success(getMyPageResponseDTO(updated));
+        } catch (err) {
+          next(err);
     }
 };

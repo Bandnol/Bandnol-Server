@@ -124,3 +124,58 @@ export const viewMyPage = async (userId, ownId) => {
         return getMyPageResponseDTO(other);
     }
 };
+
+export const modifyMypage = async (userId, data) => {
+    const allowedFields = ["nickname", "bio", "photo", "backgroundImg"];
+
+    const user = await getUserById(userId);
+    if (!user) {
+        throw new NoUserError("존재하지 않는 사용자 ID입니다.");
+    }
+
+    const normalize = (key, val) => {
+        if (val === undefined) return undefined;
+        if (key === "nickname") return typeof val === "string" && val.trim() !== "" ? val.trim() : undefined;
+        if (key === "bio") return val === "" ? null : val; // bio는 "" 보내면 null로 초기화
+        if (key === "photo" || key === "backgroundImg") return val === "" ? null : val;
+        return val;
+    };
+
+    const updates = {};
+
+    for (const field of allowedFields) {
+        const value = normalize(field, data[field]);
+        if (value !== undefined && value !== "") {
+            updates[field] = value;
+        }
+    }
+
+    if (updates.nickname && (updates.nickname.length < 1 || updates.nickname.length > 40)) {
+        throw new InvalidDateTypeError("닉네임은 1~40자여야 합니다.");
+    }
+
+    const isValidUrl = (u) => {
+        try {
+            const url = new URL(u);
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch {
+            return false;
+        }
+    };
+
+    for (const key of ["photo", "backgroundImg"]) {
+        if (updates[key] !== undefined && updates[key] !== null) {
+            if (typeof updates[key] !== "string" || !isValidUrl(updates[key])) {
+                throw new InvalidDateTypeError(`${key}는 http(s) URL 또는 null이어야 합니다.`);
+            }
+        }
+    }
+
+    if (Object.keys(updates).length === 0) {
+        throw new NoModifyDataError("수정할 데이터가 없습니다.");
+    }
+
+    const updatedUser = await modifyUser(user.id, updates);
+
+    return updatedUser;
+};

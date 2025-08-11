@@ -38,3 +38,15 @@ export const withdrawResponseDTO = (data) => {
         inactiveStatus: data.inactiveStatus
     }
 }
+
+export const myPageModifyRequestDTO = (body, fileUrls) => {
+    const removePhoto = body.removePhoto === "true" || body.removePhoto === true;
+    const removeBackgroundImg = body.removeBackgroundImg === "true" || body.removeBackgroundImg === true;
+
+    return {
+        nickname: body.nickname,                      
+        bio: body.bio ?? undefined,                   
+        photo: removePhoto ? null : (fileUrls.photoUrl ?? undefined),
+        backgroundImg: removeBackgroundImg ? null : (fileUrls.backgroundImgUrl ?? undefined),
+    };
+};
