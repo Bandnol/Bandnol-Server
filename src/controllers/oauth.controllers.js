@@ -1,13 +1,13 @@
 import { AlreadyInactiveError, AuthTokenError, NoUserError, TokenError } from "../errors.js";
 import { generateRefreshToken, generateToken } from "../utils/token.js";
 import { getKakaoUser } from "../configs/auth.config.js"
-import { findOrCreateUser, findUserByToken, modifyUserStatus, getUserById } from "../repositories/users.repository.js"
+import { findUserByToken, modifyUserStatus, getUserById, getUserByEmail, createUser, updateUserLogin } from "../repositories/users.repository.js"
 import pkg from '@prisma/client';
 import { StatusCodes } from "http-status-codes";
 const { SocialType } = pkg;
 import jwt from 'jsonwebtoken';
 import redisClient from "../utils/redis.js";
-import { withdrawResponseDTO } from "../dtos/users.dto.js";
+import { withdrawResponseDTO, userInfoRequestDTO } from "../dtos/users.dto.js";
 
 
 export const handleKakaoLogin = async (req, res, next) => {
@@ -33,8 +33,17 @@ export const handleKakaoLogin = async (req, res, next) => {
     const email = kakaoUser.email;
     const name = kakaoUser.nickname;
 
-    const user = await findOrCreateUser(name, email, SocialType.KAKAO);
-
+    let user = await getUserByEmail(name, email);
+    if(!user){
+      user = await createUser(name, email, SocialType.KAKAO);
+    }else{
+      if(user.inactiveStatus == true){
+        user = await modifyUserStatus(user.id, false);
+      }else{
+        user = await updateUserLogin(user.id,name, email, SocialType.KAKAO);
+      }
+    }
+    
     const token = generateToken({id: user.id});
     const refreshToken = generateRefreshToken({id : user.id})
 

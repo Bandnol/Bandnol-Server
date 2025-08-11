@@ -14,6 +14,15 @@ export const getUserByOwnId = async (checkingOwnId) => {
     return userData;
 };
 
+export const getUserByEmail = async (userName, userEmail) => {
+    return await prisma.user.findFirst({ 
+        where: { 
+            name: userName,
+            email: userEmail 
+        } 
+    });
+}
+
 export const modifyUser = async (userId, data) => {
     const updatedUser = await prisma.user.update({
         where: { id: userId },
@@ -35,29 +44,28 @@ export const createInquiry = async (userName, userEmail, text) => {
     return newInquiry.id;
 };
 
-export const findOrCreateUser = async (userName, userEmail, type) => {
-    let user = await prisma.user.findFirst({ where: { email: userEmail } });
+export const createUser = async (userName, userEmail, type) => {
+    user = await prisma.user.create({
+        data: {
+            name: userName,
+            email: userEmail,
+            socialType: type,
+        },
+    });
+    return user;
+}
 
-    if (!user) {
-        user = await prisma.user.create({
+export const updateUserLogin = async (id, userName, userEmail, type) => {
+    const user = await prisma.user.update({
+            where: { id: id},
             data: {
                 name: userName,
                 email: userEmail,
                 socialType: type,
             },
-        });
-    } else {
-        user = await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                name: userName,
-                email: userEmail,
-                socialType: type,
-            },
-        });
-    }
-    return { id: user.id, name: user.name, email: user.email, socialType: user.socialType };
-};
+    });
+    return user;
+}
 
 export const getNotification = async (userId, decoded, limit) => {
     const notification = await prisma.notification.findMany({
