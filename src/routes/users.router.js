@@ -5,6 +5,7 @@ import {
     handleInquiry,
     handleViewNotification,
     handleViewMyPage,
+    handleSetNotification,
 } from "../controllers/users.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -15,5 +16,6 @@ router.patch("/me/profiles", authenticateAccessToken, handleModifyUserInfo);
 router.get("/me/notification", authenticateAccessToken, handleViewNotification);
 router.post("/inquiry", handleInquiry);
 router.get("/:ownId", authenticateAccessToken, handleViewMyPage);
+router.patch("/notification-settings", authenticateAccessToken, handleSetNotification);
 
 export default router;

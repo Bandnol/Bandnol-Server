@@ -6,8 +6,15 @@ import {
     CursorError,
     AuthError,
     NotFoundOwnIdError,
+    RequestBodyError,
 } from "../errors.js";
-import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
+import {
+    getUserById,
+    getUserByOwnId,
+    modifyUser,
+    getNotification,
+    updateNotificationSetting,
+} from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 
 export const checkOwnId = async (userOwnId) => {
@@ -123,4 +130,20 @@ export const viewMyPage = async (userId, ownId) => {
     } else {
         return getMyPageResponseDTO(other);
     }
+};
+
+export const setNotification = async (userId, body) => {
+    const allowedKeys = ["recomsSent", "recomsReceived", "commentArrived", "notRecoms", "announcement"];
+
+    for (const key in body) {
+        if (!allowedKeys.includes(key)) {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+
+        if (typeof body[key] !== "boolean") {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+    }
+    const updated = await updateNotificationSetting(userId, body);
+    return updated;
 };
