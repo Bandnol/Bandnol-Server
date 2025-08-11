@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa"; 
+import { TokenError } from "../errors.js";
 
 export const getKakaoUser = async (idToken) => {
   const client = jwksClient({
@@ -7,6 +8,9 @@ export const getKakaoUser = async (idToken) => {
   });
 
   const decodedHeader = jwt.decode(idToken, { complete: true });
+  if (!decodedHeader || !decodedHeader.header) {
+    throw new TokenError("잘못된 토큰 형식입니다.");
+  }
   const kid = decodedHeader.header.kid;
 
   const key = await client.getSigningKey(kid);

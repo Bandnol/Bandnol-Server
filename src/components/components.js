@@ -471,5 +471,26 @@ export default {
                 },
             },
         },
+        AlreadyInactiveError: {
+            description: "이미 비활성화인 상태의 유저를 회원탈퇴 시킬 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "R200" },
+                                    message: { type: "string", example: "이미 비활성화 상태인 사용자입니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
 };

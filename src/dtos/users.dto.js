@@ -28,3 +28,13 @@ export const getMyPageResponseDTO = (data) => {
         bio: data.bio
     };
 };
+
+export const withdrawResponseDTO = (data) => {
+    const kstDate = data.inactiveAt!==null ? new Date(data.inactiveAt.getTime() + 9 * 60 * 60 * 1000): null;
+    
+    return {
+        id: data.id,
+        inactiveAt: kstDate,
+        inactiveStatus: data.inactiveStatus
+    }
+}
