@@ -129,11 +129,11 @@ export const handleWithdraw = async (req, res, next) => {
         $ref: "#/components/responses/TokenError"
     };
 
-    #swagger.response[404] = {
+    #swagger.responses[404] = {
         $ref: "#/components/responses/NoUserError"
     };
 
-    #swagger.response[409] = {
+    #swagger.responses[409] = {
         $ref: "#/components/responses/AlreadyInactiveError"
     };
    */
