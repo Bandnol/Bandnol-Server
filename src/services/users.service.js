@@ -90,7 +90,6 @@ export const viewNotification = async (userId, cursor) => {
     if (cursor) {
         try {
             decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-            console.log(decoded);
         } catch (err) {
             throw new CursorError("커서가 잘못되었습니다.");
         }
@@ -106,14 +105,12 @@ export const viewNotification = async (userId, cursor) => {
     if (data.length > limit) {
         hasNext = true;
         data = data.slice(0, limit);
-        console.log(data[limit - 1].createdAt);
         const nextCursorData = {
             createdAt: data[limit - 1].createdAt,
             id: data[limit - 1].id,
         };
         nextCursor = Buffer.from(JSON.stringify(nextCursorData)).toString("base64");
     }
-
     return notificationResponseDTO(data, hasNext, nextCursor);
 };
 

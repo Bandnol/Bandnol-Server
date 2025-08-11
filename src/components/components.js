@@ -1,5 +1,3 @@
-import { NoReplyError, NotFoundArtistsError } from "../errors.js";
-
 export default {
     responses: {
         Success: {
@@ -464,6 +462,48 @@ export default {
                                 properties: {
                                     code: { type: "string", example: "R1304" },
                                     message: { type: "string", example: "답장이 없습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        InvalidHeaderError: {
+            description: "요청의 헤더가 올바르지 않을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "E1003" },
+                                    message: { type: "string", example: "헤더가 올바르지 않습니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        InvalidSignatureError: {
+            description: "서명이 올바르지 않을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "E1004" },
+                                    message: { type: "string", example: "유효하지 않은 서명입니다." },
                                 },
                             },
                         },

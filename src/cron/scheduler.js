@@ -59,12 +59,9 @@ export const songScheduler = async () => {
                     let tokens = await getExpoTokens(result.senderId);
                     let body = `내가 추천한 곡이 ${result.receiver.nickname} 님에게 전달됐어요.`;
 
-                    sendPushNotification(
-                        tokens,
-                        "추천곡이 전달됐어요!",
-                        body,
-                        "bandnol://music-recommend/sendRecommend"
-                    );
+                    await sendPushNotification(tokens, "추천곡이 전달됐어요!", body, {
+                        link: "bandnol://music-recommend/sendRecommend",
+                    });
 
                     // 알림 센터에 저장(link 정해지면 수정 필요)
                     let notification = createNotifications(
@@ -81,12 +78,9 @@ export const songScheduler = async () => {
                 if (receiverNotification?.recomsReceived) {
                     let tokens = await getExpoTokens(result.receiverId);
 
-                    sendPushNotification(
-                        tokens,
-                        "띵동~ 오늘의 추천곡이 도착했어요!",
-                        `지금 바로 확인해보세요.`,
-                        "bandnol://music-recommend/receiveRecommend"
-                    );
+                    await sendPushNotification(tokens, "띵동~ 오늘의 추천곡이 도착했어요!", `지금 바로 확인해보세요.`, {
+                        link: "bandnol://music-recommend/receiveRecommend",
+                    });
 
                     // link 정해지면 수정 필요
                     let notification = createNotifications(
@@ -184,7 +178,7 @@ export const notReadScheduler = async () => {
                     if (!tokens || tokens.length === 0) continue;
 
                     try {
-                        await sendPushNotification(tokens, title, body, link);
+                        await sendPushNotification(tokens, title, body, { link: link });
                     } catch (e) {
                         console.error(`[notReadScheduler] push fail user=${userId}`, e);
                         continue;

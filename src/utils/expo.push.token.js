@@ -1,27 +1,44 @@
-export const sendPushNotification = async (expoPushToken, title, body, data) => {
-    const message = {
-        to: expoPushToken,
-        sound: "default",
-        title: title,
-        body: body,
-        data: data,
-    };
-
-    try {
-        const response = await fetch("https://exp.host/--/api/v2/push/send", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Accept-encoding": "gzip, deflate",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(message),
-        });
-        const result = await response.json();
-        console.log("Push notification sent:", result);
-        // result 객체 예시: { data: { status: 'ok', id: '...' } }
-        // status가 'error'인 경우 details 객체에 오류 정보 포함
-    } catch (error) {
-        console.error("Error sending push notification:", error);
-    }
+const chunk = (arr, size) => {
+    const out = [];
+    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+    return out;
 };
+
+export async function sendPushNotification(token, title, body, data) {
+    const tokens = Array.isArray(token) ? token : [token];
+    if (tokens.length === 0) {
+        return;
+    }
+    const payloadData = data && typeof data === "object" && !Array.isArray(data) ? data : {};
+
+    const batches = chunk(tokens, 100);
+
+    for (let i = 0; i < batches.length; i++) {
+        const batch = batches[i];
+        console.log(batch);
+
+        const messages = batch.map((to) => ({
+            to,
+            sound: "default",
+            title,
+            body,
+            data: payloadData,
+        }));
+
+        try {
+            const res = await fetch("https://exp.host/--/api/v2/push/send", {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify(messages),
+            });
+            const raw = await res.text();
+            const json = JSON.parse(raw);
+            console.log(json);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+}

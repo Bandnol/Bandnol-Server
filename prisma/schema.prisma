@@ -10,7 +10,7 @@ datasource db {
 model UserLikedArtist {
   id             String    @id @unique @default(uuid())
   createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  updatedAt      DateTime? @updatedAt @map("updated_at")
   artistId       String    @map("artist_id")
   userId         String    @map("user_id")
   inactiveAt     DateTime? @map("inactive_at")
@@ -22,10 +22,10 @@ model UserLikedArtist {
 }
 
 model Inquiry {
-  id        String   @id @unique @default(uuid())
-  email     String   @db.VarChar(100)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        String    @id @unique @default(uuid())
+  email     String    @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
   content   String
   name      String
 
@@ -67,16 +67,16 @@ model Artist {
 model Notification {
   id          String     @id @unique @default(uuid())
   createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  updatedAt   DateTime?  @updatedAt @map("updated_at")
   receiverId  String     @map("receiver_id")
   isConfirmed Boolean    @default(false) @map("is_confirmed")
   link        String?
   senderId    String?    @map("sender_id")
   type        NoticeType
-  content     String?
   receiver    User       @relation("NotificationReceiver", fields: [receiverId], references: [id])
   sender      User?      @relation("NotificationSender", fields: [senderId], references: [id])
 
+  @@index([receiverId, createdAt(sort: Desc), id(sort: Desc)], map: "idx_notification_receiver_created_id")
   @@map("notification")
 }
 
@@ -84,7 +84,7 @@ model RecomsReply {
   id               String         @id @unique @default(uuid())
   content          String
   createdAt        DateTime       @default(now()) @map("created_at")
-  updatedAt        DateTime       @updatedAt @map("updated_at")
+  updatedAt        DateTime?      @updatedAt @map("updated_at")
   userRecomsSongId String         @unique @map("user_recoms_song_id")
   responderId      String         @map("responder_id")
   responder        User           @relation(fields: [responderId], references: [id])
@@ -113,31 +113,32 @@ model UserRecomsSong {
 }
 
 model User {
-  id              String            @id @unique @default(uuid())
-  socialType      SocialType        @map("social_type")
-  nickname        String?           @db.VarChar(40)
-  birth           DateTime?
-  gender          Gender?           @default(MAN)
-  photo           String?
-  bio             String?
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime?         @updatedAt @map("updated_at")
-  inactiveAt      DateTime?         @map("inactive_at")
-  inactiveStatus  Boolean           @default(false) @map("inactive_status")
-  backgroundImg   String?           @map("background_img")
-  ownId           String?           @unique @map("own_id")
-  recomsTime      String            @default("0900") @map("recoms_time")
-  email           String
-  name            String
-  isDelivered     Boolean           @default(false) @map("is_delivered")
-  expoPushTokens  ExpoPushToken[]
-  receivedNotices Notification[]    @relation("NotificationReceiver")
-  sentNotices     Notification[]    @relation("NotificationSender")
-  notifications   NotificationType?
-  recomsReplies   RecomsReply[]
-  likedArtist     UserLikedArtist[]
-  receivedRecoms  UserRecomsSong[]  @relation("UserReceivedRecom")
-  sentRecoms      UserRecomsSong[]  @relation("UserSentRecom")
+  id                 String             @id @unique @default(uuid())
+  socialType         SocialType         @map("social_type")
+  nickname           String?            @db.VarChar(40)
+  birth              DateTime?
+  gender             Gender?            @default(MAN)
+  photo              String?
+  bio                String?
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime?          @updatedAt @map("updated_at")
+  inactiveAt         DateTime?          @map("inactive_at")
+  inactiveStatus     Boolean            @default(false) @map("inactive_status")
+  backgroundImg      String?            @map("background_img")
+  ownId              String?            @unique @map("own_id")
+  recomsTime         String             @default("0900") @map("recoms_time")
+  email              String
+  name               String
+  isDelivered        Boolean            @default(false) @map("is_delivered")
+  expoPushTokens     ExpoPushToken[]
+  receivedNotices    Notification[]     @relation("NotificationReceiver")
+  sentNotices        Notification[]     @relation("NotificationSender")
+  notifications      NotificationType?
+  recomsReplies      RecomsReply[]
+  announcementStates UserAnnouncement[]
+  likedArtist        UserLikedArtist[]
+  receivedRecoms     UserRecomsSong[]   @relation("UserReceivedRecom")
+  sentRecoms         UserRecomsSong[]   @relation("UserSentRecom")
 
   @@index([isDelivered, recomsTime])
   @@map("user")
@@ -173,6 +174,30 @@ model NotificationType {
   user           User    @relation(fields: [userId], references: [id])
 
   @@map("notification_type")
+}
+
+model Announcement {
+  id               String             @id @unique @default(uuid())
+  content          String
+  createdAt        DateTime           @default(now()) @map("created_at")
+  userAnnouncement UserAnnouncement[]
+
+  @@index([createdAt(sort: Desc), id(sort: Desc)], map: "idx_announcement_created_id")
+  @@map("announcement")
+}
+
+model UserAnnouncement {
+  id             String       @id @unique @default(uuid())
+  updatedAt      DateTime?    @updatedAt @map("updated_at")
+  announcementId String       @map("announcement_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  isConfirmed    Boolean      @default(false) @map("is_confirmed")
+  userId         String       @map("user_id")
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@index([announcementId, userId], map: "idx_uas_announcement_user")
+  @@map("user_announcement")
 }
 
 enum Gender {

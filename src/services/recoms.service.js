@@ -211,7 +211,9 @@ export const sendReplies = async (recomsId, userId, content) => {
         if (senderNotification?.commentArrived) {
             const tokens = await getExpoTokens(senderId);
             const body = `띵동~ 오늘의 추천곡에 대한 ${data.responder.nickname} 님의 코멘트가 도착했어요!`;
-            sendPushNotification(tokens, "코멘트 도착!", body, "bandnol://music-recommend/sendRecommend");
+            await sendPushNotification(tokens, "코멘트 도착!", body, {
+                link: "bandnol://music-recommend/sendRecommend",
+            });
 
             // 알림 테이블에 저장 (링크 추후 수정)
             const notification = await createNotifications(
