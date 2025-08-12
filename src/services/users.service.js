@@ -7,6 +7,8 @@ import {
     AuthError,
     NotFoundOwnIdError,
     RequestBodyError,
+    NotFoundNotificationError,
+    DuplicateRecomsError,
 } from "../errors.js";
 import {
     getUserById,
@@ -15,8 +17,11 @@ import {
     getNotification,
     createExpoToken,
     updateNotificationSetting,
+    createUserAnnouncement,
+    updateNotification,
 } from "../repositories/users.repository.js";
-import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
+import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
+import { Prisma } from "@prisma/client";
 import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
 
 export const checkOwnId = async (userOwnId) => {
@@ -241,3 +246,26 @@ export const setNotification = async (userId, body) => {
     return updated;
 };
 
+export const modifyNotification = async (userId, notificationId, body) => {
+    try {
+        if (!["RECOMS_RECEIVED", "RECOMS_SENT", "COMMENT_ARRIVED", "NOT_RECOMS", "ANNOUNCEMENT"].includes(body?.type)) {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+
+        let updated;
+        if (body.type === "ANNOUNCEMENT") {
+            updated = await createUserAnnouncement(userId, notificationId);
+        } else {
+            updated = await updateNotification(userId, notificationId);
+        }
+
+        return isConfirmedResponseDTO(notificationId, updated);
+    } catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            switch (err.code) {
+                case "P2025":
+                    throw new NotFoundNotificationError("알림 ID가 잘못되었거나 이미 읽음 처리된 알림입니다.");
+            }
+        }
+    }
+};

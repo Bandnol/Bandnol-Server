@@ -6,6 +6,7 @@ import {
     viewMyPage,
     setNotification,
     saveExpoToken,
+    modifyNotification,
     modifyMypage
 } from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
@@ -315,15 +316,19 @@ export const handleSetNotification = async (req, res, next) => {
 export const handleSaveExpoToken = async (req, res, next) => {
     /*
     #swagger.summary = 'FCM 토큰 저장 API'
+
     #swagger.security = [{
         bearerAuth: []
     }]
+
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
+
     #swagger.responses[400] = {
         $ref: "#/components/responses/RequestBodyError"
     };
+
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
@@ -332,6 +337,54 @@ export const handleSaveExpoToken = async (req, res, next) => {
     try {
         const token = await saveExpoToken(req.user.id, req.body.token);
         res.status(StatusCodes.OK).success(token);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleModifyNotification = async (req, res, next) => {
+    /*
+    #swagger.summary = '알림을 읽음으로 수정하기 API'
+
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["type"],
+            properties: {
+              type: { type: "boolean", example: "NOT_RECOMS" },
+            },
+          }
+        }
+      }
+    };
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/RequestBodyError"
+    };
+
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+
+    #swagger.responses[404] = {
+        $ref: "#/components/responses/NotFoundNotificationError"
+    };
+    */
+
+    try {
+        const updated = await modifyNotification(req.user.id, req.params.notificationId, req.body);
+        res.status(StatusCodes.OK).success(updated);
     } catch (err) {
         next(err);
     }

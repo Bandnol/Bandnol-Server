@@ -8,6 +8,7 @@ import {
     handleModifyMypage,
     handleSaveExpoToken,
     handleSetNotification,
+    handleModifyNotification,
 } from "../controllers/users.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 import { uploadMyPageImages } from "../middlewares/image.uploader.js";
@@ -22,5 +23,6 @@ router.get("/:ownId", authenticateAccessToken, handleViewMyPage);
 router.patch("/me", authenticateAccessToken, uploadMyPageImages, handleModifyMypage);
 router.post("/expo-token", authenticateAccessToken, handleSaveExpoToken);
 router.patch("/notification-settings", authenticateAccessToken, handleSetNotification);
+router.patch("/notification/:notificationId", authenticateAccessToken, handleModifyNotification);
 
 export default router;

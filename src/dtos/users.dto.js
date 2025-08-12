@@ -25,13 +25,13 @@ export const getMyPageResponseDTO = (data) => {
         ownId: data.ownId,
         photo: data.photo,
         backgroundImg: data.backgroundImg,
-        bio: data.bio
+        bio: data.bio,
     };
 };
 
 export const withdrawResponseDTO = (data) => {
-    const kstDate = data.inactiveAt!==null ? new Date(data.inactiveAt.getTime() + 9 * 60 * 60 * 1000): null;
-    
+    const kstDate = data.inactiveAt !== null ? new Date(data.inactiveAt.getTime() + 9 * 60 * 60 * 1000) : null;
+
     return {
         id: data.id,
         inactiveAt: kstDate,
@@ -46,5 +46,12 @@ export const myPageModifyRequestDTO = (body, fileUrls) => {
     return {               
         photo: rmPhoto ? null : (fileUrls.photoUrl ?? undefined),
         backgroundImg: rmBackImg ? null : (fileUrls.backgroundImgUrl ?? undefined),
+    };
+};
+
+export const isConfirmedResponseDTO = (notificationId, updated) => {
+    return {
+        id: notificationId,
+        isConfirmed: updated.isConfirmed,
     };
 };
