@@ -7,6 +7,7 @@ import {
     handleViewMyPage,
     handleSaveExpoToken,
     handleSetNotification,
+    handleModifyNotification,
 } from "../controllers/users.controller.js";
 import { authenticateAccessToken } from "../middlewares/authenticate.jwt.js";
 
@@ -19,5 +20,6 @@ router.post("/inquiry", handleInquiry);
 router.get("/:ownId", authenticateAccessToken, handleViewMyPage);
 router.post("/expo-token", authenticateAccessToken, handleSaveExpoToken);
 router.patch("/notification-settings", authenticateAccessToken, handleSetNotification);
+router.patch("/notification/:notificationId", authenticateAccessToken, handleModifyNotification);
 
 export default router;

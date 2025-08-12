@@ -25,16 +25,23 @@ export const getMyPageResponseDTO = (data) => {
         ownId: data.ownId,
         photo: data.photo,
         backgroundImg: data.backgroundImg,
-        bio: data.bio
+        bio: data.bio,
     };
 };
 
 export const withdrawResponseDTO = (data) => {
-    const kstDate = data.inactiveAt!==null ? new Date(data.inactiveAt.getTime() + 9 * 60 * 60 * 1000): null;
-    
+    const kstDate = data.inactiveAt !== null ? new Date(data.inactiveAt.getTime() + 9 * 60 * 60 * 1000) : null;
+
     return {
         id: data.id,
         inactiveAt: kstDate,
-        inactiveStatus: data.inactiveStatus
-    }
-}
+        inactiveStatus: data.inactiveStatus,
+    };
+};
+
+export const isConfirmedResponseDTO = (notificationId, updated) => {
+    return {
+        id: notificationId,
+        isConfirmed: updated.isConfirmed,
+    };
+};

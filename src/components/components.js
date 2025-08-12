@@ -532,5 +532,29 @@ export default {
                 },
             },
         },
+        NotFoundNotificationError: {
+            description: "알림 ID가 잘못되었거나 이미 읽음 처리된 알림일 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "U1304" },
+                                    message: {
+                                        type: "string",
+                                        example: "알림 ID가 잘못되었거나 이미 읽음 처리된 알림입니다.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
 };

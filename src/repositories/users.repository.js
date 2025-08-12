@@ -16,13 +16,13 @@ export const getUserByOwnId = async (checkingOwnId) => {
 };
 
 export const getUserByEmail = async (userName, userEmail) => {
-    return await prisma.user.findFirst({ 
-        where: { 
+    return await prisma.user.findFirst({
+        where: {
             name: userName,
-            email: userEmail 
-        } 
+            email: userEmail,
+        },
     });
-}
+};
 
 export const modifyUser = async (userId, data) => {
     const updatedUser = await prisma.user.update({
@@ -54,19 +54,19 @@ export const createUser = async (userName, userEmail, type) => {
         },
     });
     return user;
-}
+};
 
 export const updateUserLogin = async (id, userName, userEmail, type) => {
     const user = await prisma.user.update({
-            where: { id: id},
-            data: {
-                name: userName,
-                email: userEmail,
-                socialType: type,
-            },
+        where: { id: id },
+        data: {
+            name: userName,
+            email: userEmail,
+            socialType: type,
+        },
     });
     return user;
-}
+};
 
 export const getNotification = async (userId, decoded, limit = 20) => {
     const pageLimit = Number(limit) + 1;
@@ -117,12 +117,6 @@ export const getNotification = async (userId, decoded, limit = 20) => {
     ORDER BY feed."createdAt" DESC, feed.id DESC
     LIMIT ${pageLimit}
   `;
-};
-
-export const findUserByToken = async (id) => {
-    return await prisma.user.findUnique({
-        where: { id: id },
-    });
 };
 
 export const createExpoToken = async (userId, token) => {
@@ -213,5 +207,39 @@ export const updateNotificationSetting = async (userId, body) => {
     return await prisma.notificationType.update({
         where: { userId: userId },
         data: body,
+    });
+};
+
+export const createUserAnnouncement = async (userId, notificationId) => {
+    const result = await prisma.$transaction(async (tx) => {
+        const notification = await tx.announcement.findFirst({
+            where: { id: notificationId },
+        });
+
+        if (!notification) return;
+
+        const isExisted = await tx.userAnnouncement.findFirst({
+            where: { userId, announcementId: notificationId },
+        });
+
+        if (isExisted) return;
+
+        return await tx.userAnnouncement.create({
+            data: {
+                userId,
+                announcementId: notificationId,
+                isConfirmed: true,
+            },
+        });
+    });
+    return result;
+};
+
+export const updateNotification = async (userId, notificationId) => {
+    return await prisma.notification.update({
+        where: { id: notificationId, receiverId: userId, isConfirmed: false },
+        data: {
+            isConfirmed: true,
+        },
     });
 };

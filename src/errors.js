@@ -25,10 +25,10 @@ export class AlreadyInactiveError extends Error {
     errorcode = "U1200";
     statusCode = 409;
 
-    constructor(reason, data){
+    constructor(reason, data) {
         super(reason);
         this.reason = reason;
-        this.data = data
+        this.data = data;
     }
 }
 
@@ -66,6 +66,17 @@ export class AuthorizationCodeError extends Error {
 
 export class NotFoundOwnIdError extends Error {
     errorCode = "U1303";
+    statusCode = 404;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class NotFoundNotificationError extends Error {
+    errorCode = "U1304";
     statusCode = 404;
 
     constructor(reason, data) {
