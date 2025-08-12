@@ -40,13 +40,11 @@ export const withdrawResponseDTO = (data) => {
 }
 
 export const myPageModifyRequestDTO = (body, fileUrls) => {
-    const removePhoto = body.removePhoto === "true" || body.removePhoto === true;
-    const removeBackgroundImg = body.removeBackgroundImg === "true" || body.removeBackgroundImg === true;
+    const rmPhoto = body.rmPhoto === "true" || body.rmPhoto === true;
+    const rmBackImg = body.rmBackImg === "true" || body.rmBackImg === true;
 
-    return {
-        nickname: body.nickname,                      
-        bio: body.bio ?? undefined,                   
-        photo: removePhoto ? null : (fileUrls.photoUrl ?? undefined),
-        backgroundImg: removeBackgroundImg ? null : (fileUrls.backgroundImgUrl ?? undefined),
+    return {               
+        photo: rmPhoto ? null : (fileUrls.photoUrl ?? undefined),
+        backgroundImg: rmBackImg ? null : (fileUrls.backgroundImgUrl ?? undefined),
     };
 };
