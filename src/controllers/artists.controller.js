@@ -1,13 +1,14 @@
 import { StatusCodes } from "http-status-codes";
-import { 
-  viewRecomArtists, 
-  postLikedArtists, 
-  viewArtistsChannel,
-  viewLikedArtists 
+import {
+    viewRecomArtists,
+    postLikedArtists,
+    viewArtistsChannel,
+    viewLikedArtists,
 } from "../services/artists.service.js";
 
 export const handleViewRecomArtists = async (req, res, next) => {
     /*
+    #swagger.tags = ["Artist"]
     #swagger.summary = '추천 아티스트 채널 목록 조회하기';
     
     #swagger.responses[200] = {
@@ -50,6 +51,7 @@ export const handleViewRecomArtists = async (req, res, next) => {
 
 export const handlePostLikedArtists = async (req, res, next) => {
     /*
+    #swagger.tags = ["Artist"]
     #swagger.summary = '아티스트 즐겨찾기 하기';
 
     #swagger.security = [{
@@ -94,6 +96,7 @@ export const handlePostLikedArtists = async (req, res, next) => {
 
 export const handleViewArtists = async (req, res, next) => {
     /*
+    #swagger.tags = ["Artist"]
     #swagger.summary = '아티스트 채널 조회하기';
 
     #swagger.security = [{
@@ -122,6 +125,7 @@ export const handleViewArtists = async (req, res, next) => {
 
 export const handleViewListLikedArtists = async (req, res, next) => {
     /*
+    #swagger.tags = ["Artist"]
     #swagger.summary = '즐겨찾기한 아티스트 목록 조회하기';
 
     #swagger.security = [{
