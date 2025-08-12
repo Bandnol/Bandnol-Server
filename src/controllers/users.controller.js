@@ -237,17 +237,17 @@ export const handleModifyMypage = async (req, res, next) => {
         const userId = req.user.id;
         const files = req.files || {};
         const fileUrls = {};
-        const removePhoto = req.body.removePhoto;
-        const removeBackgroundImg = req.body.removeBackgroundImg;
+        const rmPhoto = req.body.rmPhoto;
+        const rmBackImg = req.body.rmBackImg;
         console.log(req.body);
-        if (!removePhoto && files.photo?.[0]) {
+        if (!rmPhoto && files.photo?.[0]) {
           const photoFile = files.photo[0];
           const contentType = photoFile.mimetype || mime.lookup(photoFile.originalname) || "image/jpeg";
           const key = makeUserImageKey({ userId, role: "photo", originalName: photoFile.originalname });
           fileUrls.photoUrl = await uploadBufferToS3({ buffer: photoFile.buffer, contentType, key });
         }
 
-        if (!removeBackgroundImg && files.backgroundImg?.[0]) {
+        if (!rmBackImg && files.backgroundImg?.[0]) {
           const backkgroundfile = files.backgroundImg[0];
           const contentType = backkgroundfile.mimetype || mime.lookup(backkgroundfile.originalname) || "image/jpeg";
           const key = makeUserImageKey({ userId, role: "background", originalName: backkgroundfile.originalname });
