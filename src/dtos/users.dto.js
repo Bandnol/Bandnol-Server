@@ -35,7 +35,17 @@ export const withdrawResponseDTO = (data) => {
     return {
         id: data.id,
         inactiveAt: kstDate,
-        inactiveStatus: data.inactiveStatus,
+        inactiveStatus: data.inactiveStatus
+    }
+}
+
+export const myPageModifyRequestDTO = (body, fileUrls) => {
+    const rmPhoto = body.rmPhoto === "true" || body.rmPhoto === true;
+    const rmBackImg = body.rmBackImg === "true" || body.rmBackImg === true;
+
+    return {               
+        photo: rmPhoto ? null : (fileUrls.photoUrl ?? undefined),
+        backgroundImg: rmBackImg ? null : (fileUrls.backgroundImgUrl ?? undefined),
     };
 };
 

@@ -22,6 +22,7 @@ import {
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
 import { Prisma } from "@prisma/client";
+import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
 
 export const checkOwnId = async (userOwnId) => {
     const userData = await getUserByOwnId(userOwnId);
@@ -133,6 +134,96 @@ export const viewMyPage = async (userId, ownId) => {
     } else {
         return getMyPageResponseDTO(other);
     }
+};
+
+export const modifyMypage = async (userId, data) => {
+    const allowedFields = ["photo", "backgroundImg"];
+
+    const user = await getUserById(userId);
+    if (!user) {
+        throw new NoUserError("존재하지 않는 사용자 ID입니다.");
+    }
+
+    const normalize = (key, val) => {
+        if (key === "photo" || key === "backgroundImg") return val === "" ? null : val;
+        return val;
+    };
+
+    const updates = {};
+
+    for (const field of allowedFields) {
+        const value = normalize(field, data[field]);
+        if (value !== undefined && value !== "") {
+            updates[field] = value;
+        }
+    }
+
+    const isValidUrl = (u) => {
+        try {
+            const url = new URL(u);
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch {
+            return false;
+        }
+    };
+
+    for (const key of ["photo", "backgroundImg"]) {
+        if (updates[key] !== undefined && updates[key] !== null) {
+            if (typeof updates[key] !== "string" || !isValidUrl(updates[key])) {
+                throw new InvalidDateTypeError(`${key}는 http(s) URL 또는 null이어야 합니다.`);
+            }
+        }
+    }
+
+    if (Object.keys(updates).length === 0) {
+        throw new NoModifyDataError("수정할 데이터가 없습니다.");
+    }
+
+    const deleteKeys = [];
+
+    for (const key of deleteKeys) {
+        try {
+            await deleteFromS3ByKey(key);
+        } catch (e) {
+            console.error('[S3:delete failed]', { key, msg: e?.message, code: e?.Code || e?.name, http: e?.$metadata?.httpStatusCode });
+        }
+    }
+
+    if ("photo" in updates) {
+        const oldKey = extractS3KeyFromUrl(user.photo);
+
+        if (updates.photo === null && oldKey) deleteKeys.push(oldKey);
+
+        if (typeof updates.photo === "string" && updates.photo !== user.photo && oldKey) {
+            deleteKeys.push(oldKey);
+        }
+    }
+
+    if ("backgroundImg" in updates) {
+        const oldKey = extractS3KeyFromUrl(user.backgroundImg);
+
+        if (updates.backgroundImg === null && oldKey) deleteKeys.push(oldKey);
+        if (typeof updates.backgroundImg === "string" && updates.backgroundImg !== user.backgroundImg && oldKey) {
+            deleteKeys.push(oldKey);
+        }
+    }
+
+    const updated = await modifyUser(user.id, updates);
+
+    for (const key of deleteKeys) {
+        try {
+            await deleteFromS3ByKey(key);
+        } catch (e) {
+            console.error("[S3:delete failed]", {
+            key,
+            msg: e?.message,
+            code: e?.Code || e?.name,
+            http: e?.$metadata?.httpStatusCode,
+            });
+        }
+    }
+
+    return updated;
 };
 
 export const saveExpoToken = async (userId, token) => {
