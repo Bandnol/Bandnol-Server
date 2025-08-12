@@ -7,19 +7,16 @@ import {
     setNotification,
     saveExpoToken,
     modifyNotification,
-    modifyMypage
+    modifyMypage,
 } from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
-import { 
-  userInfoRequestDTO, 
-  myPageModifyRequestDTO, 
-  getMyPageResponseDTO 
-} from "../dtos/users.dto.js";
+import { userInfoRequestDTO, myPageModifyRequestDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 import { uploadBufferToS3, makeUserImageKey } from "../utils/s3.js";
 import mime from "mime-types";
 
 export const handleCheckOwnId = async (req, res, next) => {
     /*
+    #swagger.tags = ["User"]
     #swagger.summary = '유저 아이디 중복 확인하기 API';
 
     #swagger.security = [{
@@ -46,6 +43,7 @@ export const handleCheckOwnId = async (req, res, next) => {
 
 export const handleModifyUserInfo = async (req, res, next) => {
     /*
+    #swagger.tags = ["User"]
     #swagger.summary = '회원 정보 수정 API';
 
     #swagger.security = [{
@@ -101,6 +99,7 @@ export const handleModifyUserInfo = async (req, res, next) => {
 
 export const handleInquiry = async (req, res, next) => {
     /*
+    #swagger.tags = ["User"]
     #swagger.summary = '문의하기 API';
 
     #swagger.requestBody = {
@@ -141,6 +140,7 @@ export const handleInquiry = async (req, res, next) => {
 
 export const handleViewNotification = async (req, res, next) => {
     /*
+    #swagger.tags = ["Notice"]
     #swagger.summary = '알림 센터 조회 API'
 
     #swagger.security = [{
@@ -174,6 +174,7 @@ export const handleViewNotification = async (req, res, next) => {
 
 export const handleViewMyPage = async (req, res, next) => {
     /*
+    #swagger.tags = ["User"]
     #swagger.summary = '마이페이지 조회 API'
 
     #swagger.security = [{
@@ -199,6 +200,7 @@ export const handleViewMyPage = async (req, res, next) => {
 
 export const handleModifyMypage = async (req, res, next) => {
     /*
+    #swagger.tags = ["User"]
     #swagger.summary = '마이페이지 수정 API';
 
     #swagger.security = [{
@@ -244,30 +246,31 @@ export const handleModifyMypage = async (req, res, next) => {
         const rmBackImg = req.body.rmBackImg;
         console.log(req.body);
         if (!rmPhoto && files.photo?.[0]) {
-          const photoFile = files.photo[0];
-          const contentType = photoFile.mimetype || mime.lookup(photoFile.originalname) || "image/jpeg";
-          const key = makeUserImageKey({ userId, role: "photo", originalName: photoFile.originalname });
-          fileUrls.photoUrl = await uploadBufferToS3({ buffer: photoFile.buffer, contentType, key });
+            const photoFile = files.photo[0];
+            const contentType = photoFile.mimetype || mime.lookup(photoFile.originalname) || "image/jpeg";
+            const key = makeUserImageKey({ userId, role: "photo", originalName: photoFile.originalname });
+            fileUrls.photoUrl = await uploadBufferToS3({ buffer: photoFile.buffer, contentType, key });
         }
 
         if (!rmBackImg && files.backgroundImg?.[0]) {
-          const backImgFile = files.backgroundImg[0];
-          const contentType = backImgFile.mimetype || mime.lookup(backImgFile.originalname) || "image/jpeg";
-          const key = makeUserImageKey({ userId, role: "background", originalName: backImgFile.originalname });
-          fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backImgFile.buffer, contentType, key });
+            const backImgFile = files.backgroundImg[0];
+            const contentType = backImgFile.mimetype || mime.lookup(backImgFile.originalname) || "image/jpeg";
+            const key = makeUserImageKey({ userId, role: "background", originalName: backImgFile.originalname });
+            fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backImgFile.buffer, contentType, key });
         }
 
         const dto = myPageModifyRequestDTO(req.body, fileUrls);
 
         const updated = await modifyMypage(userId, dto);
         res.status(StatusCodes.OK).success(getMyPageResponseDTO(updated));
-        } catch (err) {
-          next(err);
+    } catch (err) {
+        next(err);
     }
 };
 
 export const handleSetNotification = async (req, res, next) => {
     /*
+    #swagger.tags = ["Notice"]
     #swagger.summary = '알림 설정 API'
     
     #swagger.security = [{
@@ -315,7 +318,8 @@ export const handleSetNotification = async (req, res, next) => {
 
 export const handleSaveExpoToken = async (req, res, next) => {
     /*
-    #swagger.summary = 'FCM 토큰 저장 API'
+    #swagger.tags = ["Notice"]
+    #swagger.summary = 'Expo 토큰 저장 API'
 
     #swagger.security = [{
         bearerAuth: []
@@ -344,6 +348,7 @@ export const handleSaveExpoToken = async (req, res, next) => {
 
 export const handleModifyNotification = async (req, res, next) => {
     /*
+    #swagger.tags = ["Notice"]
     #swagger.summary = '알림을 읽음으로 수정하기 API'
 
     #swagger.security = [{

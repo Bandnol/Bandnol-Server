@@ -17,6 +17,7 @@ import { genAIComment } from "../services/gemini.service.js";
 
 export const handleAllTracks = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = 'iTunes API 이용하여 추천할 노래 검색하기';
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
@@ -35,6 +36,7 @@ export const handleAllTracks = async (req, res, next) => {
 
 export const handleSentRecomsSong = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '발신한 추천 곡 조회 API'
 
     #swagger.security = [{
@@ -60,6 +62,7 @@ export const handleSentRecomsSong = async (req, res, next) => {
 
 export const handleReceivedRecomsSong = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '수신한 추천 곡 조회 API'
 
     #swagger.security = [{
@@ -85,6 +88,7 @@ export const handleReceivedRecomsSong = async (req, res, next) => {
 
 export const handleSearchRecomSong = async (req, res, next) => {
     /*
+        #swagger.tags = ["Recommend"]
         #swagger.summary = '추천 기록 검색 API'
 
         #swagger.security = [{
@@ -118,6 +122,7 @@ export const handleSearchRecomSong = async (req, res, next) => {
 
 export const handleViewComments = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '코멘트 조회 API'
 
     #swagger.security = [{
@@ -151,6 +156,7 @@ export const handleViewComments = async (req, res, next) => {
 
 export const handleModifyLikeStatus = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '추천 곡에 좋아요/별로예요 누르기 API'
 
     #swagger.security = [{
@@ -184,6 +190,7 @@ export const handleModifyLikeStatus = async (req, res, next) => {
 
 export const handleViewReplies = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '답장 조회 API'
 
     #swagger.security = [{
@@ -217,6 +224,7 @@ export const handleViewReplies = async (req, res, next) => {
 
 export const handleAddRecoms = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '노래 추천하기 API'
 
     #swagger.security = [{
@@ -272,6 +280,7 @@ export const handleAddRecoms = async (req, res, next) => {
 
 export const handleAIComment = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = 'AI를 이용하여 코멘트 작성하기 API'
 
     #swagger.security = [{
@@ -317,6 +326,7 @@ export const handleAIComment = async (req, res, next) => {
 
 export const handleCalendarRecomSong = async (req, res, next) => {
     /*
+        #swagger.tags = ["Recommend"]
         #swagger.summary = '추천 기록 캘린더 조회 API'
 
         #swagger.security = [{
@@ -355,6 +365,7 @@ export const handleCalendarRecomSong = async (req, res, next) => {
 
 export const handleSendReplies = async (req, res, next) => {
     /*
+    #swagger.tags = ["Recommend"]
     #swagger.summary = '답장 전송 API'
 
     #swagger.security = [{
@@ -392,6 +403,7 @@ export const handleSendReplies = async (req, res, next) => {
 
 export const handleListRecomSong = async (req, res, next) => {
     /*
+        #swagger.tags = ["Recommend"]
         #swagger.summary = '추천 기록 리스트 조회 API'
 
         #swagger.security = [{

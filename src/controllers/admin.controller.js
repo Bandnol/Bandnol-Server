@@ -3,6 +3,7 @@ import { adminSendNotifications } from "../services/admin.service.js";
 
 export const handleAdminSendNotifications = async (req, res, next) => {
     /*
+    #swagger.tags = ["Admin"]
     #swagger.summary = '관리자용 알림 발송 API';
     
     #swagger.responses[200] = {
