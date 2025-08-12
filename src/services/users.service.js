@@ -6,8 +6,16 @@ import {
     CursorError,
     AuthError,
     NotFoundOwnIdError,
+    RequestBodyError,
 } from "../errors.js";
-import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
+import {
+    getUserById,
+    getUserByOwnId,
+    modifyUser,
+    getNotification,
+    createExpoToken,
+    updateNotificationSetting,
+} from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
 
@@ -84,7 +92,6 @@ export const viewNotification = async (userId, cursor) => {
     if (cursor) {
         try {
             decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-            console.log(decoded);
         } catch (err) {
             throw new CursorError("커서가 잘못되었습니다.");
         }
@@ -100,14 +107,12 @@ export const viewNotification = async (userId, cursor) => {
     if (data.length > limit) {
         hasNext = true;
         data = data.slice(0, limit);
-        console.log(data[limit - 1].createdAt);
         const nextCursorData = {
             createdAt: data[limit - 1].createdAt,
             id: data[limit - 1].id,
         };
         nextCursor = Buffer.from(JSON.stringify(nextCursorData)).toString("base64");
     }
-
     return notificationResponseDTO(data, hasNext, nextCursor);
 };
 
@@ -215,3 +220,24 @@ export const modifyMypage = async (userId, data) => {
 
     return updated;
 };
+
+export const saveExpoToken = async (userId, token) => {
+    if (!token) {
+        throw new RequestBodyError("잘못된 Request body 형식입니다.");
+    }
+    const created = await createExpoToken(userId, token);
+    return created;
+};
+
+export const setNotification = async (userId, body) => {
+    const allowedKeys = ["recomsSent", "recomsReceived", "commentArrived", "notRecoms", "announcement"];
+
+    for (const key in body) {
+        if (!allowedKeys.includes(key) || typeof body[key] !== "boolean") {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+    }
+    const updated = await updateNotificationSetting(userId, body);
+    return updated;
+};
+

@@ -300,3 +300,25 @@ export class SchedulerError extends Error {
         this.data = data;
     }
 }
+
+export class InvalidHeaderError extends Error {
+    errorCode = "E1003";
+    statusCode = 401;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class InvalidSignatureError extends Error {
+    errorCode = "E1004";
+    statusCode = 401;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}

@@ -34,10 +34,10 @@ export const genAIComment = async (data, userId) => {
 };
 
 export const genAIAutoRecoms = async () => {
-    const prompt = `국내 인디 밴드 하나를 추천해줘(한글 이름만 반환, 특수기호 제외).
-    자꾸 새소년만 추천하지 말고 다른 아티스트들도 추천해줬으면 좋겠어.
-    그리고 이 그룹의 노래를 왜 추천하는지 친근하게 한 줄 이내로 코멘트를 작성해줘.
-    밴드 이름과 코멘트는 '/' 기호로 분리해줘`;
+    const prompt = `국내 인디 밴드 한 팀을 추천해줘. (밴드 이름은 한글만, 특수기호 없이 작성)
+    최근에 추천했던 아티스트는 제외하고, 다양한 팀을 골라줘.
+    이 밴드의 노래를 듣는 걸 추천하는 이유를 친근하게 한 줄로 덧붙여줘.
+    밴드 이름과 코멘트는 '/'로 구분해줘.`;
 
     try {
         const result = await model.generateContent(prompt);
