@@ -93,17 +93,24 @@ export const getNotification = async (userId, decoded, limit) => {
 };
 
 export const findUserByToken = async (id) => {
-    return await prisma.user.findUnique({ 
-        where: { id: id } 
+    return await prisma.user.findUnique({
+        where: { id: id },
     });
-}
+};
 
 export const modifyUserStatus = async (id, status) => {
     return await prisma.user.update({
-        where: {id: id},
+        where: { id: id },
         data: {
             inactiveStatus: status,
-            inactiveAt: status ? new Date() : null // "YYYY-MM-DD"
-        }
-    })
-}
+            inactiveAt: status ? new Date() : null, // "YYYY-MM-DD"
+        },
+    });
+};
+
+export const updateNotificationSetting = async (userId, body) => {
+    return await prisma.notificationType.update({
+        where: { userId: userId },
+        data: body,
+    });
+};
