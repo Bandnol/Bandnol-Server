@@ -76,9 +76,9 @@ export const addRecoms = async (data, userId) => {
 
     // 오늘 추천한 적 있는지 확인
     const existUser = await getSenderToday(userId);
-    if (existUser) {
-        throw new DuplicateRecomsError("오늘은 이미 노래를 추천하셨습니다.");
-    }
+    // if (existUser) {
+    //     throw new DuplicateRecomsError("오늘은 이미 노래를 추천하셨습니다.");
+    // }
 
     // recomsSong 테이블에 데이터 생성
     let recomsSong = await getRecomsSong(data.id);
