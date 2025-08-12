@@ -127,7 +127,7 @@ export const viewMyPage = async (userId, ownId) => {
 };
 
 export const modifyMypage = async (userId, data) => {
-    const allowedFields = ["nickname", "bio", "photo", "backgroundImg"];
+    const allowedFields = ["photo", "backgroundImg"];
 
     const user = await getUserById(userId);
     if (!user) {
@@ -136,8 +136,6 @@ export const modifyMypage = async (userId, data) => {
 
     const normalize = (key, val) => {
         if (val === undefined) return undefined;
-        if (key === "nickname") return typeof val === "string" && val.trim() !== "" ? val.trim() : undefined;
-        if (key === "bio") return val === "" ? null : val; // bio는 "" 보내면 null로 초기화
         if (key === "photo" || key === "backgroundImg") return val === "" ? null : val;
         return val;
     };
@@ -149,10 +147,6 @@ export const modifyMypage = async (userId, data) => {
         if (value !== undefined && value !== "") {
             updates[field] = value;
         }
-    }
-
-    if (updates.nickname && (updates.nickname.length < 1 || updates.nickname.length > 40)) {
-        throw new InvalidDateTypeError("닉네임은 1~40자여야 합니다.");
     }
 
     const isValidUrl = (u) => {

@@ -248,10 +248,10 @@ export const handleModifyMypage = async (req, res, next) => {
         }
 
         if (!rmBackImg && files.backgroundImg?.[0]) {
-          const backkgroundfile = files.backgroundImg[0];
-          const contentType = backkgroundfile.mimetype || mime.lookup(backkgroundfile.originalname) || "image/jpeg";
-          const key = makeUserImageKey({ userId, role: "background", originalName: backkgroundfile.originalname });
-          fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backkgroundfile.buffer, contentType, key });
+          const backImgFile = files.backgroundImg[0];
+          const contentType = backImgFile.mimetype || mime.lookup(backImgFile.originalname) || "image/jpeg";
+          const key = makeUserImageKey({ userId, role: "background", originalName: backImgFile.originalname });
+          fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backImgFile.buffer, contentType, key });
         }
 
         const dto = myPageModifyRequestDTO(req.body, fileUrls);
