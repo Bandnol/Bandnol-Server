@@ -15,6 +15,15 @@ export const getUserByOwnId = async (checkingOwnId) => {
     return userData;
 };
 
+export const getUserByEmail = async (userName, userEmail) => {
+    return await prisma.user.findFirst({ 
+        where: { 
+            name: userName,
+            email: userEmail 
+        } 
+    });
+}
+
 export const modifyUser = async (userId, data) => {
     const updatedUser = await prisma.user.update({
         where: { id: userId },
@@ -36,29 +45,28 @@ export const createInquiry = async (userName, userEmail, text) => {
     return newInquiry.id;
 };
 
-export const findOrCreateUser = async (userName, userEmail, type) => {
-    let user = await prisma.user.findFirst({ where: { email: userEmail } });
+export const createUser = async (userName, userEmail, type) => {
+    user = await prisma.user.create({
+        data: {
+            name: userName,
+            email: userEmail,
+            socialType: type,
+        },
+    });
+    return user;
+}
 
-    if (!user) {
-        user = await prisma.user.create({
+export const updateUserLogin = async (id, userName, userEmail, type) => {
+    const user = await prisma.user.update({
+            where: { id: id},
             data: {
                 name: userName,
                 email: userEmail,
                 socialType: type,
             },
-        });
-    } else {
-        user = await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                name: userName,
-                email: userEmail,
-                socialType: type,
-            },
-        });
-    }
-    return { id: user.id, name: user.name, email: user.email, socialType: user.socialType };
-};
+    });
+    return user;
+}
 
 export const getNotification = async (userId, decoded, limit = 20) => {
     const pageLimit = Number(limit) + 1;
@@ -183,4 +191,27 @@ export const getAllowedAnnouncement = async () => {
         select: { userId: true },
     });
     return result;
+};
+
+export const findUserByToken = async (id) => {
+    return await prisma.user.findUnique({
+        where: { id: id },
+    });
+};
+
+export const modifyUserStatus = async (id, status) => {
+    return await prisma.user.update({
+        where: { id: id },
+        data: {
+            inactiveStatus: status,
+            inactiveAt: status ? new Date() : null, // "YYYY-MM-DD"
+        },
+    });
+};
+
+export const updateNotificationSetting = async (userId, body) => {
+    return await prisma.notificationType.update({
+        where: { userId: userId },
+        data: body,
+    });
 };

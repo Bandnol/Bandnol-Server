@@ -14,6 +14,7 @@ import {
     modifyUser,
     getNotification,
     createExpoToken,
+    updateNotificationSetting,
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
 
@@ -135,4 +136,16 @@ export const saveExpoToken = async (userId, token) => {
     }
     const created = await createExpoToken(userId, token);
     return created;
+};
+
+export const setNotification = async (userId, body) => {
+    const allowedKeys = ["recomsSent", "recomsReceived", "commentArrived", "notRecoms", "announcement"];
+
+    for (const key in body) {
+        if (!allowedKeys.includes(key) || typeof body[key] !== "boolean") {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+    }
+    const updated = await updateNotificationSetting(userId, body);
+    return updated;
 };

@@ -21,6 +21,17 @@ export class InvalidEmailTypeError extends Error {
     }
 }
 
+export class AlreadyInactiveError extends Error {
+    errorcode = "U1200";
+    statusCode = 409;
+
+    constructor(reason, data){
+        super(reason);
+        this.reason = reason;
+        this.data = data
+    }
+}
+
 export class NotSupportedSocialLoginError extends Error {
     errorCode = "U1300";
     statusCode = 401;

@@ -1,5 +1,12 @@
 import { StatusCodes } from "http-status-codes";
-import { checkOwnId, modifyUserInfo, viewNotification, viewMyPage, saveExpoToken } from "../services/users.service.js";
+import {
+    checkOwnId,
+    modifyUserInfo,
+    viewNotification,
+    viewMyPage,
+    setNotification,
+    saveExpoToken
+} from "../services/users.service.js";
 import { sendEmail } from "../services/nodemailer.service.js";
 import { userInfoRequestDTO } from "../dtos/users.dto.js";
 
@@ -182,13 +189,31 @@ export const handleViewMyPage = async (req, res, next) => {
     }
 };
 
-export const handleSaveExpoToken = async (req, res, next) => {
+export const handleSetNotification = async (req, res, next) => {
     /*
-    #swagger.summary = 'FCM 토큰 저장 API'
+    #swagger.summary = '알림 설정 API'
 
     #swagger.security = [{
         bearerAuth: []
     }]
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              recomsSent: { type: "boolean", example: true },
+              recomsReceived: { type: "boolean", example: true },
+              commentArrived: { type: "boolean", example: true },
+              notRecoms: { type: "boolean", example: true },
+              announcement: { type: "boolean", example: true }
+            },
+          }
+        }
+      }
+    };
 
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
@@ -198,6 +223,31 @@ export const handleSaveExpoToken = async (req, res, next) => {
         $ref: "#/components/responses/RequestBodyError"
     };
 
+    #swagger.responses[401] = {
+        $ref: "#/components/responses/TokenError"
+    };
+    */
+
+    try {
+        const setting = await setNotification(req.user.id, req.body);
+        res.status(StatusCodes.OK).success(setting);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const handleSaveExpoToken = async (req, res, next) => {
+    /*
+    #swagger.summary = 'FCM 토큰 저장 API'
+    #swagger.security = [{
+        bearerAuth: []
+    }]
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+    #swagger.responses[400] = {
+        $ref: "#/components/responses/RequestBodyError"
+    };
     #swagger.responses[401] = {
         $ref: "#/components/responses/TokenError"
     };
