@@ -135,7 +135,6 @@ export const modifyMypage = async (userId, data) => {
     }
 
     const normalize = (key, val) => {
-        if (val === undefined) return undefined;
         if (key === "photo" || key === "backgroundImg") return val === "" ? null : val;
         return val;
     };
