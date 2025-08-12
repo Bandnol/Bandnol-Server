@@ -9,7 +9,12 @@ import session from "express-session";
 import passport from "passport";
 import { prisma } from "./configs/db.config.js";
 import components from "./components/components.js";
-import { resetIsDeliveredScheduler, songScheduler, deleteUserLikedArtistScheduler } from "./cron/scheduler.js";
+import {
+    resetIsDeliveredScheduler,
+    songScheduler,
+    deleteUserLikedArtistScheduler,
+    notReadScheduler,
+} from "./cron/scheduler.js";
 
 dotenv.config();
 
@@ -19,6 +24,16 @@ passport.deserializeUser((user, done) => done(null, user));
 
 const app = express();
 const port = process.env.PORT;
+
+// 관리자 검증
+app.use(
+    express.json({
+        verify: (req, res, buf, encoding) => {
+            req.rawBody = buf.toString(encoding || "utf8");
+        },
+        limit: "1mb",
+    })
+);
 
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
@@ -144,6 +159,7 @@ app.use((err, req, res, next) => {
 songScheduler();
 resetIsDeliveredScheduler();
 deleteUserLikedArtistScheduler();
+notReadScheduler();
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

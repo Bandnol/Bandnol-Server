@@ -13,6 +13,7 @@ import {
     getUserByOwnId,
     modifyUser,
     getNotification,
+    createExpoToken,
     updateNotificationSetting,
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
@@ -90,7 +91,6 @@ export const viewNotification = async (userId, cursor) => {
     if (cursor) {
         try {
             decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-            console.log(decoded);
         } catch (err) {
             throw new CursorError("커서가 잘못되었습니다.");
         }
@@ -106,14 +106,12 @@ export const viewNotification = async (userId, cursor) => {
     if (data.length > limit) {
         hasNext = true;
         data = data.slice(0, limit);
-        console.log(data[limit - 1].createdAt);
         const nextCursorData = {
             createdAt: data[limit - 1].createdAt,
             id: data[limit - 1].id,
         };
         nextCursor = Buffer.from(JSON.stringify(nextCursorData)).toString("base64");
     }
-
     return notificationResponseDTO(data, hasNext, nextCursor);
 };
 
@@ -130,6 +128,14 @@ export const viewMyPage = async (userId, ownId) => {
     } else {
         return getMyPageResponseDTO(other);
     }
+};
+
+export const saveExpoToken = async (userId, token) => {
+    if (!token) {
+        throw new RequestBodyError("잘못된 Request body 형식입니다.");
+    }
+    const created = await createExpoToken(userId, token);
+    return created;
 };
 
 export const setNotification = async (userId, body) => {

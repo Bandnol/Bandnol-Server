@@ -39,11 +39,17 @@ import {
     updateIsDeliveredToTrue,
 } from "../repositories/recoms.repository.js";
 import { createArtist, createSing, getSing, getArtistById } from "../repositories/artists.repository.js";
-import { getUserById } from "../repositories/users.repository.js";
+import {
+    createNotifications,
+    getAllowedNotifications,
+    getExpoTokens,
+    getUserById,
+} from "../repositories/users.repository.js";
 import { getSongInfo, getArtistInfo, getSongInfoBySearch } from "./musicAPI.service.js";
 import { Prisma } from "@prisma/client";
 import { genAIAutoRecoms } from "./gemini.service.js";
 import redisClient from "../utils/redis.js";
+import { sendPushNotification } from "../utils/expo.push.token.js";
 
 export const sentRecomsSong = async (userId) => {
     const data = await getSentRecomsSong(userId);
@@ -197,6 +203,28 @@ export const sendReplies = async (recomsId, userId, content) => {
         if (!data) {
             throw new RecomsNotFoundOrAuthError("추천 곡이 없거나 접근 권한이 없습니다.");
         }
+
+        // 푸시 알림 발송
+        const senderId = data.userRecomsSong.senderId;
+        const senderNotification = await getAllowedNotifications(senderId);
+
+        if (senderNotification?.commentArrived) {
+            const tokens = await getExpoTokens(senderId);
+            const body = `띵동~ 오늘의 추천곡에 대한 ${data.responder.nickname} 님의 코멘트가 도착했어요!`;
+            await sendPushNotification(tokens, "코멘트 도착!", body, {
+                link: "bandnol://music-recommend/sendRecommend",
+            });
+
+            // 알림 테이블에 저장 (링크 추후 수정)
+            const notification = await createNotifications(
+                senderId,
+                userId,
+                "COMMENT_ARRIVED",
+                "bandnol://music-recommend/sendRecommend"
+            );
+            console.log(notification);
+        }
+
         return createdReplyResponseDTO(data);
     } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -214,31 +242,30 @@ export const listRecomsSong = async (userId) => {
     return listRecomsResponseDTO(data, userId);
 };
 
-export const sendUserRecoms = async (recomsId, userId) => {
-    await redisClient.del(`userRecomsSongData:user:${userId}`);
-    let update = await updateReceiver(recomsId, userId);
+export const sendUserRecoms = async (recomsId, receiverId, senderId) => {
+    let update = await updateReceiver(recomsId, receiverId);
     if (!update) {
         throw new RecommendationNotFoundError("userRecomsSong 테이블에 데이터가 생성되지 않았습니다.");
     }
-    console.log(update);
+    await redisClient.del(`userRecomsSongData:user:${senderId}`);
 
     // isDelivered true로 변경
-    await redisClient.sRem("user:isDeliveredFalse", userId); // redis set에서 데이터 제거
-    const isDelivered = await updateIsDeliveredToTrue(userId);
+    const isDelivered = await updateIsDeliveredToTrue(receiverId);
     if (!isDelivered) {
         throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
     }
-    console.log(isDelivered);
+    await redisClient.sRem("user:isDeliveredFalse", receiverId); // redis set에서 데이터 제거
+    return update;
 };
 
 export const sendAIRecoms = async (userId) => {
     // 보낼 추천 곡이 없는 경우 - AI 생성
     const result = await genAIAutoRecoms();
-    console.log(result);
+    //console.log(result);
 
     // iTunes에서 곡 정보 받아오기 (DTO로 가공됨)
     const songData = await getSongInfoBySearch(result.artist);
-    console.log("songData: ", songData);
+    //console.log("songData: ", songData);
     if (!songData.id) {
         throw new NotFoundSongError("트랙이 존재하지 않습니다.");
     }
@@ -252,15 +279,15 @@ export const sendAIRecoms = async (userId) => {
         if (!recomsSong) {
             throw new RecommendationNotFoundError("recomsSong 테이블에 데이터가 생성되지 않았습니다.");
         }
-        console.log("ai가 recomsSong에 생성한 데이터: ", recomsSong);
+        //console.log("ai가 recomsSong에 생성한 데이터: ", recomsSong);
     }
 
     // UserRecomsSong 테이블에 데이터 생성
-    let newUserSongData = await createUserRecomsSongByAI(userId, result.comment || songData.comment, recomsSong);
+    let newUserSongData = await createUserRecomsSongByAI(userId, songData.comment || result.comment, recomsSong);
     if (!newUserSongData) {
         throw new RecommendationNotFoundError("userRecomsSong 테이블에 데이터가 생성되지 않았습니다.");
     }
-    console.log("ai가 userRecomsSong에 생성한 데이터: ", newUserSongData);
+    //console.log("ai가 userRecomsSong에 생성한 데이터: ", newUserSongData);
 
     // isDelivered true로 변경
     await redisClient.sRem("user:isDeliveredFalse", userId); // redis set에서 데이터 제거
@@ -268,5 +295,6 @@ export const sendAIRecoms = async (userId) => {
     if (!isDelivered) {
         throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
     }
-    console.log(isDelivered);
+    //console.log(isDelivered);
+    return newUserSongData;
 };

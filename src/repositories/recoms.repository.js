@@ -242,6 +242,18 @@ export const createReply = async (recomsId, userId, content) => {
             userRecomsSongId: recomsId,
             responderId: userId,
         },
+        include: {
+            userRecomsSong: {
+                select: {
+                    senderId: true,
+                },
+            },
+            responder: {
+                select: {
+                    nickname: true,
+                },
+            },
+        },
     });
 
     return created;
@@ -252,6 +264,13 @@ export const updateReceiver = async (recomsId, userId) => {
         where: { id: recomsId, NOT: { senderId: userId } },
         data: {
             receiverId: userId,
+        },
+        include: {
+            receiver: {
+                select: {
+                    nickname: true,
+                },
+            },
         },
     });
 
@@ -272,6 +291,13 @@ export const createUserRecomsSongByAI = async (receiverId, comment, recomsSong) 
             },
             isAnoymous: true,
             comment: comment,
+        },
+        include: {
+            receiver: {
+                select: {
+                    nickname: true,
+                },
+            },
         },
     });
     return created;
@@ -330,4 +356,34 @@ export const updateIsDeliveredToFalse = async () => {
     });
 
     return result;
+};
+
+export const getIsReadFalse = async () => {
+    const nowUtc = new Date();
+    const threeHoursAgoUtc = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
+    const fourHoursAgoUtc = new Date(nowUtc.getTime() - 4 * 60 * 60 * 1000);
+
+    const isReadFalse = await prisma.userRecomsSong.findMany({
+        where: {
+            createdAt: {
+                gte: startOfDay(new Date()),
+                lt: endOfDay(new Date()),
+            },
+            updatedAt: {
+                gte: fourHoursAgoUtc,
+                lt: threeHoursAgoUtc,
+            },
+            isRead: false,
+        },
+        include: {
+            sender: {
+                select: {
+                    id: true,
+                    nickname: true,
+                },
+            },
+        },
+    });
+
+    return isReadFalse;
 };
