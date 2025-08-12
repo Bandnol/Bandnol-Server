@@ -136,11 +136,7 @@ export const setNotification = async (userId, body) => {
     const allowedKeys = ["recomsSent", "recomsReceived", "commentArrived", "notRecoms", "announcement"];
 
     for (const key in body) {
-        if (!allowedKeys.includes(key)) {
-            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
-        }
-
-        if (typeof body[key] !== "boolean") {
+        if (!allowedKeys.includes(key) || typeof body[key] !== "boolean") {
             throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
         }
     }
