@@ -6,9 +6,23 @@ import {
     CursorError,
     AuthError,
     NotFoundOwnIdError,
+    RequestBodyError,
+    NotFoundNotificationError,
+    DuplicateRecomsError,
 } from "../errors.js";
-import { getUserById, getUserByOwnId, modifyUser, getNotification } from "../repositories/users.repository.js";
-import { notificationResponseDTO, getMyPageResponseDTO } from "../dtos/users.dto.js";
+import {
+    getUserById,
+    getUserByOwnId,
+    modifyUser,
+    getNotification,
+    createExpoToken,
+    updateNotificationSetting,
+    createUserAnnouncement,
+    updateNotification,
+} from "../repositories/users.repository.js";
+import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
+import { Prisma } from "@prisma/client";
+import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
 
 export const checkOwnId = async (userOwnId) => {
     const userData = await getUserByOwnId(userOwnId);
@@ -83,7 +97,6 @@ export const viewNotification = async (userId, cursor) => {
     if (cursor) {
         try {
             decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-            console.log(decoded);
         } catch (err) {
             throw new CursorError("커서가 잘못되었습니다.");
         }
@@ -99,14 +112,12 @@ export const viewNotification = async (userId, cursor) => {
     if (data.length > limit) {
         hasNext = true;
         data = data.slice(0, limit);
-        console.log(data[limit - 1].createdAt);
         const nextCursorData = {
             createdAt: data[limit - 1].createdAt,
             id: data[limit - 1].id,
         };
         nextCursor = Buffer.from(JSON.stringify(nextCursorData)).toString("base64");
     }
-
     return notificationResponseDTO(data, hasNext, nextCursor);
 };
 
@@ -122,5 +133,139 @@ export const viewMyPage = async (userId, ownId) => {
         return getMyPageResponseDTO(user);
     } else {
         return getMyPageResponseDTO(other);
+    }
+};
+
+export const modifyMypage = async (userId, data) => {
+    const allowedFields = ["photo", "backgroundImg"];
+
+    const user = await getUserById(userId);
+    if (!user) {
+        throw new NoUserError("존재하지 않는 사용자 ID입니다.");
+    }
+
+    const normalize = (key, val) => {
+        if (key === "photo" || key === "backgroundImg") return val === "" ? null : val;
+        return val;
+    };
+
+    const updates = {};
+
+    for (const field of allowedFields) {
+        const value = normalize(field, data[field]);
+        if (value !== undefined && value !== "") {
+            updates[field] = value;
+        }
+    }
+
+    const isValidUrl = (u) => {
+        try {
+            const url = new URL(u);
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch {
+            return false;
+        }
+    };
+
+    for (const key of ["photo", "backgroundImg"]) {
+        if (updates[key] !== undefined && updates[key] !== null) {
+            if (typeof updates[key] !== "string" || !isValidUrl(updates[key])) {
+                throw new InvalidDateTypeError(`${key}는 http(s) URL 또는 null이어야 합니다.`);
+            }
+        }
+    }
+
+    if (Object.keys(updates).length === 0) {
+        throw new NoModifyDataError("수정할 데이터가 없습니다.");
+    }
+
+    const deleteKeys = [];
+
+    for (const key of deleteKeys) {
+        try {
+            await deleteFromS3ByKey(key);
+        } catch (e) {
+            console.error('[S3:delete failed]', { key, msg: e?.message, code: e?.Code || e?.name, http: e?.$metadata?.httpStatusCode });
+        }
+    }
+
+    if ("photo" in updates) {
+        const oldKey = extractS3KeyFromUrl(user.photo);
+
+        if (updates.photo === null && oldKey) deleteKeys.push(oldKey);
+
+        if (typeof updates.photo === "string" && updates.photo !== user.photo && oldKey) {
+            deleteKeys.push(oldKey);
+        }
+    }
+
+    if ("backgroundImg" in updates) {
+        const oldKey = extractS3KeyFromUrl(user.backgroundImg);
+
+        if (updates.backgroundImg === null && oldKey) deleteKeys.push(oldKey);
+        if (typeof updates.backgroundImg === "string" && updates.backgroundImg !== user.backgroundImg && oldKey) {
+            deleteKeys.push(oldKey);
+        }
+    }
+
+    const updated = await modifyUser(user.id, updates);
+
+    for (const key of deleteKeys) {
+        try {
+            await deleteFromS3ByKey(key);
+        } catch (e) {
+            console.error("[S3:delete failed]", {
+            key,
+            msg: e?.message,
+            code: e?.Code || e?.name,
+            http: e?.$metadata?.httpStatusCode,
+            });
+        }
+    }
+
+    return updated;
+};
+
+export const saveExpoToken = async (userId, token) => {
+    if (!token) {
+        throw new RequestBodyError("잘못된 Request body 형식입니다.");
+    }
+    const created = await createExpoToken(userId, token);
+    return created;
+};
+
+export const setNotification = async (userId, body) => {
+    const allowedKeys = ["recomsSent", "recomsReceived", "commentArrived", "notRecoms", "announcement"];
+
+    for (const key in body) {
+        if (!allowedKeys.includes(key) || typeof body[key] !== "boolean") {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+    }
+    const updated = await updateNotificationSetting(userId, body);
+    return updated;
+};
+
+export const modifyNotification = async (userId, notificationId, body) => {
+    try {
+        if (!["RECOMS_RECEIVED", "RECOMS_SENT", "COMMENT_ARRIVED", "NOT_RECOMS", "ANNOUNCEMENT"].includes(body?.type)) {
+            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+        }
+
+        let updated;
+        if (body.type === "ANNOUNCEMENT") {
+            updated = await createUserAnnouncement(userId, notificationId);
+        } else {
+            updated = await updateNotification(userId, notificationId);
+        }
+
+        return isConfirmedResponseDTO(notificationId, updated);
+    } catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            switch (err.code) {
+                case "P2025":
+                    throw new NotFoundNotificationError("알림 ID가 잘못되었거나 이미 읽음 처리된 알림입니다.");
+            }
+        }
     }
 };

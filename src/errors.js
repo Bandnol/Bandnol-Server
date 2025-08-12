@@ -21,6 +21,17 @@ export class InvalidEmailTypeError extends Error {
     }
 }
 
+export class AlreadyInactiveError extends Error {
+    errorcode = "U1200";
+    statusCode = 409;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 export class NotSupportedSocialLoginError extends Error {
     errorCode = "U1300";
     statusCode = 401;
@@ -55,6 +66,17 @@ export class AuthorizationCodeError extends Error {
 
 export class NotFoundOwnIdError extends Error {
     errorCode = "U1303";
+    statusCode = 404;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class NotFoundNotificationError extends Error {
+    errorCode = "U1304";
     statusCode = 404;
 
     constructor(reason, data) {
@@ -282,6 +304,28 @@ export class AuthError extends Error {
 export class SchedulerError extends Error {
     errorCode = "E1301";
     statusCode = 500;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class InvalidHeaderError extends Error {
+    errorCode = "E1003";
+    statusCode = 401;
+
+    constructor(reason, data) {
+        super(reason);
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
+export class InvalidSignatureError extends Error {
+    errorCode = "E1004";
+    statusCode = 401;
 
     constructor(reason, data) {
         super(reason);
