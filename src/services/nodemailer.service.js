@@ -35,6 +35,6 @@ export const sendEmail = async (userName, userEmail, text) => {
     return {id: inquiryId};
   } catch (err) {
     console.error("Nodemailer 요청 실패:",  err.response?.data || err.message);
-    throw new Error(`이메일 전송 실패: ${err.message}`);
+    throw new Error(`이메일 전송 중 알 수 없는 오류가 발생했습니다.`);
   }
 };
