@@ -47,8 +47,7 @@ export async function getSpotifyToken() {
 
         return response.data.access_token;
     } catch (error) {
-        console.error("Spotify 토큰 발급 실패:", err.response?.data || err.message);
-        throw new Error("Spotify 토큰 발급 중 알 수 없는 오류가 발생했습니다.");
+        throw new Error ("Spotify Token을 가져오던 중 알 수 없는 오류가 발생했습니다.");
     }
 }
 
