@@ -2,7 +2,12 @@
 
 > 인디밴드 노래를 하루 한 곡씩 주고받으며 함께 디깅하고 즐기는 팬 커뮤니티 플랫폼, **밴놀(Bandnol)** 서버 레파지토리입니다.
 <br>
-<br>
+
+## 실행 방법
+```plaintext
+npm run dev
+```
+
 
 ## Main Features (주요 기능)
 <img src = "https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/content/introduction.png">
