@@ -1,16 +1,20 @@
 <img src = "https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/content/Frame+561.png">
+> 인디밴드 노래를 하루 한 곡씩 주고받으며 함께 디깅하고 즐기는 팬 커뮤니티 플랫폼, **밴놀(Bandnol)** 서버 레파지토리입니다.
+<br>
+<br>
 
-# Main Features (주요 기능)
+## Main Features (주요 기능)
 <img src = "https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/content/introduction.png">
 
-# Team Members (팀원 및 팀 소개)
+## Team Members (팀원 및 팀 소개)
 | 강다현 | 김나영 | 임지은 |
 |:------:|:------:|:------:|
 | <img src="https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/profile/KakaoTalk_20250529_174914622.jpg.png" alt="강다현" width="150"> | <img src="https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/profile/44E22A8C-7406-4749-9DF1-A4A8D6E77DA4_1_102_o.jpeg" alt="김나영" width="150"> | <img src="https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/profile/IMG_8629.jpg" alt="임지은" width="150"> |
 | BE | BE | BE |
 | [@dadang6842](https://github.com/dadang6842) | [@kny2383](https://github.com/kny2383) | [@wldmsdl7](https://github.com/wldmsdl7) 
+<br>
 
-# Tech Skill (기술 스택) 
+## Tech Skill (기술 스택) 
 ### Skills
 <div>
 
@@ -31,15 +35,14 @@
 </div>
 
 <br>
-<br>
 
-# System Architecutre (시스템 아키텍처)
+
+## System Architecutre (시스템 아키텍처)
 <img src = "https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/content/Frame+2.png"></img>
 
 <br>
-<br>
 
-# Branch Strategy (브랜치 전략)
+## Branch Strategy (브랜치 전략)
 <img src = "https://bandnol-be-profile.s3.ap-northeast-2.amazonaws.com/content/gitflow.png">
 
 ### Git Flow 사용 이유
@@ -65,10 +68,10 @@
 4. 긴급 수정은 `hotfix` → `main` 병합  
 
 <br>
-<br>
 
 
-# Project Structure (프로젝트 구조)
+
+## Project Structure (프로젝트 구조)
 ```plaintext
 project/
 ├── assets/                           # README.md 작성 시 사용하는 이미지들
