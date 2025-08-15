@@ -22,7 +22,7 @@ export class InvalidEmailTypeError extends Error {
 }
 
 export class AlreadyInactiveError extends Error {
-    errorcode = "U1200";
+    errorCode = "U1200";
     statusCode = 409;
 
     constructor(reason, data) {

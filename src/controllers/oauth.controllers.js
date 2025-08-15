@@ -182,6 +182,6 @@ export const handleWithdraw = async (req, res, next) => {
 
         res.status(StatusCodes.OK).success(withdrawResponseDTO(data));
     } catch (err) {
-        throw new TokenError(`로그아웃 중 오류가 발생했습니다. ${err}`);
+        next(err);
     }
 };
