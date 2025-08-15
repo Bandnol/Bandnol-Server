@@ -157,6 +157,7 @@ export const listRecomsResponseDTO = (data, userId) => {
 
         const dto = {
             title: recom.recomsSong.title,
+            artistId: recom.recomsSong.artistId,
             artistName: recom.recomsSong.artistName,
             imageUrl: recom.recomsSong.imgUrl,
             comment: recom.comment,

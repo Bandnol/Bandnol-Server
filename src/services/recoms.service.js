@@ -38,7 +38,7 @@ import {
     createUserRecomsSongByAI,
     updateIsDeliveredToTrue,
 } from "../repositories/recoms.repository.js";
-import { createArtist, createSing, getSing, getArtistById } from "../repositories/artists.repository.js";
+import { createArtist, createSing, getSing, getArtistById, getArtistByName } from "../repositories/artists.repository.js";
 import {
     createNotifications,
     getAllowedNotifications,
@@ -239,7 +239,17 @@ export const sendReplies = async (recomsId, userId, content) => {
 export const listRecomsSong = async (userId) => {
     const data = await getListRecomsSong(userId);
 
-    return listRecomsResponseDTO(data, userId);
+    const promises = data.map(async (recoms) => {
+        const artist = await getArtistInfo(recoms.recomsSong.artistName);
+        recoms.recomsSong.artistId = artist?.id ?? null; // 안전하게 null 처리
+        return recoms;
+    });
+
+    // 병렬로 처리 (병렬로 처리 안 하면 데이터 하나 당 외부 API 이용하기 때문에 오래걸림)
+    const updatedData = await Promise.all(promises);
+    console.log(updatedData);
+
+    return listRecomsResponseDTO(updatedData, userId);
 };
 
 export const sendUserRecoms = async (recomsId, receiverId, senderId) => {

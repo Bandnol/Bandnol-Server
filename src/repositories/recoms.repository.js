@@ -303,7 +303,7 @@ export const createUserRecomsSongByAI = async (receiverId, comment, recomsSong) 
     return created;
 };
 
-export const getListRecomsSong = async (userId) => {
+export const getListRecomsSong = async (userId, artistId) => {
     const listData = await prisma.userRecomsSong.findMany({
         where: {
             OR: [{ senderId: userId }, { receiverId: userId }],
