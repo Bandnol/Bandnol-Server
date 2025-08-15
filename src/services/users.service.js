@@ -185,7 +185,12 @@ export const modifyMypage = async (userId, data) => {
         try {
             await deleteFromS3ByKey(key);
         } catch (e) {
-            console.error('[S3:delete failed]', { key, msg: e?.message, code: e?.Code || e?.name, http: e?.$metadata?.httpStatusCode });
+            console.error("[S3:delete failed]", {
+                key,
+                msg: e?.message,
+                code: e?.Code || e?.name,
+                http: e?.$metadata?.httpStatusCode,
+            });
         }
     }
 
@@ -215,10 +220,10 @@ export const modifyMypage = async (userId, data) => {
             await deleteFromS3ByKey(key);
         } catch (e) {
             console.error("[S3:delete failed]", {
-            key,
-            msg: e?.message,
-            code: e?.Code || e?.name,
-            http: e?.$metadata?.httpStatusCode,
+                key,
+                msg: e?.message,
+                code: e?.Code || e?.name,
+                http: e?.$metadata?.httpStatusCode,
             });
         }
     }
@@ -247,25 +252,27 @@ export const setNotification = async (userId, body) => {
 };
 
 export const modifyNotification = async (userId, notificationId, body) => {
-    try {
-        if (!["RECOMS_RECEIVED", "RECOMS_SENT", "COMMENT_ARRIVED", "NOT_RECOMS", "ANNOUNCEMENT"].includes(body?.type)) {
-            throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
-        }
+    if (
+        !body?.type ||
+        !["RECOMS_RECEIVED", "RECOMS_SENT", "COMMENT_ARRIVED", "NOT_RECOMS", "ANNOUNCEMENT"].includes(body?.type)
+    ) {
+        throw new RequestBodyError("유효하지 않은 request body 형식입니다.");
+    }
 
-        let updated;
-        if (body.type === "ANNOUNCEMENT") {
-            updated = await createUserAnnouncement(userId, notificationId);
-        } else {
-            updated = await updateNotification(userId, notificationId);
-        }
+    try {
+        const updated =
+            body.type === "ANNOUNCEMENT"
+                ? await createUserAnnouncement(userId, notificationId)
+                : await updateNotification(userId, notificationId);
 
         return isConfirmedResponseDTO(notificationId, updated);
     } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
-            switch (err.code) {
-                case "P2025":
-                    throw new NotFoundNotificationError("알림 ID가 잘못되었거나 이미 읽음 처리된 알림입니다.");
+            if (err.code === "P2025") {
+                throw new NotFoundNotificationError("알림 ID가 잘못되었거나 이미 읽음 처리된 알림입니다.");
             }
         }
+
+        throw err;
     }
 };
