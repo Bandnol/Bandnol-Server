@@ -13,6 +13,16 @@ export const createArtist = async (artistData) => {
     return created;
 };
 
+export const getArtistByName = async (artistName) => {
+    console.log(artistName);
+    const artist = await prisma.artist.findFirst({
+        where: {
+            name: artistName
+        }
+    })
+    return artist.id;
+}
+
 export const getArtistById = async (artistId) => {
     return await prisma.artist.findUnique({
         where: {
