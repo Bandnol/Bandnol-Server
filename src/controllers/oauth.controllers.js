@@ -133,7 +133,7 @@ export const handleKakaoLogout = async (req, res, next) => {
 
         res.status(StatusCodes.OK).success({ message: "로그아웃 성공!" });
     } catch (err) {
-       throw new Error (`로그아웃 중 알 수 없는 오류가 발생했습니다. ${err}`)
+       throw new TokenError (`유효하지 않은 토큰입니다: ${err}`);
     }
 };
 
@@ -182,6 +182,6 @@ export const handleWithdraw = async (req, res, next) => {
 
         res.status(StatusCodes.OK).success(withdrawResponseDTO(data));
     } catch (err) {
-        throw new Error ("회원 탈퇴 중 알 수 없는 오류가 발생했습니다.");
+        throw new TokenError(`로그아웃 중 오류가 발생했습니다. ${err}`);
     }
 };
