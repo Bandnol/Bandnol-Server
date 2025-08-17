@@ -76,7 +76,7 @@ export const getSongInfoResponseDTO = (songData) => {
     };
 };
 
-export const userRecomsSongResponseDTO = (userRecomsSongData, singData, artists) => {
+export const userRecomsSongResponseDTO = (userRecomsSongData) => {
     return {
         id: userRecomsSongData.id,
         recomsSong: {

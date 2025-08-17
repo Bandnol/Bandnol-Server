@@ -91,7 +91,7 @@ export const addRecoms = async (data, userId) => {
         
         const artistNames = songData.artist.split("&").map(s => s.trim());
 
-        const artists = [];
+        let artists = [];
         for (const artistName of artistNames) {
             const artistData = await getArtistInfo(artistName);
             const existArtist = await getArtistById(artistData.id);
@@ -123,7 +123,7 @@ export const addRecoms = async (data, userId) => {
     const expireAt = tomorrow.getTime();
     await redisClient.set(`userRecomsSongData:user:${userId}`, JSON.stringify(newUserSongData), { PXAT: expireAt });
 
-    return userRecomsSongResponseDTO(newUserSongData, artists, singData);
+    return userRecomsSongResponseDTO(newUserSongData);
 };
 
 export const viewComment = async (recomsId, type, userId) => {
