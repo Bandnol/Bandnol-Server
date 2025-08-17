@@ -35,6 +35,7 @@ model Inquiry {
 model RecomsSong {
   id              String           @id @unique
   title           String           @db.VarChar(100)
+  artistIds       String[]         @default([]) @map("artist_ids")
   artistName      String           @map("artist_name")
   imgUrl          String?          @map("img_url")
   previewUrl      String?          @map("preview_url")

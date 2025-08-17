@@ -88,27 +88,30 @@ export const addRecoms = async (data, userId) => {
         if (!songData) {
             throw new NotFoundSongError("트랙 ID가 존재하지 않습니다.");
         }
-        recomsSong = await createRecomsSong(songData);
-    }
+        
+        const artistNames = songData.artist.split("&").map(s => s.trim());
 
-    //아티스트 테이블에 아티스트 생성
-    const artists = [];
-    const artistNames = recomsSong.artistName.split("&").map((name) => name.trim());
-    for (const artistName of artistNames) {
-        const artistData = await getArtistInfo(artistName);
-        const existArtist = await getArtistById(artistData.id);
-        if (!existArtist) {
-            await createArtist(artistData);
+        const artists = [];
+        for (const artistName of artistNames) {
+            const artistData = await getArtistInfo(artistName);
+            const existArtist = await getArtistById(artistData.id);
+            if (!existArtist) {
+                await createArtist(artistData);
+            }
+            artists.push(artistData);
         }
-        artists.push(artistData);
-    }
-    console.log(artists);
+        console.log(artists);
 
-    let singData = null;
-    for (const artist of artists) {
-        singData = await getSing(recomsSong.id, artist.id);
-        if (!singData) {
-            singData = await createSing(recomsSong.id, artist.id);
+        const artistIds = artists.map(a => a.id);
+
+        recomsSong = await createRecomsSong(songData, artistIds);
+
+        let singData = null;
+        for (const artist of artists) {
+            singData = await getSing(recomsSong.id, artist.id);
+            if (!singData) {
+                singData = await createSing(recomsSong.id, artist.id);
+            }
         }
     }
 
