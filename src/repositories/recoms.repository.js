@@ -111,11 +111,12 @@ export const getRecomsSong = async (recomsSongId) => {
     });
 };
 
-export const createRecomsSong = async (recomsSong) => {
+export const createRecomsSong = async (recomsSong, artistIds = []) => {
     const created = await prisma.recomsSong.create({
         data: {
             id: recomsSong.id,
             title: recomsSong.title,
+            artistIds : artistIds,
             artistName: recomsSong.artist,
             imgUrl: recomsSong.albumImg,
             previewUrl: recomsSong.previewUrl,
@@ -303,7 +304,7 @@ export const createUserRecomsSongByAI = async (receiverId, comment, recomsSong) 
     return created;
 };
 
-export const getListRecomsSong = async (userId) => {
+export const getListRecomsSong = async (userId, artistId) => {
     const listData = await prisma.userRecomsSong.findMany({
         where: {
             OR: [{ senderId: userId }, { receiverId: userId }],

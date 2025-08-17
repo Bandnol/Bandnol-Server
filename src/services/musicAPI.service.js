@@ -95,10 +95,13 @@ export async function getArtistInfo(artistName) {
             },
         });
 
+        console.log(spotifyData.data.artists.items[0]);
+        const artistImgUrl = spotifyData?.data?.artists?.items?.[0]?.images?.[0]?.url ?? null;
+
         return {
             id: spotifyData.data.artists.items[0].id,
             name: spotifyData.data.artists.items[0].name,
-            imgUrl: spotifyData.data.artists.items[0].images[0].url,
+            imgUrl: artistImgUrl,
         };
     } catch (err) {
         console.error("Spotify API 요청 실패:", err.response?.data || err.message);
