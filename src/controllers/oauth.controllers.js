@@ -15,25 +15,71 @@ export const handleSignup = async (req, res, next) => {
      /*
     #swagger.tags = ["OAuth"]
     #swagger.summary = 'JWT 회원가입 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            required: [
+            "nickname",
+            "ownId",
+            "password",
+            "email",
+            "gender",
+            "birth"
+            ],
+            properties: {
+                nickname: { type: "string", example: "징니" },
+                ownId: { type: "string", example: "jingni" },
+                password: { type: "string", example: "securePassword123!" },
+                email: { type: "string", example: "jingni@example.com" },
+                gender: { type: "string", example: "WOMAN" },
+                birth: { type: "string", format: "date", example: "2004-03-08" },
+            }
+        }
+        }
+    }
+    }
+    
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
 
     #swagger.responses[400] = {
-        description: "잘못된 요청(빈 항목 / 날짜 형식 오류 등)",
-        content: {
-            "application/json": {
-                schema: {
-                    oneOf: [
-                        { $ref: "#/components/responses/RequestBodyError" },
-                        { $ref: "#/components/responses/InvalidDateTypeError" }
-                    ]
-                }
+      description: "잘못된 요청 (빈 항목 / 날짜 형식 오류 등)",
+      content: {
+        "application/json": {
+          schema: {
+            oneOf: [
+              { $ref: "#/components/schemas/RequestBodyError" },
+              { $ref: "#/components/schemas/InvalidDateTypeError" }
+            ]
+          },
+          examples: {
+            RequestBodyError: {
+              summary: "빈 항목 오류",
+              value: {
+                success: false,
+                data: null,
+                error: { code: "E1001", message: "필수 항목입니다." }
+              }
+            },
+            InvalidDateTypeError: {
+              summary: "날짜 형식 오류",
+              value: {
+                success: false,
+                data: null,
+                error: { code: "U1000", message: "날짜 형식이 잘못되었습니다." }
+              }
             }
+          }
         }
-    }
+      }
+    };
 
-    #swagger.responses[200] = {
+    #swagger.responses[409] = {
         $ref: "#/components/responses/DupliacteUserError"
     };
 
@@ -53,6 +99,26 @@ export const handleLogin = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
     #swagger.summary = '카카오톡 소셜 로그인 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            required: [
+                "ownId",
+                "password",
+            ],
+            properties: {
+                ownId: { type: "string", example: "jingni" },
+                password: { type: "string", example: "securePassword123!" }
+            }
+        }
+        }
+    }
+    }
+
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
@@ -62,7 +128,7 @@ export const handleLogin = async (req, res, next) => {
     };
 
     #swagger.responses[403] = {
-      $ref: "#/components/responses/AuthError"
+      $ref: "#/components/responses/InvalidPasswordError"
     };
     */
     try {
