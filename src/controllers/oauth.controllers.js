@@ -8,7 +8,7 @@ import {
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import redisClient from "../utils/redis.js";
-import { withdrawResponseDTO, userInfoRequestDTO } from "../dtos/users.dto.js";
+import { withdrawResponseDTO } from "../dtos/users.dto.js";
 import { userSignup, userLogin } from "../services/users.service.js";
 
 export const handleSignup = async (req, res, next) => {
@@ -58,7 +58,11 @@ export const handleLogin = async (req, res, next) => {
     };
 
     #swagger.responses[401] = {
-      $ref: "#/components/responses/TokenError"
+      $ref: "#/components/responses/NoUserError"
+    };
+
+    #swagger.responses[403] = {
+      $ref: "#/components/responses/AuthError"
     };
     */
     try {
