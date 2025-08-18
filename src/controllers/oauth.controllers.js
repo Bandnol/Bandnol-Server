@@ -1,20 +1,15 @@
 import { AlreadyInactiveError, AuthTokenError, NoUserError, TokenError } from "../errors.js";
-import { generateRefreshToken, generateToken } from "../utils/token.js";
-import { getKakaoUser } from "../configs/auth.config.js";
+import { generateToken } from "../utils/token.js";
 import {
     findUserByToken,
     modifyUserStatus,
     getUserById,
-    getUserByEmail,
-    createUser,
-    updateUserLogin,
-    createAllowedNotifications,
 } from "../repositories/users.repository.js";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import redisClient from "../utils/redis.js";
 import { withdrawResponseDTO, userInfoRequestDTO } from "../dtos/users.dto.js";
-import { userSignup } from "../services/users.service.js";
+import { userSignup, userLogin } from "../services/users.service.js";
 
 export const handleSignup = async (req, res, next) => {
      /*
@@ -54,7 +49,7 @@ export const handleSignup = async (req, res, next) => {
     }
 }
 
-export const handleKakaoLogin = async (req, res, next) => {
+export const handleLogin = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
     #swagger.summary = '카카오톡 소셜 로그인 API';
@@ -67,37 +62,14 @@ export const handleKakaoLogin = async (req, res, next) => {
     };
     */
     try {
-        const { id_token } = req.body;
+        const { ownId, password } = req.body;
+        const data = await userLogin(ownId, password);
 
-        if (!id_token) {
-            throw new TokenError("토큰이 전달되지 않았습니다");
-        }
+        const user = data.user;
+        const token = data.token;
+        const refreshToken = data.refreshToken;
 
-        const kakaoUser = await getKakaoUser(id_token);
-
-        const email = kakaoUser.email;
-        const name = kakaoUser.nickname;
-
-        let user = await getUserByEmail(name, email);
-        if (!user) {
-            user = await createUser(name, email);
-        } else {
-            if (user.inactiveStatus == true) {
-                user = await modifyUserStatus(user.id, false);
-            } else {
-                user = await updateUserLogin(user.id, name, email);
-            }
-        }
-
-        const token = generateToken({ id: user.id });
-        const refreshToken = generateRefreshToken({ id: user.id });
-
-        await redisClient.set(`accessToken:user:${user.id}`, token, { EX: 7 * 24 * 60 * 60 });
-        await redisClient.set(`refreshToken:user:${user.id}`, refreshToken, { EX: 30 * 24 * 60 * 60 });
-
-        const userNotifications = await createAllowedNotifications(user.id);
-
-        res.status(StatusCodes.OK).success({ token, refreshToken, user });
+        res.status(StatusCodes.OK).success({ user, token, refreshToken });
     } catch (err) {
         console.error("Kakao 로그인 실패", err);
         next(err);

@@ -26,7 +26,9 @@ import {
 import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
 import { Prisma } from "@prisma/client";
 import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
+import redisClient from "../utils/redis.js";
 import bcrypt from "bcryptjs";
+import { generateRefreshToken, generateToken } from "../utils/token.js";
 
 export const userSignup = async (user) => {
     // 빈 항목 존재하는지 검사
@@ -66,6 +68,28 @@ export const userSignup = async (user) => {
     const newUser = await createUser({ ...user, password: hashedPassword });
 
     return newUser;
+}
+
+export const userLogin = async (ownId, password) => {
+    const user = await getUserByOwnId(ownId);
+
+    if(!user){
+        throw new NoUserError("사용자 정보가 없습니다. 회원가입 후 이용해주세요.");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+        throw new AuthError("잘못된 비밀번호입니다.");
+    }
+
+    const token = generateToken({id: user.id});
+    const refreshToken = generateRefreshToken({id: user.id});
+
+    await redisClient.set(`accessToken:user:${user.id}`, token, { EX: 7 * 24 * 60 * 60 });
+    await redisClient.set(`refreshToken:user:${user.id}`, refreshToken, { EX: 30 * 24 * 60 * 60 });
+
+    return { user, token, refreshToken}
 }
 
 export const checkOwnId = async (userOwnId) => {
