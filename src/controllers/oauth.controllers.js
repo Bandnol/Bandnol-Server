@@ -24,6 +24,25 @@ export const handleSignup = async (req, res, next) => {
         $ref: "#/components/responses/Success"
     };
 
+    #swagger.responses[400] = {
+        description: "잘못된 요청(빈 항목 / 날짜 형식 오류 등)",
+        content: {
+            "application/json": {
+                schema: {
+                    oneOf: [
+                        { $ref: "#/components/responses/RequestBodyError" },
+                        { $ref: "#/components/responses/InvalidDateTypeError" }
+                    ]
+                }
+            }
+        }
+    }
+
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/DupliacteUserError"
+    };
+
+
     */
     try {
         const user = req.body;
