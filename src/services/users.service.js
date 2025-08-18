@@ -77,6 +77,7 @@ export const userSignup = async (user) => {
 
 export const userLogin = async (ownId, password) => {
     let user = await getUserByOwnId(ownId);
+    let isActive = false;
 
     if(!user){
         throw new NoUserError("사용자 정보가 없습니다. 회원가입 후 이용해주세요.");
@@ -89,6 +90,7 @@ export const userLogin = async (ownId, password) => {
 
     if(user.inactiveStatus==true){
         user = await modifyUserStatus(user.id, false);
+        isActive = true;
     }
 
     const token = generateToken({id: user.id});
@@ -97,7 +99,7 @@ export const userLogin = async (ownId, password) => {
     await redisClient.set(`accessToken:user:${user.id}`, token, { EX: 7 * 24 * 60 * 60 });
     await redisClient.set(`refreshToken:user:${user.id}`, refreshToken, { EX: 30 * 24 * 60 * 60 });
 
-    return { user, token, refreshToken}
+    return { user, token, refreshToken, isActive}
 }
 
 export const checkOwnId = async (userOwnId) => {
@@ -125,12 +127,15 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     for (const field of allowedFields) {
-        const value = data[field];
-        if (value !== undefined && value !== "") {
+    const value = data[field];
+    if (value !== undefined && value !== "") {
+        if (field === "password") {
+            updates.password = await bcrypt.hash(value, 10);
+        } else {
             updates[field] = value;
-            console.log(updates[field]);
         }
     }
+}
 
     // 시간 형식 검사: HHmm
     if (updates.recomsTime) {
@@ -165,6 +170,7 @@ export const modifyUserInfo = async (userId, data) => {
     }
     console.log(user.id);
     const updatedUser = await modifyUser(user.id, updates);
+    console.log(updatedUser)
 
     return { userId: updatedUser.id };
 };

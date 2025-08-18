@@ -138,8 +138,9 @@ export const handleLogin = async (req, res, next) => {
         const user = data.user;
         const token = data.token;
         const refreshToken = data.refreshToken;
+        const isActive = data.isActive;
 
-        res.status(StatusCodes.OK).success({ user, token, refreshToken });
+        res.status(StatusCodes.OK).success({ user, token, refreshToken,isActive });
     } catch (err) {
         console.error(" 로그인 실패", err);
         next(err);
