@@ -12,7 +12,7 @@ import adminRouter from "./admin.router.js";
 // Importing the auth router
 const routers = Router();
 
-routers.use("/api/v1/oauth2", authRouter);
+routers.use("/api/v2/oauth2", authRouter);
 routers.use("/api/v1/recoms", recomsRouter);
 routers.use("/api/v1/users", usersRouter);
 routers.use("/api/v1/artists", artistsRouter);
