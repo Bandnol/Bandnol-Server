@@ -88,27 +88,30 @@ export const addRecoms = async (data, userId) => {
         if (!songData) {
             throw new NotFoundSongError("트랙 ID가 존재하지 않습니다.");
         }
-        recomsSong = await createRecomsSong(songData);
-    }
+        
+        const artistNames = songData.artist.split("&").map(s => s.trim());
 
-    //아티스트 테이블에 아티스트 생성
-    const artists = [];
-    const artistNames = recomsSong.artistName.split("&").map((name) => name.trim());
-    for (const artistName of artistNames) {
-        const artistData = await getArtistInfo(artistName);
-        const existArtist = await getArtistById(artistData.id);
-        if (!existArtist) {
-            await createArtist(artistData);
+        let artists = [];
+        for (const artistName of artistNames) {
+            const artistData = await getArtistInfo(artistName);
+            const existArtist = await getArtistById(artistData.id);
+            if (!existArtist) {
+                await createArtist(artistData);
+            }
+            artists.push(artistData);
         }
-        artists.push(artistData);
-    }
-    console.log(artists);
+        console.log(artists);
 
-    let singData = null;
-    for (const artist of artists) {
-        singData = await getSing(recomsSong.id, artist.id);
-        if (!singData) {
-            singData = await createSing(recomsSong.id, artist.id);
+        const artistIds = artists.map(a => a.id);
+
+        recomsSong = await createRecomsSong(songData, artistIds);
+
+        let singData = null;
+        for (const artist of artists) {
+            singData = await getSing(recomsSong.id, artist.id);
+            if (!singData) {
+                singData = await createSing(recomsSong.id, artist.id);
+            }
         }
     }
 
@@ -120,7 +123,7 @@ export const addRecoms = async (data, userId) => {
     const expireAt = tomorrow.getTime();
     await redisClient.set(`userRecomsSongData:user:${userId}`, JSON.stringify(newUserSongData), { PXAT: expireAt });
 
-    return userRecomsSongResponseDTO(newUserSongData, artists, singData);
+    return userRecomsSongResponseDTO(newUserSongData);
 };
 
 export const viewComment = async (recomsId, type, userId) => {
@@ -239,17 +242,7 @@ export const sendReplies = async (recomsId, userId, content) => {
 export const listRecomsSong = async (userId) => {
     const data = await getListRecomsSong(userId);
 
-    const promises = data.map(async (recoms) => {
-        const artist = await getArtistInfo(recoms.recomsSong.artistName);
-        recoms.recomsSong.artistId = artist?.id ?? null; // 안전하게 null 처리
-        return recoms;
-    });
-
-    // 병렬로 처리 (병렬로 처리 안 하면 데이터 하나 당 외부 API 이용하기 때문에 오래걸림)
-    const updatedData = await Promise.all(promises);
-    console.log(updatedData);
-
-    return listRecomsResponseDTO(updatedData, userId);
+    return listRecomsResponseDTO(data, userId);
 };
 
 export const sendUserRecoms = async (recomsId, receiverId, senderId) => {
