@@ -98,7 +98,7 @@ export const handleSignup = async (req, res, next) => {
 export const handleLogin = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
-    #swagger.summary = '카카오톡 소셜 로그인 API';
+    #swagger.summary = 'JWT 로그인 API';
 
     #swagger.requestBody = {
     required: true,
@@ -141,7 +141,7 @@ export const handleLogin = async (req, res, next) => {
 
         res.status(StatusCodes.OK).success({ user, token, refreshToken });
     } catch (err) {
-        console.error("Kakao 로그인 실패", err);
+        console.error(" 로그인 실패", err);
         next(err);
     }
 };
@@ -150,6 +150,21 @@ export const handleRefreshAccessToken = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
     #swagger.summary = 'AccessToken 재발급 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            properties: {
+                refreshToken: { type: "string", example: "afasdfdsadfdasfdasfafwfgqwf3frgwegwfwgewfqwfqwfwfqffqwfqfqfqdqweq" }
+            }
+        }
+        }
+    }
+    }
+    
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
@@ -185,10 +200,25 @@ export const handleRefreshAccessToken = async (req, res, next) => {
     }
 };
 
-export const handleKakaoLogout = async (req, res, next) => {
+export const handleLogout = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
-    #swagger.summary = '카카오톡 소셜 로그아웃 API';
+    #swagger.summary = 'JWT 로그아웃 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            properties: {
+                refreshToken: { type: "string", example: "afasdfdsadfdasfdasfafwfgqwf3frgwegwfwgewfqwfqwfwfqffqwfqfqfqdqweq" }
+            }
+        }
+        }
+    }
+    }
+
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
@@ -207,7 +237,6 @@ export const handleKakaoLogout = async (req, res, next) => {
             throw new TokenError("유효하지 않은 토큰입니다!");
         }
 
-        await redisClient.del(`accessToken:user:${user.id}`);
         await redisClient.del(`refreshToken:user:${user.id}`);
 
         res.status(StatusCodes.OK).success({ message: "로그아웃 성공!" });

@@ -22,6 +22,7 @@ import {
     updateNotification,
     createUser,
     getUserByEmail,
+    modifyUserStatus,
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
 import { Prisma } from "@prisma/client";
@@ -60,7 +61,11 @@ export const userSignup = async (user) => {
     // 가장 사용자를 나타낼 수 있는 것들로 이미 가입된 사용자인지 확인
     const existUser = await getUserByEmail(user.birth, user.email);
     if(existUser){
-        throw new DuplicateUserError("이미 가입된 사용자입니다.");
+        if(existUser.inactiveStatus == false){
+            throw new DuplicateUserError("이미 가입된 사용자입니다.");
+        }
+
+        
     }
 
     // 10 (Salt rounds) : 해시를 생성할 때 내부적으로 2^10 번 연산을 반복
@@ -71,16 +76,19 @@ export const userSignup = async (user) => {
 }
 
 export const userLogin = async (ownId, password) => {
-    const user = await getUserByOwnId(ownId);
+    let user = await getUserByOwnId(ownId);
 
     if(!user){
         throw new NoUserError("사용자 정보가 없습니다. 회원가입 후 이용해주세요.");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
         throw new AuthError("잘못된 비밀번호입니다.");
+    }
+
+    if(user.inactiveStatus==true){
+        user = await modifyUserStatus(user.id, false);
     }
 
     const token = generateToken({id: user.id});
