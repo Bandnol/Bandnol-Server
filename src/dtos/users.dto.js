@@ -8,6 +8,8 @@ export const userInfoRequestDTO = (body) => {
         birth: birth,
         bio: body.bio,
         recomsTime: body.recomsTime,
+        email: body.email,
+        password: body.password
     };
 };
 

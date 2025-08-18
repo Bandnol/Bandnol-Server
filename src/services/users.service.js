@@ -111,7 +111,7 @@ export const checkOwnId = async (userOwnId) => {
 };
 
 export const modifyUserInfo = async (userId, data) => {
-    const allowedFields = ["nickname", "gender", "birth", "recomsTime", "bio"];
+    const allowedFields = ["nickname", "email", "password", "gender", "birth", "recomsTime", "bio"];
 
     const user = await getUserById(userId);
     if (!user) {
@@ -119,11 +119,16 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     const updates = {};
+    
+    if ('password' in data && data.password !== "") {
+        updates.password = await bcrypt.hash(data.password, 10);
+    }
 
     for (const field of allowedFields) {
         const value = data[field];
         if (value !== undefined && value !== "") {
             updates[field] = value;
+            console.log(updates[field]);
         }
     }
 
@@ -136,7 +141,7 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     /// 날짜 형식 검사: YYYY-MM-DD
-    if (updates.birth) {
+    if (updates.birth !== undefined && 'birth' in updates ) {
         if (typeof updates.birth === "string") {
             const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!birthRegex.test(updates.birth)) {
@@ -149,12 +154,8 @@ export const modifyUserInfo = async (userId, data) => {
             }
 
             updates.birth = parsedDate;
-        } else if (updates.birth instanceof Date) {
-            if (isNaN(updates.birth.getTime())) {
-                throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
-            }
         } else {
-            throw new InvalidDateTypeError("birth 값은 문자열(YYYY-MM-DD)이거나 Date여야 합니다.");
+            delete updates.birth; 
         }
     }
 
@@ -162,7 +163,7 @@ export const modifyUserInfo = async (userId, data) => {
     if (!isModified) {
         throw new NoModifyDataError("수정할 데이터가 없습니다.");
     }
-
+    console.log(user.id);
     const updatedUser = await modifyUser(user.id, updates);
 
     return { userId: updatedUser.id };
