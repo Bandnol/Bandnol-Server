@@ -115,8 +115,8 @@ model UserRecomsSong {
 
 model User {
   id                 String             @id @unique @default(uuid())
-  socialType         SocialType         @map("social_type")
   nickname           String?            @db.VarChar(40)
+  password           String            
   birth              DateTime?
   gender             Gender?            @default(MAN)
   photo              String?
@@ -129,7 +129,6 @@ model User {
   ownId              String?            @unique @map("own_id")
   recomsTime         String             @default("0900") @map("recoms_time")
   email              String
-  name               String
   isDelivered        Boolean            @default(false) @map("is_delivered")
   expoPushTokens     ExpoPushToken[]
   receivedNotices    Notification[]     @relation("NotificationReceiver")
@@ -204,16 +203,7 @@ model UserAnnouncement {
 enum Gender {
   MAN
   WOMAN
-
   @@map("gender")
-}
-
-enum SocialType {
-  NAVER
-  KAKAO
-  GOOGLE
-
-  @@map("social_type")
 }
 
 enum NoticeType {

@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { handleKakaoLogin, handleKakaoLogout, handleRefreshAccessToken, handleWithdraw } from "../controllers/oauth.controllers.js"
+import { handleSignup, handleWithdraw } from "../controllers/oauth.controllers.js"
 
 const router = Router();
 
-router.post("/callback/kakao", handleKakaoLogin);
-router.patch("/refresh/token", handleRefreshAccessToken);
-router.post("/logout", handleKakaoLogout);
+router.post("/signup", handleSignup);
+//router.post("/login", handleLogin);
+//router.post("/logout", handleLogout);
 router.post("/withdraw", handleWithdraw);
 
 export default router;

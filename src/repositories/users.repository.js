@@ -15,10 +15,10 @@ export const getUserByOwnId = async (checkingOwnId) => {
     return userData;
 };
 
-export const getUserByEmail = async (userName, userEmail) => {
+export const getUserByEmail = async (userBirth, userEmail) => {
     return await prisma.user.findFirst({
         where: {
-            name: userName,
+            birth: userBirth,
             email: userEmail,
         },
     });
@@ -45,12 +45,15 @@ export const createInquiry = async (userName, userEmail, text) => {
     return newInquiry.id;
 };
 
-export const createUser = async (userName, userEmail, type) => {
+export const createUser = async (user) => {
     user = await prisma.user.create({
         data: {
-            name: userName,
-            email: userEmail,
-            socialType: type,
+           ownId : user.ownId,
+           nickname : user.nickname,
+           password : user.password,
+           birth : user.birth,
+           gender : user.gender,
+           email : user.email,
         },
     });
     return user;
@@ -62,7 +65,6 @@ export const updateUserLogin = async (id, userName, userEmail, type) => {
         data: {
             name: userName,
             email: userEmail,
-            socialType: type,
         },
     });
     return user;

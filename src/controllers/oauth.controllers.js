@@ -10,12 +10,30 @@ import {
     updateUserLogin,
     createAllowedNotifications,
 } from "../repositories/users.repository.js";
-import pkg from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
-const { SocialType } = pkg;
 import jwt from "jsonwebtoken";
 import redisClient from "../utils/redis.js";
 import { withdrawResponseDTO, userInfoRequestDTO } from "../dtos/users.dto.js";
+import { userSignup } from "../services/users.service.js";
+
+export const handleSignup = async (req, res, next) => {
+     /*
+    #swagger.tags = ["OAuth"]
+    #swagger.summary = 'JWT 회원가입 API';
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    */
+    try {
+        const user = req.body;
+        const newUser = await userSignup(user);
+        res.status(StatusCodes.OK).success(newUser.id);
+    }catch (err) {
+        console.error("회원가입 실패", err);
+        next(err);
+    }
+}
 
 export const handleKakaoLogin = async (req, res, next) => {
     /*
@@ -43,12 +61,12 @@ export const handleKakaoLogin = async (req, res, next) => {
 
         let user = await getUserByEmail(name, email);
         if (!user) {
-            user = await createUser(name, email, SocialType.KAKAO);
+            user = await createUser(name, email);
         } else {
             if (user.inactiveStatus == true) {
                 user = await modifyUserStatus(user.id, false);
             } else {
-                user = await updateUserLogin(user.id, name, email, SocialType.KAKAO);
+                user = await updateUserLogin(user.id, name, email);
             }
         }
 
