@@ -275,7 +275,6 @@ export const sendUserRecoms = async (recomsId, receiverId, senderId) => {
 export const sendAIRecoms = async (userId) => {
     // 보낼 추천 곡이 없는 경우 - AI 생성
     const result = await genAIAutoRecoms();
-    //console.log(result);
 
     // iTunes에서 곡 정보 받아오기 (DTO로 가공됨)
     const songData = await getSongInfoBySearch(result.artist);
@@ -287,9 +286,30 @@ export const sendAIRecoms = async (userId) => {
     // recomsSong에 중복 데이터가 있는지 확인 -> artist만으로는 중복 데이터를 확인할 수 없어서 부득이하게 곡 정보를 가져온 후 검사를 하게 됨
     let recomsSong = await getRecomsSong(songData.id);
 
-    // recomsSong 테이블에 데이터 생성
     if (!recomsSong) {
-        recomsSong = await createRecomsSong(songData);
+        let artistNames;
+        if (songData.artist.includes("&")) {
+            artistNames = songData.artist.split("&").map((s) => s.trim());
+        } else if (songData.artist.includes(",")) {
+            artistNames = songData.artist.split(",").map((s) => s.trim());
+        } else {
+            artistNames = Array(songData.artist);
+        }
+        //console.log("artistNames: ", artistNames);
+
+        const artistIds = await Promise.all(
+            artistNames.map(async (name) => {
+                const artistData = await getArtistInfo(name);
+                const existArtist = await getArtistById(artistData.id);
+                if (!existArtist) {
+                    await createArtist(artistData);
+                }
+                //console.log("artistId: ", artistData.id);
+                return artistData.id;
+            })
+        );
+        //console.log("artistIds: ", artistIds);
+        recomsSong = await createRecomsSong(songData, artistIds);
         if (!recomsSong) {
             throw new RecommendationNotFoundError("recomsSong 테이블에 데이터가 생성되지 않았습니다.");
         }
