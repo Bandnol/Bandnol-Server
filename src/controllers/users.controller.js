@@ -240,10 +240,10 @@ export const handleModifyMypage = async (req, res, next) => {
           schema: {
             type: "object",
             properties: {
-              nickname: { type: "string", example: "징니" },
-              bio: { type: "string", example: "안뇽하세용 ~ 징니에요 ~ " },
               photo: { type: ["string", "null"], example: "https://cdn.example.com/u/123/photo.jpg", nullable: true },
-              backgroundImg: { type: ["string", "null"], example: null, nullable: true }
+              backgroundImg: { type: ["string", "null"], example: null, nullable: true },
+              rmPhoto: { type: "boolean", example : true },
+              rmBackImg: {type: "boolean", example : false }
             },
             additionalProperties: false
           }
