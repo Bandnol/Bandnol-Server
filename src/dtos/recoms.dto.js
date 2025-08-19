@@ -65,7 +65,6 @@ export const searchRecomsResponseDTO = (recom, isReceived = false) => {
 
 export const getSongInfoResponseDTO = (songData) => {
     const highResAlbumImg = songData.artworkUrl100.replace(/\/[0-9]+x[0-9]+bb\.jpg$/, "/1000x1000bb.jpg");
-
     return {
         id: songData.trackId.toString(),
         title: songData.trackName,

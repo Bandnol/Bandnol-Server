@@ -47,7 +47,7 @@ export async function getSpotifyToken() {
 
         return response.data.access_token;
     } catch (error) {
-        throw new Error ("Spotify Token을 가져오던 중 알 수 없는 오류가 발생했습니다.");
+        throw new Error("Spotify Token을 가져오던 중 알 수 없는 오류가 발생했습니다.");
     }
 }
 
@@ -82,7 +82,7 @@ export async function getArtistInfo(artistName) {
         if (!token) {
             throw new TokenError("유효하지 않은 스포티파이 토큰입니다.");
         }
-        console.log(artistName);
+
         const spotifyData = await axios.get("https://api.spotify.com/v1/search", {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -131,14 +131,14 @@ export async function getSongInfoBySearch(artist) {
         // 정보가 없으면 backup 데이터 반환
         if (results.length === 0) {
             return {
-                id: "1750866318",
-                title: "파도",
-                artist: "고고학",
-                album: "VOL.04 - EP",
+                id: "1708568038",
+                title: "Wish",
+                artist: "Gogohawk",
+                album: "Wish - Single",
                 albumImg:
-                    "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f7/02/52/f7025226-a5ed-0c06-92da-ac185ceecaa8/8800242664761.jpg/100x100bb.jpg",
+                    "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2b/8d/90/2b8d90c5-5ab0-6cfd-ac1e-d85772bac285/Gogohawk.jpg/1000x1000bb.jpg",
                 previewUrl:
-                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/78/50/da/7850daec-e772-81da-8295-acb01153563f/mzaf_7649718482759982762.plus.aac.p.m4a",
+                    "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/73/7c/b0/737cb02b-d23a-d1d0-66dd-d5a383bea9de/mzaf_7331981473876391296.plus.aac.p.m4a",
                 comment: "꼭 들어주세요 ...",
             };
         }

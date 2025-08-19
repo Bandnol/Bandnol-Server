@@ -9,6 +9,7 @@ import {
     RequestBodyError,
     NotFoundNotificationError,
     DuplicateRecomsError,
+    DuplicateUserError,
 } from "../errors.js";
 import {
     getUserById,
@@ -19,10 +20,87 @@ import {
     updateNotificationSetting,
     createUserAnnouncement,
     updateNotification,
+    createUser,
+    getUserByEmail,
+    modifyUserStatus,
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
 import { Prisma } from "@prisma/client";
 import { extractS3KeyFromUrl, deleteFromS3ByKey } from "../utils/s3.js";
+import redisClient from "../utils/redis.js";
+import bcrypt from "bcryptjs";
+import { generateRefreshToken, generateToken } from "../utils/token.js";
+
+export const userSignup = async (user) => {
+    // 빈 항목 존재하는지 검사
+    if(!user.ownId ||!user.password ||!user.nickname ||!user.email || !user.gender || !user.birth ){
+        throw new RequestBodyError("비어있는 항목이 존재합니다.");
+    }
+
+    // Birth 형식 검사
+    if (typeof user.birth === "string") {
+        const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!birthRegex.test(user.birth)) {
+            throw new InvalidDateTypeError("날짜 형식은 반드시 YYYY-MM-DD 형식이어야 합니다.");
+        }
+
+        const parsedDate = new Date(user.birth);
+        if (isNaN(parsedDate.getTime())) {
+            throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
+        }
+
+        user.birth = parsedDate;
+    } else if (user.birth instanceof Date) {
+        if (isNaN(user.birth.getTime())) {
+            throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
+        }
+    } else {
+        throw new InvalidDateTypeError("birth 값은 문자열(YYYY-MM-DD)이거나 Date여야 합니다.");
+    }
+
+    // 가장 사용자를 나타낼 수 있는 것들로 이미 가입된 사용자인지 확인
+    const existUser = await getUserByEmail(user.email);
+    if(existUser){
+        if(existUser.inactiveStatus == false){
+            throw new DuplicateUserError("이미 가입된 사용자입니다.");
+        }
+
+        
+    }
+
+    // 10 (Salt rounds) : 해시를 생성할 때 내부적으로 2^10 번 연산을 반복
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const newUser = await createUser({ ...user, password: hashedPassword });
+
+    return newUser;
+}
+
+export const userLogin = async (ownId, password) => {
+    let user = await getUserByOwnId(ownId);
+    let isActive = false;
+
+    if(!user){
+        throw new NoUserError("사용자 정보가 없습니다. 회원가입 후 이용해주세요.");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new AuthError("잘못된 비밀번호입니다.");
+    }
+
+    if(user.inactiveStatus==true){
+        user = await modifyUserStatus(user.id, false);
+        isActive = true;
+    }
+
+    const token = generateToken({id: user.id});
+    const refreshToken = generateRefreshToken({id: user.id});
+
+    await redisClient.set(`accessToken:user:${user.id}`, token, { EX: 7 * 24 * 60 * 60 });
+    await redisClient.set(`refreshToken:user:${user.id}`, refreshToken, { EX: 30 * 24 * 60 * 60 });
+
+    return { user, token, refreshToken, isActive}
+}
 
 export const checkOwnId = async (userOwnId) => {
     const userData = await getUserByOwnId(userOwnId);
@@ -30,12 +108,12 @@ export const checkOwnId = async (userOwnId) => {
         console.log("아이디 중복 / 사용 불가");
         return false;
     }
-    console.log("아이디 중복 아님 / 사용 가능");
+    console.log("아이디 중복 아님 / 사용 가능")
     return true;
 };
 
 export const modifyUserInfo = async (userId, data) => {
-    const allowedFields = ["nickname", "ownId", "gender", "birth", "recomsTime", "bio"];
+    const allowedFields = ["nickname", "email", "password", "gender", "birth", "recomsTime", "bio"];
 
     const user = await getUserById(userId);
     if (!user) {
@@ -43,13 +121,17 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     const updates = {};
+    
+    if ('password' in data && data.password !== "") {
+        updates.password = await bcrypt.hash(data.password, 10);
+    }
 
     for (const field of allowedFields) {
-        const value = data[field];
-        if (value !== undefined && value !== "") {
-            updates[field] = value;
-        }
+    const value = data[field];
+    if (value !== undefined && value !== "") {
+        updates[field] = value;
     }
+}
 
     // 시간 형식 검사: HHmm
     if (updates.recomsTime) {
@@ -60,7 +142,7 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     /// 날짜 형식 검사: YYYY-MM-DD
-    if (updates.birth) {
+    if (updates.birth !== undefined && 'birth' in updates ) {
         if (typeof updates.birth === "string") {
             const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!birthRegex.test(updates.birth)) {
@@ -73,12 +155,8 @@ export const modifyUserInfo = async (userId, data) => {
             }
 
             updates.birth = parsedDate;
-        } else if (updates.birth instanceof Date) {
-            if (isNaN(updates.birth.getTime())) {
-                throw new InvalidDateTypeError("올바른 birth 값이 아닙니다.");
-            }
         } else {
-            throw new InvalidDateTypeError("birth 값은 문자열(YYYY-MM-DD)이거나 Date여야 합니다.");
+            delete updates.birth; 
         }
     }
 

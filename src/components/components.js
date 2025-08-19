@@ -214,6 +214,30 @@ export default {
                 },
             },
         },
+        DupliacteUserError: {
+            description: "이미 가입된 사용자일 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "U1201" },
+                                    message: {
+                                        type: "string",
+                                        example: "이미 존재하는 사용자입니다. 로그인 후 이용해주세요.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         DuplicateRecomsError: {
             description: "노래를 하루에 2번 이상 추천하려고 할 때",
             content: {
@@ -319,23 +343,30 @@ export default {
                 },
             },
         },
-        InvalidTypeError: {
-            description: "날짜 또는 추천시간 형식이 잘못되었을 때",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            success: { type: "boolean", example: false },
-                            data: { type: "object", nullable: true },
-                            error: {
-                                type: "object",
-                                properties: {
-                                    code: { type: "string", example: "날짜 형식 오류 : U1000, 시간 형식 오류 : R1000" },
-                                    message: { type: "string", example: "날짜 또는 추천 시간 형식이 잘못되었습니다." },
-                                },
-                            },
-                        },
+        InvalidTimeTypeError: {
+            type: "object",
+            properties: {
+                success: { type: "boolean", example: false },
+                data: { type: "object", nullable: true },
+                error: {
+                    type: "object",
+                    properties: {
+                        code: { type: "string", example: "R1000" },
+                        message: { type: "string", example: "추천 시간 형식이 잘못되었습니다." },
+                    },
+                },
+            },
+        },
+        InvalidDateTypeError: {
+            type: "object",
+            properties: {
+                success: { type: "boolean", example: false },
+                data: { type: "object", nullable: true },
+                error: {
+                    type: "object",
+                    properties: {
+                        code: { type: "string", example: "U1000" },
+                        message: { type: "string", example: "날짜 형식이 잘못되었습니다." },
                     },
                 },
             },
@@ -399,6 +430,30 @@ export default {
                                 properties: {
                                     code: { type: "string", example: "U1001" },
                                     message: { type: "string", example: "올바르지 않은 이메일 형식입니다." },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        InvalidPasswordError: {
+            description: "패스워드가 잘못되었을 때",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean", example: false },
+                            data: { type: "object", nullable: true },
+                            error: {
+                                type: "object",
+                                properties: {
+                                    code: { type: "string", example: "E1200" },
+                                    message: {
+                                        type: "string",
+                                        example: "잘못된 비밀번호입니다.",
+                                    },
                                 },
                             },
                         },
