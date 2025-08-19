@@ -2,7 +2,7 @@ export const userInfoRequestDTO = (body) => {
     const birth = new Date(body.birth);
 
     return {
-        nickname: body.name,
+        nickname: body.nickname,
         ownId: body.ownId,
         gender: body.gender,
         birth: birth,

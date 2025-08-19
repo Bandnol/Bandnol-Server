@@ -112,6 +112,7 @@ export const checkOwnId = async (userOwnId) => {
 };
 
 export const modifyUserInfo = async (userId, data) => {
+    console.log(data);
     const allowedFields = ["nickname", "email", "password", "gender", "birth", "recomsTime", "bio"];
 
     const user = await getUserById(userId);
@@ -120,16 +121,18 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     const updates = {};
-
-    if ("password" in data && data.password !== "") {
+    
+    if ('password' in data && data.password !== undefined) {
         updates.password = await bcrypt.hash(data.password, 10);
     }
 
     for (const field of allowedFields) {
-        const value = data[field];
+    console.log(field);
+    const value = data[field];
         if (value !== undefined && value !== "") {
             updates[field] = value;
         }
+        console.log(updates[field]);
     }
 
     // 시간 형식 검사: HHmm
@@ -165,6 +168,7 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     const updatedUser = await modifyUser(user.id, updates);
+    console.log(updatedUser);
 
     return { userId: updatedUser.id };
 };
