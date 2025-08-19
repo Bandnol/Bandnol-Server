@@ -19,10 +19,6 @@ export const handleCheckOwnId = async (req, res, next) => {
     #swagger.tags = ["User"]
     #swagger.summary = '유저 아이디 중복 확인하기 API';
 
-    #swagger.security = [{
-        bearerAuth: []
-    }]
-    
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
     };
