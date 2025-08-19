@@ -1,68 +1,148 @@
 import { AlreadyInactiveError, AuthTokenError, NoUserError, TokenError } from "../errors.js";
-import { generateRefreshToken, generateToken } from "../utils/token.js";
-import { getKakaoUser } from "../configs/auth.config.js";
+import { generateToken } from "../utils/token.js";
 import {
     findUserByToken,
     modifyUserStatus,
     getUserById,
-    getUserByEmail,
-    createUser,
-    updateUserLogin,
-    createAllowedNotifications,
 } from "../repositories/users.repository.js";
-import pkg from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
-const { SocialType } = pkg;
 import jwt from "jsonwebtoken";
 import redisClient from "../utils/redis.js";
-import { withdrawResponseDTO, userInfoRequestDTO } from "../dtos/users.dto.js";
+import { withdrawResponseDTO } from "../dtos/users.dto.js";
+import { userSignup, userLogin } from "../services/users.service.js";
 
-export const handleKakaoLogin = async (req, res, next) => {
+export const handleSignup = async (req, res, next) => {
+     /*
+    #swagger.tags = ["OAuth"]
+    #swagger.summary = 'JWT 회원가입 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            required: [
+            "nickname",
+            "ownId",
+            "password",
+            "email",
+            "gender",
+            "birth"
+            ],
+            properties: {
+                nickname: { type: "string", example: "징니" },
+                ownId: { type: "string", example: "jingni" },
+                password: { type: "string", example: "securePassword123!" },
+                email: { type: "string", example: "jingni@example.com" },
+                gender: { type: "string", example: "WOMAN" },
+                birth: { type: "string", format: "date", example: "2004-03-08" },
+            }
+        }
+        }
+    }
+    }
+    
+    #swagger.responses[200] = {
+        $ref: "#/components/responses/Success"
+    };
+
+    #swagger.responses[400] = {
+      description: "잘못된 요청 (빈 항목 / 날짜 형식 오류 등)",
+      content: {
+        "application/json": {
+          schema: {
+            oneOf: [
+              { $ref: "#/components/schemas/RequestBodyError" },
+              { $ref: "#/components/schemas/InvalidDateTypeError" }
+            ]
+          },
+          examples: {
+            RequestBodyError: {
+              summary: "빈 항목 오류",
+              value: {
+                success: false,
+                data: null,
+                error: { code: "E1001", message: "필수 항목입니다." }
+              }
+            },
+            InvalidDateTypeError: {
+              summary: "날짜 형식 오류",
+              value: {
+                success: false,
+                data: null,
+                error: { code: "U1000", message: "날짜 형식이 잘못되었습니다." }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    #swagger.responses[409] = {
+        $ref: "#/components/responses/DupliacteUserError"
+    };
+
+
+    */
+    try {
+        const user = req.body;
+        const newUser = await userSignup(user);
+        res.status(StatusCodes.OK).success(newUser.id);
+    }catch (err) {
+        console.error("회원가입 실패", err);
+        next(err);
+    }
+}
+
+export const handleLogin = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
-    #swagger.summary = '카카오톡 소셜 로그인 API';
+    #swagger.summary = 'JWT 로그인 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            required: [
+                "ownId",
+                "password",
+            ],
+            properties: {
+                ownId: { type: "string", example: "jingni" },
+                password: { type: "string", example: "securePassword123!" }
+            }
+        }
+        }
+    }
+    }
+
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
 
     #swagger.responses[401] = {
-      $ref: "#/components/responses/TokenError"
+      $ref: "#/components/responses/NoUserError"
+    };
+
+    #swagger.responses[403] = {
+      $ref: "#/components/responses/InvalidPasswordError"
     };
     */
     try {
-        const { id_token } = req.body;
+        const { ownId, password } = req.body;
+        const data = await userLogin(ownId, password);
 
-        if (!id_token) {
-            throw new TokenError("토큰이 전달되지 않았습니다");
-        }
+        const user = data.user;
+        const token = data.token;
+        const refreshToken = data.refreshToken;
+        const isActive = data.isActive;
 
-        const kakaoUser = await getKakaoUser(id_token);
-
-        const email = kakaoUser.email;
-        const name = kakaoUser.nickname;
-
-        let user = await getUserByEmail(name, email);
-        if (!user) {
-            user = await createUser(name, email, SocialType.KAKAO);
-        } else {
-            if (user.inactiveStatus == true) {
-                user = await modifyUserStatus(user.id, false);
-            } else {
-                user = await updateUserLogin(user.id, name, email, SocialType.KAKAO);
-            }
-        }
-
-        const token = generateToken({ id: user.id });
-        const refreshToken = generateRefreshToken({ id: user.id });
-
-        await redisClient.set(`accessToken:user:${user.id}`, token, { EX: 7 * 24 * 60 * 60 });
-        await redisClient.set(`refreshToken:user:${user.id}`, refreshToken, { EX: 30 * 24 * 60 * 60 });
-
-        const userNotifications = await createAllowedNotifications(user.id);
-
-        res.status(StatusCodes.OK).success({ token, refreshToken, user });
+        res.status(StatusCodes.OK).success({ user, token, refreshToken,isActive });
     } catch (err) {
-        console.error("Kakao 로그인 실패", err);
+        console.error(" 로그인 실패", err);
         next(err);
     }
 };
@@ -71,6 +151,21 @@ export const handleRefreshAccessToken = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
     #swagger.summary = 'AccessToken 재발급 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            properties: {
+                refreshToken: { type: "string", example: "afasdfdsadfdasfdasfafwfgqwf3frgwegwfwgewfqwfqwfwfqffqwfqfqfqdqweq" }
+            }
+        }
+        }
+    }
+    }
+    
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
@@ -106,10 +201,25 @@ export const handleRefreshAccessToken = async (req, res, next) => {
     }
 };
 
-export const handleKakaoLogout = async (req, res, next) => {
+export const handleLogout = async (req, res, next) => {
     /*
     #swagger.tags = ["OAuth"]
-    #swagger.summary = '카카오톡 소셜 로그아웃 API';
+    #swagger.summary = 'JWT 로그아웃 API';
+
+    #swagger.requestBody = {
+    required: true,
+    content: {
+        "application/json": {
+        schema: {
+            type: "object",
+            properties: {
+                refreshToken: { type: "string", example: "afasdfdsadfdasfdasfafwfgqwf3frgwegwfwgewfqwfqwfwfqffqwfqfqfqdqweq" }
+            }
+        }
+        }
+    }
+    }
+
     #swagger.responses[200] = {
         $ref: "#/components/responses/Success"
     };
@@ -128,7 +238,6 @@ export const handleKakaoLogout = async (req, res, next) => {
             throw new TokenError("유효하지 않은 토큰입니다!");
         }
 
-        await redisClient.del(`accessToken:user:${user.id}`);
         await redisClient.del(`refreshToken:user:${user.id}`);
 
         res.status(StatusCodes.OK).success({ message: "로그아웃 성공!" });

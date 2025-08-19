@@ -19,10 +19,6 @@ export const handleCheckOwnId = async (req, res, next) => {
     #swagger.tags = ["User"]
     #swagger.summary = '유저 아이디 중복 확인하기 API';
 
-    #swagger.security = [{
-        bearerAuth: []
-    }]
-    
     #swagger.responses[200] = {
       $ref: "#/components/responses/Success"
     };
@@ -59,6 +55,7 @@ export const handleModifyUserInfo = async (req, res, next) => {
             properties: {
               nickname: { type: "string", example: "징니" },
               ownId: { type: "string", example: "jingni" },
+              password: { type: "string", example: "password"},
               gender: { type: "string", example: "WOMAN" },
               birth: { type: "string", format: "date", example: "2004-03-08" },
               recomsTime: { type: "string", example: "09:00" },
@@ -72,8 +69,37 @@ export const handleModifyUserInfo = async (req, res, next) => {
       $ref: "#/components/responses/Success"
     };
     #swagger.responses[400] = {
-      $ref: "#/components/responses/InvalidTypeError"
+      description: "잘못된 요청 (추천 시간 형식 / 날짜 형식 오류 등)",
+      content: {
+        "application/json": {
+          schema: {
+            oneOf: [
+              { $ref: "#/components/responses/InvalidTimeTypeError" },
+              { $ref: "#/components/responses/InvalidDateTypeError" }
+            ]
+          },
+          examples: {
+            RequestBodyError: {
+              summary: "추천 시간 형식 오류",
+              value: {
+                success: false,
+                data: null,
+                error: { code: "R1000", message: "추천 시간 형식이 잘못되었습니다." }
+              }
+            },
+            InvalidDateTypeError: {
+              summary: "날짜 형식 오류",
+              value: {
+                success: false,
+                data: null,
+                error: { code: "U1000", message: "날짜 형식이 잘못되었습니다." }
+              }
+            }
+          }
+        }
+      }
     };
+
     #swagger.responses[401] = {
       $ref: "#/components/responses/TokenError"
     };

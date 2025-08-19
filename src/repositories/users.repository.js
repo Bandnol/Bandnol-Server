@@ -15,10 +15,9 @@ export const getUserByOwnId = async (checkingOwnId) => {
     return userData;
 };
 
-export const getUserByEmail = async (userName, userEmail) => {
+export const getUserByEmail = async (userEmail) => {
     return await prisma.user.findFirst({
         where: {
-            name: userName,
             email: userEmail,
         },
     });
@@ -45,24 +44,15 @@ export const createInquiry = async (userName, userEmail, text) => {
     return newInquiry.id;
 };
 
-export const createUser = async (userName, userEmail, type) => {
+export const createUser = async (user) => {
     user = await prisma.user.create({
         data: {
-            name: userName,
-            email: userEmail,
-            socialType: type,
-        },
-    });
-    return user;
-};
-
-export const updateUserLogin = async (id, userName, userEmail, type) => {
-    const user = await prisma.user.update({
-        where: { id: id },
-        data: {
-            name: userName,
-            email: userEmail,
-            socialType: type,
+           ownId : user.ownId,
+           nickname : user.nickname,
+           password : user.password,
+           birth : user.birth,
+           gender : user.gender,
+           email : user.email,
         },
     });
     return user;
