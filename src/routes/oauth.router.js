@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/signup", handleSignup);
 router.post("/login", handleLogin);
-router.post("/re-refreshToken",handleRefreshAccessToken);
+router.post("/refreshToken",handleRefreshAccessToken);
 router.post("/logout", handleLogout);
 router.post("/withdraw", handleWithdraw);
 

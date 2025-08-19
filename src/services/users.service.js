@@ -59,7 +59,7 @@ export const userSignup = async (user) => {
     }
 
     // 가장 사용자를 나타낼 수 있는 것들로 이미 가입된 사용자인지 확인
-    const existUser = await getUserByEmail(user.birth, user.email);
+    const existUser = await getUserByEmail(user.email);
     if(existUser){
         if(existUser.inactiveStatus == false){
             throw new DuplicateUserError("이미 가입된 사용자입니다.");
@@ -129,11 +129,7 @@ export const modifyUserInfo = async (userId, data) => {
     for (const field of allowedFields) {
     const value = data[field];
     if (value !== undefined && value !== "") {
-        if (field === "password") {
-            updates.password = await bcrypt.hash(value, 10);
-        } else {
-            updates[field] = value;
-        }
+        updates[field] = value;
     }
 }
 
@@ -168,9 +164,8 @@ export const modifyUserInfo = async (userId, data) => {
     if (!isModified) {
         throw new NoModifyDataError("수정할 데이터가 없습니다.");
     }
-    console.log(user.id);
+
     const updatedUser = await modifyUser(user.id, updates);
-    console.log(updatedUser)
 
     return { userId: updatedUser.id };
 };
