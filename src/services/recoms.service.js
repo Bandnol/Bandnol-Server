@@ -38,7 +38,13 @@ import {
     createUserRecomsSongByAI,
     updateIsDeliveredToTrue,
 } from "../repositories/recoms.repository.js";
-import { createArtist, createSing, getSing, getArtistById, getArtistByName } from "../repositories/artists.repository.js";
+import {
+    createArtist,
+    createSing,
+    getSing,
+    getArtistById,
+    getArtistByName,
+} from "../repositories/artists.repository.js";
 import {
     createNotifications,
     getAllowedNotifications,
@@ -88,9 +94,14 @@ export const addRecoms = async (data, userId) => {
         if (!songData) {
             throw new NotFoundSongError("트랙 ID가 존재하지 않습니다.");
         }
-        
-        const artistNames = songData.artist.split("&").map(s => s.trim());
 
+        let artistNames;
+        if (songData.artist.includes("&")) {
+            artistNames = songData.artist.split("&").map((s) => s.trim());
+        }
+        if (songData.artist.includes(",")) {
+            artistNames = songData.artist.split(",").map((s) => s.trim());
+        }
         let artists = [];
         for (const artistName of artistNames) {
             const artistData = await getArtistInfo(artistName);
@@ -102,7 +113,7 @@ export const addRecoms = async (data, userId) => {
         }
         console.log(artists);
 
-        const artistIds = artists.map(a => a.id);
+        const artistIds = artists.map((a) => a.id);
 
         recomsSong = await createRecomsSong(songData, artistIds);
 
