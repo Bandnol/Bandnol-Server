@@ -98,10 +98,12 @@ export const addRecoms = async (data, userId) => {
         let artistNames;
         if (songData.artist.includes("&")) {
             artistNames = songData.artist.split("&").map((s) => s.trim());
-        }
-        if (songData.artist.includes(",")) {
+        } else if (songData.artist.includes(",")) {
             artistNames = songData.artist.split(",").map((s) => s.trim());
+        } else {
+            artistNames = Array(songData.artist);
         }
+
         let artists = [];
         for (const artistName of artistNames) {
             const artistData = await getArtistInfo(artistName);
@@ -111,7 +113,7 @@ export const addRecoms = async (data, userId) => {
             }
             artists.push(artistData);
         }
-        console.log(artists);
+        //console.log(artists);
 
         const artistIds = artists.map((a) => a.id);
 
