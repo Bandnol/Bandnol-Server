@@ -11,7 +11,7 @@ export const songScheduler = async () => {
     cron.schedule("* * * * *", async () => {
         try {
             let recomsList = [];
-            let keys = await redisClient.keys("*userRecomsSong*");
+            let keys = await redisClient.keys("*userRecomsSongData*");
             //console.log(keys);
 
             if (keys.length > 0) {
