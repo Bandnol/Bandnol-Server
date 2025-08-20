@@ -264,33 +264,47 @@ export const handleModifyMypage = async (req, res, next) => {
     };
    */
 
+    const toBool = (v) => {
+      if (typeof v === 'boolean') return v;
+      if (v === undefined || v === null) return false;
+      return ['true', '1', 'on', 'yes'].includes(String(v).toLowerCase());
+    };
+
     try {
-        const userId = req.user.id;
-        const files = req.files || {};
-        const fileUrls = {};
-        const rmPhoto = req.body.rmPhoto;
-        const rmBackImg = req.body.rmBackImg;
-        console.log(req.body);
-        if (!rmPhoto && files.photo?.[0]) {
-            const photoFile = files.photo[0];
-            const contentType = photoFile.mimetype || mime.lookup(photoFile.originalname) || "image/jpeg";
-            const key = makeUserImageKey({ userId, role: "photo", originalName: photoFile.originalname });
-            fileUrls.photoUrl = await uploadBufferToS3({ buffer: photoFile.buffer, contentType, key });
-        }
+      const userId = req.user.id;
+      const files = req.files || {};
+      const fileUrls = {};
 
-        if (!rmBackImg && files.backgroundImg?.[0]) {
-            const backImgFile = files.backgroundImg[0];
-            const contentType = backImgFile.mimetype || mime.lookup(backImgFile.originalname) || "image/jpeg";
-            const key = makeUserImageKey({ userId, role: "background", originalName: backImgFile.originalname });
-            fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backImgFile.buffer, contentType, key });
-        }
+      const rmPhoto   = toBool(req.body.rmPhoto);
+      const rmBackImg = toBool(req.body.rmBackImg);
 
-        const dto = myPageModifyRequestDTO(req.body, fileUrls);
+      if (!rmPhoto && files.photo?.[0]) {
+        const photoFile = files.photo[0];
+        const contentType = photoFile.mimetype || mime.lookup(photoFile.originalname) || 'image/jpeg';
+        const key = makeUserImageKey({ userId, role: 'photo', originalName: photoFile.originalname });
+        fileUrls.photoUrl = await uploadBufferToS3({ buffer: photoFile.buffer, contentType, key });
+      }
 
-        const updated = await modifyMypage(userId, dto);
-        res.status(StatusCodes.OK).success(getMyPageResponseDTO(updated));
+      if (!rmBackImg && files.backgroundImg?.[0]) {
+        const backImgFile = files.backgroundImg[0];
+        const contentType = backImgFile.mimetype || mime.lookup(backImgFile.originalname) || 'image/jpeg';
+        const key = makeUserImageKey({ userId, role: 'background', originalName: backImgFile.originalname });
+        fileUrls.backgroundImgUrl = await uploadBufferToS3({ buffer: backImgFile.buffer, contentType, key });
+      }
+
+      const dto = {
+        ...(rmPhoto ? { photo: null } : fileUrls.photoUrl ? { photo: fileUrls.photoUrl } : {}),
+        ...(rmBackImg ? { backgroundImg: null } : fileUrls.backgroundImgUrl ? { backgroundImg: fileUrls.backgroundImgUrl } : {}),
+      };
+
+      if (Object.keys(dto).length === 0) {
+        throw new AppError('E1300', '수정할 데이터가 없습니다.');
+      }
+
+      const updated = await modifyMypage(userId, dto);
+      res.status(StatusCodes.OK).success(getMyPageResponseDTO(updated));
     } catch (err) {
-        next(err);
+      next(err);
     }
 };
 
