@@ -70,7 +70,6 @@ export const userSignup = async (user) => {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     const newUser = await createUser({ ...user, password: hashedPassword });
 
-    await redisClient.sAdd("user:isDeliveredFalse", newUser.id);
     return newUser;
 };
 
@@ -121,14 +120,14 @@ export const modifyUserInfo = async (userId, data) => {
     }
 
     const updates = {};
-    
-    if ('password' in data && data.password !== undefined) {
+
+    if ("password" in data && data.password !== undefined) {
         updates.password = await bcrypt.hash(data.password, 10);
     }
 
     for (const field of allowedFields) {
-    console.log(field);
-    const value = data[field];
+        console.log(field);
+        const value = data[field];
         if (value !== undefined && value !== "") {
             updates[field] = value;
         }
