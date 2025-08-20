@@ -23,6 +23,7 @@ import {
     createUser,
     getUserByEmail,
     modifyUserStatus,
+    createAllowedNotifications,
 } from "../repositories/users.repository.js";
 import { notificationResponseDTO, getMyPageResponseDTO, isConfirmedResponseDTO } from "../dtos/users.dto.js";
 import { Prisma } from "@prisma/client";
@@ -70,6 +71,8 @@ export const userSignup = async (user) => {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     const newUser = await createUser({ ...user, password: hashedPassword });
 
+    // 알림 초기 설정
+    const notifSetting = await createAllowedNotifications(newUser.id);
     return newUser;
 };
 
