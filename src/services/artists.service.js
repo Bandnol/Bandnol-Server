@@ -1,9 +1,4 @@
-import { 
-    QueryParamError, 
-    CursorError, 
-    NotFoundArtistsError, 
-    RequestBodyError,
-} from "../errors.js";
+import { QueryParamError, CursorError, NotFoundArtistsError, RequestBodyError } from "../errors.js";
 import {
     getArtistsByPopularity,
     createLikedArtist,
@@ -11,15 +6,15 @@ import {
     updateInactiveStatusToFalse,
     updateInactiveStatusToTrue,
     getArtistsChannel,
-    getMyLikedArtists
+    getMyLikedArtists,
 } from "../repositories/artists.repository.js";
 import { getArtistsRandomly } from "./musicAPI.service.js";
-import { 
-    artistsResponseDTO, 
-    recomsArtistsResponseDTO, 
+import {
+    artistsResponseDTO,
+    recomsArtistsResponseDTO,
     likedArtistsResponseDTO,
     channelResponseDTO,
-    likedArtistsListResponseDTO
+    likedArtistsListResponseDTO,
 } from "../dtos/artists.dto.js";
 
 export const viewRecomArtists = async (sort, cursor) => {
@@ -71,17 +66,18 @@ export const postLikedArtists = async (body, userId) => {
         typeof body !== "object" ||
         typeof body.id !== "string" ||
         typeof body.name !== "string" ||
-        typeof body.imgUrl !== "string"
+        typeof body.imgUrl !== "string" ||
+        typeof body.inactive !== "boolean"
     ) {
         throw new RequestBodyError("잘못된 request body 형식입니다.");
     }
     let updated;
     const likedArtist = await getUserlikedArtist(body.id, userId);
     if (likedArtist) {
-        if (likedArtist.inactiveStatus) {
-            updated = await updateInactiveStatusToFalse(likedArtist.id);
-        } else {
+        if (body.inactive) {
             updated = await updateInactiveStatusToTrue(likedArtist.id);
+        } else {
+            updated = await updateInactiveStatusToFalse(likedArtist.id);
         }
     } else {
         updated = await createLikedArtist(body, userId);
