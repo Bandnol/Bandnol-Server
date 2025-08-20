@@ -135,6 +135,7 @@ export const addRecoms = async (data, userId) => {
 
     const expireAt = tomorrow.getTime();
     await redisClient.set(`userRecomsSongData:user:${userId}`, JSON.stringify(newUserSongData), { PXAT: expireAt });
+    await redisClient.sAdd("user:isSentSong", userId);
 
     return userRecomsSongResponseDTO(newUserSongData);
 };
@@ -263,14 +264,7 @@ export const sendUserRecoms = async (recomsId, receiverId, senderId) => {
     if (!update) {
         throw new RecommendationNotFoundError("userRecomsSong 테이블에 데이터가 생성되지 않았습니다.");
     }
-    await redisClient.del(`userRecomsSongData:user:${senderId}`);
 
-    // isDelivered true로 변경
-    const isDelivered = await updateIsDeliveredToTrue(receiverId);
-    if (!isDelivered) {
-        throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
-    }
-    await redisClient.sRem("user:isDeliveredFalse", receiverId); // redis set에서 데이터 제거
     return update;
 };
 
@@ -325,12 +319,5 @@ export const sendAIRecoms = async (userId) => {
     }
     //console.log("ai가 userRecomsSong에 생성한 데이터: ", newUserSongData);
 
-    // isDelivered true로 변경
-    await redisClient.sRem("user:isDeliveredFalse", userId); // redis set에서 데이터 제거
-    const isDelivered = await updateIsDeliveredToTrue(userId);
-    if (!isDelivered) {
-        throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
-    }
-    //console.log(isDelivered);
     return newUserSongData;
 };

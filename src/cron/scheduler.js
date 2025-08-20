@@ -1,5 +1,10 @@
 import { sendAIRecoms, sendUserRecoms } from "../services/recoms.service.js";
-import { updateIsDeliveredToFalse, getIsReadFalse } from "../repositories/recoms.repository.js";
+import {
+    updateIsDeliveredToFalse,
+    getIsReadFalse,
+    getUserList,
+    updateIsDeliveredToTrue,
+} from "../repositories/recoms.repository.js";
 import { deleteUserLikedArtists } from "../repositories/artists.repository.js";
 import { createNotifications, getAllowedNotifications, getExpoTokens } from "../repositories/users.repository.js";
 import cron from "node-cron";
@@ -10,9 +15,10 @@ import { sendPushNotification } from "../utils/expo.push.token.js";
 export const songScheduler = async () => {
     cron.schedule("* * * * *", async () => {
         try {
+            console.log("songScheduler: ", new Date());
             let recomsList = [];
             let keys = await redisClient.keys("*userRecomsSongData*");
-            //console.log(keys);
+            console.log("redis cache: ", keys);
 
             if (keys.length > 0) {
                 for (let i = 0; i < keys.length; i++) {
@@ -23,20 +29,28 @@ export const songScheduler = async () => {
             }
             //console.log("recomsList: ", recomsList);
 
-            let userList = await redisClient.sMembers("user:isDeliveredFalse");
-            //console.log("userList: ", userList);
+            const users = await getUserList();
+
+            const userList = users.map((u) => u.id);
+            console.log("userList: ", userList);
+
+            let isDeliveredTrueUsers = [];
+            let sentSongData = [];
 
             for (let user of userList) {
-                let isSent = await redisClient.get(`userRecomsSongData:user:${user}`);
+                const isSent = await redisClient.sIsMember("user:isSentSong", user);
 
                 // 노래를 보내지 않았을 경우
                 if (!isSent) {
+                    console.log(user, " 노래를 보내지 않음");
                     continue;
                 }
 
+                console.log(user, " 노래를 보냄");
+
                 let result;
                 const recoms = recomsList.find((r) => r.senderId !== user);
-                //console.log("recoms: ", recoms);
+                console.log("recoms: ", recoms);
                 if (recoms) {
                     // 보낼 추천 곡이 있는 경우 - 추천 곡 리스트에서 곡을 반환
                     result = await sendUserRecoms(recoms.id, user, recoms.senderId);
@@ -44,13 +58,15 @@ export const songScheduler = async () => {
                     if (idx !== -1) {
                         recomsList.splice(idx, 1);
                     }
-                    //console.log("receiver 등록 완료!");
+                    sentSongData.push(`userRecomsSongData:user:${recoms.senderId}`);
+                    console.log("receiver 등록 완료!");
                 } else {
                     // 보낼 추천 곡이 없는 경우 - AI 생성
-                    //console.log("AI로 노래를 생성합니다.");
+                    console.log("AI로 노래를 생성합니다.");
                     result = await sendAIRecoms(user);
-                    //console.log("AI 노래 생성 완료!");
+                    console.log("AI 노래 생성 완료!");
                 }
+                isDeliveredTrueUsers.push(user);
 
                 // 푸시 알림 보내기
                 const senderNotification = await getAllowedNotifications(result.senderId);
@@ -92,6 +108,20 @@ export const songScheduler = async () => {
                     console.log(notification);
                 }
             }
+            console.log("isDeliveredTrueUsers", isDeliveredTrueUsers);
+            console.log("sentSongData: ", sentSongData);
+            if (isDeliveredTrueUsers) {
+                const isDelivered = await updateIsDeliveredToTrue(isDeliveredTrueUsers);
+                if (!isDelivered) {
+                    throw new NoModifyDataError("userId가 잘못되었습니다. isDelivered가 변경되지 않았습니다.");
+                }
+            }
+
+            if (sentSongData.length > 0) {
+                await redisClient.del(sentSongData);
+                let keys = await redisClient.keys("*userRecomsSongData*");
+                console.log("redis cache after delete: ", keys);
+            }
         } catch (err) {
             console.error(`songScheduler error: ${err}`);
             throw new SchedulerError("songScheduler - 추천 곡 자동 발신 과정에서 에러가 발생했습니다.");
@@ -104,15 +134,10 @@ export const resetIsDeliveredScheduler = async () => {
         "0 0 * * *",
         async () => {
             try {
-                await redisClient.del("user:isDeliveredFalse");
-
-                const userIds = await updateIsDeliveredToFalse();
-
-                if (userIds.length > 0) {
-                    for (const id of userIds) {
-                        await redisClient.sAdd("user:isDeliveredFalse", id);
-                    }
-                }
+                const updated = await updateIsDeliveredToFalse();
+                console.log("업데이트 된 행의 개수: ", updated);
+                console.log(new Date());
+                await redis.del("user:isSentSong");
             } catch (err) {
                 console.error(`resetIsDeliveredScheduler error: ${err}`);
                 throw new SchedulerError(

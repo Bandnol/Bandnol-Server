@@ -116,7 +116,7 @@ export const createRecomsSong = async (recomsSong, artistIds = []) => {
         data: {
             id: recomsSong.id,
             title: recomsSong.title,
-            artistIds : artistIds,
+            artistIds: artistIds,
             artistName: recomsSong.artist,
             imgUrl: recomsSong.albumImg,
             previewUrl: recomsSong.previewUrl,
@@ -328,9 +328,11 @@ export const getListRecomsSong = async (userId) => {
     return listData;
 };
 
-export const updateIsDeliveredToTrue = async (userId) => {
-    const modified = await prisma.user.update({
-        where: { id: userId },
+export const updateIsDeliveredToTrue = async (userIds) => {
+    const modified = await prisma.user.updateMany({
+        where: {
+            id: { in: userIds },
+        },
         data: {
             isDelivered: true,
         },
@@ -354,7 +356,7 @@ export const updateIsDeliveredToFalse = async () => {
             data: { isDelivered: false },
         });
 
-        return userIds;
+        return updatedCount;
     });
 
     return result;
@@ -388,4 +390,37 @@ export const getIsReadFalse = async () => {
     });
 
     return isReadFalse;
+};
+
+export const getUserList = async () => {
+    let now = new Date();
+    let hour = now.getHours();
+    let min = now.getMinutes();
+
+    if (hour < 10) {
+        hour = "0" + hour.toString();
+    } else {
+        hour = hour.toString();
+    }
+
+    if (min < 10) {
+        min = "0" + min.toString();
+    } else {
+        min = min.toString();
+    }
+    let time = hour + min;
+
+    const userList = await prisma.user.findMany({
+        where: {
+            isDelivered: false,
+            recomsTime: {
+                lte: time,
+            },
+            inactiveStatus: false,
+        },
+        select: {
+            id: true,
+        },
+    });
+    return userList;
 };
