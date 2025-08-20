@@ -68,6 +68,7 @@ export const handlePostLikedArtists = async (req, res, next) => {
                         id: { type: "string" },
                         name: { type: "string" },
                         imgUrl: { type: "string" },
+                        inactive: { type: "boolean" }
                     }
                 }
             }
