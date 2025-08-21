@@ -35,6 +35,7 @@ export const likedArtistsResponseDTO = (data) => {
 export const channelResponseDTO = (data) => {
     return {
         id: data.id,
+        artistName : data.artistName,
         imgUrl: data.imgUrl,
         isLiked: data.isLiked,
         likedCount: data.likedCount,

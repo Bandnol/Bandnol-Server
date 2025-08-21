@@ -165,6 +165,7 @@ export const getArtistsChannel = async (userId, artistId) => {
         },
         select: {
             id: true,
+            name: true,
             imgUrl: true
         }
     });
@@ -221,6 +222,7 @@ export const getArtistsChannel = async (userId, artistId) => {
     ]);
 
     return {
+        artistName : artist.name,
         imgUrl: artist.imgUrl ?? null,
         isLiked,
         likedCount,
