@@ -129,11 +129,12 @@ export const addRecoms = async (data, userId) => {
     }
 
     const newUserSongData = await createUserRecomsSong(data, userId, recomsSong);
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setHours(24, 0, 0, 0); // 오늘 자정(내일 0시)으로 설정
 
-    const expireAt = tomorrow.getTime();
+    const KST = 9 * 60 * 60 * 1000;
+    const nowKst = new Date(Date.now() + KST);
+    const nextMidnightKst = new Date(nowKst.getFullYear(), nowKst.getMonth(), nowKst.getDate() + 1, 0, 0, 0, 0);
+    const expireAt = nextMidnightKst.getTime() - KST;
+
     await redisClient.set(`userRecomsSongData:user:${userId}`, JSON.stringify(newUserSongData), { PXAT: expireAt });
     await redisClient.sAdd("user:isSentSong", userId);
 

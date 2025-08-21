@@ -382,6 +382,7 @@ export const updateIsDeliveredToFalse = async () => {
 };
 
 export const getIsReadFalse = async () => {
+    const { startUtc, endUtc } = getUtcWindowForTodayKst();
     const nowUtc = new Date();
     const threeHoursAgoUtc = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
     const fourHoursAgoUtc = new Date(nowUtc.getTime() - 4 * 60 * 60 * 1000);
