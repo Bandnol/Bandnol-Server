@@ -13,7 +13,7 @@ import redisClient from "../utils/redis.js";
 import { sendPushNotification } from "../utils/expo.push.token.js";
 
 export const songScheduler = async () => {
-    cron.schedule("* * * * *", async () => {
+    cron.schedule("*/15 * * * * *", async () => {
         try {
             console.log("songScheduler: ", new Date());
             let recomsList = [];
