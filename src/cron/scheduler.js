@@ -134,10 +134,11 @@ export const resetIsDeliveredScheduler = async () => {
         "0 0 * * *",
         async () => {
             try {
+                await redisClient.del("user:isSentSong");
+                await redisClient.del("*userRecomsSongData*"); // TTL이 반영되지 않는 경우 대비
                 const updated = await updateIsDeliveredToFalse();
                 console.log("업데이트 된 행의 개수: ", updated);
                 console.log(new Date());
-                await redis.del("user:isSentSong");
             } catch (err) {
                 console.error(`resetIsDeliveredScheduler error: ${err}`);
                 throw new SchedulerError(
@@ -178,10 +179,11 @@ export const notReadScheduler = async () => {
         async () => {
             try {
                 const isReadFalse = await getIsReadFalse();
+                console.log(isReadFalse);
                 if (!isReadFalse?.length) return;
-
+                console.log(isReadFalse);
                 const users = isReadFalse.map((item) => item.receiverId);
-
+                console.log("users: ", users);
                 const allowedNotifications = await getAllowedNotifications(users);
                 const allowedMap = new Map(allowedNotifications.map((r) => [r.userId, r]));
 

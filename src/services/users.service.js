@@ -143,6 +143,19 @@ export const modifyUserInfo = async (userId, data) => {
         if (!timeRegex.test(updates.recomsTime)) {
             throw new InvalidRecomsTimeError("추천 시간은 HHmm 형식이어야 합니다.");
         }
+
+        // UTC 변환 후 DB 저장
+        const hours = parseInt(updates.recomsTime.slice(0, 2), 10);
+        const minutes = parseInt(updates.recomsTime.slice(2), 10);
+
+        const kstDate = new Date();
+        kstDate.setHours(hours, minutes, 0, 0);
+
+        const utcHours = kstDate.getUTCHours().toString().padStart(2, "0");
+        const utcMinutes = kstDate.getUTCMinutes().toString().padStart(2, "0");
+
+        updates.recomsTime = `${utcHours}${utcMinutes}`;
+        console.log(updates.recomsTime);
     }
 
     /// 날짜 형식 검사: YYYY-MM-DD
