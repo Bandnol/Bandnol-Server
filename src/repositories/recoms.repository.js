@@ -1,14 +1,29 @@
 import { prisma } from "../configs/db.config.js";
 import { startOfDay, endOfDay } from "date-fns";
 
+function getUtcWindowForTodayKst(now = new Date()) {
+    const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+    const kstNow = new Date(now.getTime() + KST_OFFSET_MS);
+    const y = kstNow.getUTCFullYear();
+    const m = kstNow.getUTCMonth();
+    const d = kstNow.getUTCDate();
+
+    const kstMidnightUTCms = Date.UTC(y, m, d, 0, 0, 0, 0); // "KST 자정"을 UTC 기준으로 표현
+    const startUtc = new Date(kstMidnightUTCms - KST_OFFSET_MS); // KST 00:00 -> UTC
+    const endUtc = new Date(kstMidnightUTCms + 24 * 60 * 60 * 1000 - KST_OFFSET_MS); // 다음날 KST 00:00 -> UTC
+    return { startUtc, endUtc };
+}
+
 // 발신한 추천 곡 반환
 export const getSentRecomsSong = async (userId) => {
+    const { startUtc, endUtc } = getUtcWindowForTodayKst();
+
     const recomsData = await prisma.userRecomsSong.findFirst({
         where: {
             senderId: userId,
             createdAt: {
-                gte: startOfDay(new Date()),
-                lt: endOfDay(new Date()),
+                gte: startUtc,
+                lt: endUtc,
             },
         },
         select: {
@@ -33,12 +48,14 @@ export const getSentRecomsSong = async (userId) => {
 
 // 수신한 추천 곡 반환
 export const getReceivedRecomsSong = async (userId) => {
+    const { startUtc, endUtc } = getUtcWindowForTodayKst();
+
     const recomsData = await prisma.userRecomsSong.findFirst({
         where: {
             receiverId: userId,
             createdAt: {
-                gte: startOfDay(new Date()),
-                lt: endOfDay(new Date()),
+                gte: startUtc,
+                lt: endUtc,
             },
         },
         select: {
@@ -93,13 +110,15 @@ export const findSongByKeyword = async (userId, keyword) => {
 };
 
 export const getSenderToday = async (userId) => {
+    const { startUtc, endUtc } = getUtcWindowForTodayKst();
+
     return await prisma.userRecomsSong.findFirst({
         where: {
             senderId: userId,
             createdAt: {
                 // 오늘과 생성 날짜가 같은지 (하루에 2번 추천하는지 확인 용도)
-                gte: startOfDay(new Date()),
-                lt: endOfDay(new Date()),
+                gte: startUtc,
+                lt: endUtc,
             },
         },
     });
@@ -370,8 +389,8 @@ export const getIsReadFalse = async () => {
     const isReadFalse = await prisma.userRecomsSong.findMany({
         where: {
             createdAt: {
-                gte: startOfDay(new Date()),
-                lt: endOfDay(new Date()),
+                gte: startUtc,
+                lt: endUtc,
             },
             updatedAt: {
                 gte: fourHoursAgoUtc,

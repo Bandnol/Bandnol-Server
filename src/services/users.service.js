@@ -148,15 +148,12 @@ export const modifyUserInfo = async (userId, data) => {
         const hours = parseInt(updates.recomsTime.slice(0, 2), 10);
         const minutes = parseInt(updates.recomsTime.slice(2), 10);
 
-        // KST 기준 Date 객체 생성
         const kstDate = new Date();
         kstDate.setHours(hours, minutes, 0, 0);
 
-        // UTC 기준으로 변환
         const utcHours = kstDate.getUTCHours().toString().padStart(2, "0");
         const utcMinutes = kstDate.getUTCMinutes().toString().padStart(2, "0");
 
-        // DB 저장용 UTC 시간 문자열
         updates.recomsTime = `${utcHours}${utcMinutes}`;
         console.log(updates.recomsTime);
     }
