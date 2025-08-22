@@ -212,7 +212,7 @@ export const getCalendarRecomsSong = async (userId, year, month, status) => {
             gte: startDate,
             lt: endDate,
         },
-        ...(status === "recommending" ? { senderId: userId, receiverId: { not: null } } : { receiverId: userId }),
+        ...(status === "recommending" ? { senderId: userId } : { receiverId: userId }),
     };
 
     const calendarsData = await prisma.userRecomsSong.findMany({
