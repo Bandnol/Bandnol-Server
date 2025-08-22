@@ -13,7 +13,7 @@ import redisClient from "../utils/redis.js";
 import { sendPushNotification } from "../utils/expo.push.token.js";
 
 export const songScheduler = async () => {
-    cron.schedule("* * * * *", async () => {
+    cron.schedule("*/15 * * * * *", async () => {
         try {
             console.log("songScheduler: ", new Date());
             let recomsList = [];
@@ -135,7 +135,6 @@ export const resetIsDeliveredScheduler = async () => {
         async () => {
             try {
                 await redisClient.del("user:isSentSong");
-                await redisClient.del("*userRecomsSongData*"); // TTL이 반영되지 않는 경우 대비
                 const updated = await updateIsDeliveredToFalse();
                 console.log("업데이트 된 행의 개수: ", updated);
                 console.log(new Date());
@@ -179,11 +178,8 @@ export const notReadScheduler = async () => {
         async () => {
             try {
                 const isReadFalse = await getIsReadFalse();
-                console.log(isReadFalse);
                 if (!isReadFalse?.length) return;
-                console.log(isReadFalse);
-                const users = isReadFalse.map((item) => item.receiverId);
-                console.log("users: ", users);
+                const users = isReadFalse.filter((item) => item.receiverId !== null).map((item) => item.receiverId);
                 const allowedNotifications = await getAllowedNotifications(users);
                 const allowedMap = new Map(allowedNotifications.map((r) => [r.userId, r]));
 
@@ -201,6 +197,15 @@ export const notReadScheduler = async () => {
                     const body = `${senderName} 님이 애타게 기다리고 있어요 ㅜ.ㅜ`;
                     const link = "bandnol://music-recommend/receiveRecommend";
 
+                    // 알림 테이블에 저장
+                    try {
+                        await createNotifications(userId, item?.sender?.id, "NOT_RECOMS", link);
+                        console.log("[notReadScheduler]: 알림 생성 완료");
+                    } catch (e) {
+                        console.error(`[notReadScheduler] createNotifications fail user=${userId}`, e);
+                    }
+
+                    // 푸시 알림
                     const tokens = await getExpoTokens(userId);
                     if (!tokens || tokens.length === 0) continue;
 
@@ -208,14 +213,6 @@ export const notReadScheduler = async () => {
                         await sendPushNotification(tokens, title, body, { link: link });
                     } catch (e) {
                         console.error(`[notReadScheduler] push fail user=${userId}`, e);
-                        continue;
-                    }
-
-                    // 알림 테이블에 저장 - 링크 추후 수정 필요
-                    try {
-                        await createNotifications(userId, item?.sender?.id, "NOT_RECOMS", link);
-                    } catch (e) {
-                        console.error(`[notReadScheduler] createNotifications fail user=${userId}`, e);
                     }
                 }
             } catch (err) {

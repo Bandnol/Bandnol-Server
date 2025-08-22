@@ -382,6 +382,7 @@ export const updateIsDeliveredToFalse = async () => {
 };
 
 export const getIsReadFalse = async () => {
+    const { startUtc, endUtc } = getUtcWindowForTodayKst();
     const nowUtc = new Date();
     const threeHoursAgoUtc = new Date(nowUtc.getTime() - 3 * 60 * 60 * 1000);
     const fourHoursAgoUtc = new Date(nowUtc.getTime() - 4 * 60 * 60 * 1000);
@@ -412,34 +413,19 @@ export const getIsReadFalse = async () => {
 };
 
 export const getUserList = async () => {
-    let now = new Date();
-    let hour = now.getHours();
-    let min = now.getMinutes();
-
-    if (hour < 10) {
-        hour = "0" + hour.toString();
-    } else {
-        hour = hour.toString();
-    }
-
-    if (min < 10) {
-        min = "0" + min.toString();
-    } else {
-        min = min.toString();
-    }
-    let time = hour + min;
+    const now = new Date();
+    const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const hour = String(kstNow.getUTCHours()).padStart(2, "0");
+    const min = String(kstNow.getUTCMinutes()).padStart(2, "0");
+    const time = hour + min;
 
     const userList = await prisma.user.findMany({
         where: {
             isDelivered: false,
-            recomsTime: {
-                lte: time,
-            },
+            recomsTime: { lte: time },
             inactiveStatus: false,
         },
-        select: {
-            id: true,
-        },
+        select: { id: true },
     });
     return userList;
 };
