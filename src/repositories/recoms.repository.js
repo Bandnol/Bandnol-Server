@@ -36,6 +36,12 @@ export const getSentRecomsSong = async (userId) => {
                     nickname: true,
                 },
             },
+            sender: {
+                select: {
+                    id: true,
+                    recomsTime: true,
+                },
+            },
             replies: {
                 select: {
                     id: true,
