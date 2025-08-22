@@ -70,6 +70,10 @@ export const receivedRecomsSong = async (userId) => {
     if (!data) {
         return [];
     }
+
+    if (data.isAnoymous) {
+        data.sender.nickname = "익명";
+    }
     return receivedRecomsResponseDTO(data);
 };
 
