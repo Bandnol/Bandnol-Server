@@ -15,6 +15,10 @@ export const sentRecomsResponseDTO = (recomsData) => {
             id: recomsData.receiver?.id || null,
             nickname: recomsData.receiver?.nickname || null,
         },
+        sender: {
+            id: recomsData.sender.id,
+            recomsTime: recomsData.sender.recomsTime,
+        },
         replyId: recomsData.replies?.id || null,
     };
 };
